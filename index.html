@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>ComputTools</title>
+
+  <link rel="stylesheet" href="/index-b986123be1fd284b.css" integrity="sha384&#x2D;R5nvAe8jokeUbp5&#x2B;BXihIeTrgJW8fUtXennQF0YFKBIDvXYRO9tUFBAlhGyKEXMW"/>
+  
+<script type="module" nonce="XatdRcB57yImEzzl5uuy6w==">
+import init, * as bindings from '/computools-51ca1ae5a25d4bcf.js';
+const wasm = await init('/computools-51ca1ae5a25d4bcf_bg.wasm');
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+
+<link rel="modulepreload" href="/computools-51ca1ae5a25d4bcf.js" crossorigin=anonymous integrity="sha384-xPeH+inuLeX2qG7R7XshbVmI3LOr+ZT3OCF5l/pDTWF8Fj7VbrSqh1kGAyeIxs8u"><link rel="preload" href="/computools-51ca1ae5a25d4bcf_bg.wasm" crossorigin=anonymous integrity="sha384-R8VxrOP8j1dO3yMyCqVWnBg7X+HpYOw0gsXFuXIniwO619oXG1kFvKr0vgUWLmhy" as="fetch" type="application/wasm"></head>
+
+<body></body>
+
+</html>
