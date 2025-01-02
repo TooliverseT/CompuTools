@@ -1,4 +1,4 @@
-use super::home::Home;
+use super::{home::Home, navbar::Navbar, page::Page};
 use log::info;
 use yew::prelude::*;
 use yew_router::prelude::*;
@@ -16,6 +16,7 @@ impl Component for Router {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <HashRouter>
+                <Navbar />
                 <div class="main-wrapper">
                     <div class="main-content">
                         <Switch<Route> render={switch} />
@@ -30,6 +31,9 @@ fn switch(routes: Route) -> Html {
     match routes {
         Route::Home => {
             html! { <Home /> }
+        }
+        Route::Page { index } => {
+            html! { <Page index={index.clone()} /> }
         }
         Route::NotFound => {
             html! {
@@ -50,6 +54,8 @@ fn switch(routes: Route) -> Html {
 pub enum Route {
     #[at("/")]
     Home,
+    #[at("/tools/:index")]
+    Page { index: String },
     #[not_found]
     #[at("/404")]
     NotFound,
