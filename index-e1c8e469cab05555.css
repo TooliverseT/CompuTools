@@ -44,6 +44,29 @@ body {
   align-items: center;
 }
 
+.home-title {
+  font-family: "Noto Sans", helvetica, sans-serif;
+  color: var(--color-font);
+  font-weight: 800;
+  font-size: 20px;
+  width: 100%;
+  padding-bottom: 5px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--color-fourth);
+}
+
+.home-all {
+  display: flex;
+}
+
+.ascending-icon {
+  width: 10%;
+  display: flex;
+  justify-content: right;
+  cursor: pointer;
+}
+
 .home-list {
   font-size: 20px;
   font-family: "Noto Sans", helvetica, sans-serif;
@@ -60,79 +83,10 @@ body {
   text-align: center;
   border: 1px solid var(--color-fourth);
   padding: 15px;
-  border-radius: 10px;
+  border-radius: 7px;
 }
 .home-thumbnail:hover {
   text-decoration: none;
   cursor: pointer;
   background-color: var(--color-second);
-}
-
-.navbar-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.navbar-container {
-  height: 6.5vh;
-  display: grid;
-  grid-template-columns: 150px 20fr 1fr;
-  max-width: 1400px;
-  padding-left: 30px;
-  padding-right: 30px;
-  width: 100%;
-}
-
-.navbar-content {
-  display: flex;
-  align-items: center;
-  font-size: 28px;
-  font-family: "Oswald", helvetica, sans-serif;
-  color: var(--color-font);
-}
-.navbar-content.icon {
-  font-size: 16px;
-  justify-content: right;
-}
-.navbar-content.subtitle {
-  font-size: 13px;
-  font-weight: 600;
-  font-family: "JetBrains Mono", helvetica, sans-serif;
-  margin-left: 50px;
-}
-.navbar-content:hover {
-  color: var(--color-font);
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.subtitle-content {
-  padding: 0px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--color-font);
-  margin-left: 10px;
-  margin-right: 10px;
-}
-.subtitle-content:hover {
-  color: var(--color-font);
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.toggle-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.toggle-btn i {
-  color: var(--color-third);
-}
-
-[data-theme=dark] .toggle-btn i {
-  color: var(--color-third);
 }

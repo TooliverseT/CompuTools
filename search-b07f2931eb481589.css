@@ -44,6 +44,29 @@ body {
   align-items: center;
 }
 
+.home-title {
+  font-family: "Noto Sans", helvetica, sans-serif;
+  color: var(--color-font);
+  font-weight: 800;
+  font-size: 20px;
+  width: 100%;
+  padding-bottom: 5px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--color-fourth);
+}
+
+.home-all {
+  display: flex;
+}
+
+.ascending-icon {
+  width: 10%;
+  display: flex;
+  justify-content: right;
+  cursor: pointer;
+}
+
 .home-list {
   font-size: 20px;
   font-family: "Noto Sans", helvetica, sans-serif;
@@ -60,7 +83,7 @@ body {
   text-align: center;
   border: 1px solid var(--color-fourth);
   padding: 15px;
-  border-radius: 10px;
+  border-radius: 7px;
 }
 .home-thumbnail:hover {
   text-decoration: none;
@@ -68,41 +91,46 @@ body {
   background-color: var(--color-second);
 }
 
-.thumbnail {
-  position: relative;
-  border-radius: 0.7rem;
-  overflow: hidden;
-  border: 1px solid var(--color-fourth);
-  height: 80px;
-  aspect-ratio: 1/1;
-}
-
-.thumbnail-img {
-  position: absolute;
-  top: 0;
-  left: 0;
+.search-outer {
+  display: flex;
+  justify-content: right;
+  margin-bottom: 10px;
   width: 100%;
-  height: 100%;
-  z-index: -1;
 }
 
-.thumbnail-contents {
-  padding-left: 5px;
-  padding-right: 5px;
+.search-inner {
+  display: flex;
+  justify-content: center;
 }
 
-.thumbnail-title {
-  padding-top: 10px;
-  color: var(--color-font);
+.search-input {
+  width: 100%;
+  font-family: "Noto Sans", helvetica, sans-serif;
+  line-height: 1.8;
   font-size: 16px;
-  font-family: "Oswald", helvetica, sans-serif;
-  font-weight: 800;
+  padding: 5px 15px 5px 15px;
+  border: 1px solid black;
+  background-color: var(--color-second);
+  color: var(--color-font);
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
-.thumbnail-description {
-  padding-top: 2px;
-  color: var(--color-font);
+.search-button {
+  width: 100px;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  line-height: 1.8;
   font-size: 14px;
-  font-family: "Oswald", helvetica, sans-serif;
-  font-weight: 400;
+  font-weight: 600;
+  border: 1px solid black;
+  color: var(--color-font);
+  background-color: var(--color-fourth);
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.search-button:hover {
+  background-color: var(--color-third);
 }

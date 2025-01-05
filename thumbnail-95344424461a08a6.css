@@ -44,6 +44,29 @@ body {
   align-items: center;
 }
 
+.home-title {
+  font-family: "Noto Sans", helvetica, sans-serif;
+  color: var(--color-font);
+  font-weight: 800;
+  font-size: 20px;
+  width: 100%;
+  padding-bottom: 5px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--color-fourth);
+}
+
+.home-all {
+  display: flex;
+}
+
+.ascending-icon {
+  width: 10%;
+  display: flex;
+  justify-content: right;
+  cursor: pointer;
+}
+
 .home-list {
   font-size: 20px;
   font-family: "Noto Sans", helvetica, sans-serif;
@@ -60,10 +83,49 @@ body {
   text-align: center;
   border: 1px solid var(--color-fourth);
   padding: 15px;
-  border-radius: 10px;
+  border-radius: 7px;
 }
 .home-thumbnail:hover {
   text-decoration: none;
   cursor: pointer;
   background-color: var(--color-second);
+}
+
+.thumbnail {
+  position: relative;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  border: 1px solid var(--color-fourth);
+  height: 80px;
+  aspect-ratio: 1/1;
+}
+
+.thumbnail-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.thumbnail-contents {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.thumbnail-title {
+  padding-top: 10px;
+  color: var(--color-font);
+  font-size: 16px;
+  font-family: "Oswald", helvetica, sans-serif;
+  font-weight: 800;
+}
+
+.thumbnail-description {
+  padding-top: 2px;
+  color: var(--color-font);
+  font-size: 14px;
+  font-family: "Oswald", helvetica, sans-serif;
+  font-weight: 400;
 }
