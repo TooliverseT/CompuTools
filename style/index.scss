@@ -63,6 +63,29 @@ body {
     align-items: center;
 }
 
+.home-title {
+    font-family: $font;
+    color: var(--color-font);
+    font-weight: 800;
+    font-size: 20px;
+    width: 100%;
+    padding-bottom: 5px;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--color-fourth);
+}
+
+.home-all {
+    display: flex;
+}
+
+.ascending-icon {
+    width: 10%;
+    display: flex;
+    justify-content: right;
+    cursor: pointer;
+}
+
 .home-list {
     font-size: 20px;
     font-family: $font;
@@ -79,7 +102,7 @@ body {
     text-align: center;
     border: 1px solid var(--color-fourth);
     padding: 15px;
-    border-radius: 10px;
+    border-radius: 7px;
 
     &:hover {
         text-decoration: none;

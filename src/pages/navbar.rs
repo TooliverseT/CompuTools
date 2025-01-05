@@ -22,7 +22,6 @@ impl Component for Navbar {
         match msg {
             Msg::ToggleTheme => {
                 let mut theme = self.get_theme_from_storage();
-                info!("toggle");
                 // 테마를 토글하고 저장
                 if theme == "light" {
                     theme = "dark".to_string();

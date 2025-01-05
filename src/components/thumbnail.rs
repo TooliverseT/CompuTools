@@ -40,10 +40,7 @@ impl Component for Thumbnail {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         let title = _ctx.props().title.clone();
         let img = _ctx.props().img.clone();
-        info!("{}", img);
         let description = _ctx.props().description.clone();
-        info!("{}", description);
-        let style = format!("background: linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url({}); background-position:center; background-size: cover", img);
 
         html! {
             <>
