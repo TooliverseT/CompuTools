@@ -72,7 +72,6 @@ impl Component for Home {
                         let index = thumbnail.index.clone();
                         let title = thumbnail.title.clone();
                         let description = thumbnail.description.clone();
-                        let img = thumbnail.img.clone();
 
                         let item_onclick = {
                             let title = title.clone();
@@ -81,7 +80,7 @@ impl Component for Home {
                         html! {
                             <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { index: index.clone() }}>
                                 <div onclick={item_onclick}> 
-                                    <Thumbnail title={title.clone()} description={description.clone()} img={img.clone()} />
+                                    <Thumbnail title={title.clone()} description={description.clone()} />
                                 </div>
                             </Link<Route>>
                         }
@@ -98,7 +97,6 @@ impl Component for Home {
                             let index = thumbnail.index.clone();
                             let title = thumbnail.title.clone();
                             let description = thumbnail.description.clone();
-                            let img = thumbnail.img.clone();
 
                             let item_onclick = {
                                 let title = title.clone();
@@ -107,7 +105,7 @@ impl Component for Home {
                             html! {
                                 <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { index: index.clone() }}>
                                     <div onclick={item_onclick}>
-                                        <Thumbnail title={title.clone()} description={description.clone()} img={img.clone()} />
+                                        <Thumbnail title={title.clone()} description={description.clone()} />
                                     </div>
                                 </Link<Route>>
                             }
@@ -176,25 +174,32 @@ impl Component for Home {
 
         html! {
             <div class="home-wrapper">
+                <div class="home-welcome">
+                    { "Welcome to CompuTools" }
+                </div>
+                <div class="home-intro">
+                    { "Empowering engineers with tools to solve problems faster and innovate smarter."}
+                </div>
                 <div class="home-title">
                     { "Recently Used" }
                 </div>
                 <div class="home-list">
                     { for recent_items }
                 </div>
-                <div class="home-title home-all">
-                    <div style="width: 90%;">
-                    { "All" }
+                <div style="display: grid; grid-template-columns: 2.4fr 1fr; width: 100%; margin-top: 20px;">
+                    <div class="home-title home-all">
+                        <div style="width: 90%;">
+                        { "All" }
+                        </div>
+                        <div onclick={ascending} class="ascending-icon">
+                            if self.asc == "asc".to_string() {
+                                <i class="fa-solid fa-arrow-up-z-a"></i>
+                            } else {
+                                <i class="fa-solid fa-arrow-down-z-a"></i>
+                            }
+                        </div>
                     </div>
-                    <div onclick={ascending} class="ascending-icon">
-                        if self.asc == "asc".to_string() {
-                            <i class="fa-solid fa-arrow-up-z-a"></i>
-                        } else {
-                            <i class="fa-solid fa-arrow-down-z-a"></i>
-                        }
-                    </div>
-                </div>
-                <div class="search-outer">
+                    <div class="search-outer">
                         <div class="search-inner">
                             <input
                                 // ref={self.input_ref.clone()}
@@ -208,6 +213,7 @@ impl Component for Home {
                             </button>
                         </div>
                     </div>
+                </div>
                 <div class="home-list">
                     { for thumbnail }
                 </div>
@@ -223,13 +229,11 @@ impl Component for Home {
                     index: "unixtime".to_string(),            // URL INDEX
                     title: "unixtime".to_string(),            // THUMBNAIL TITLE
                     description: "unixtime".to_string(),      // THUMBNAIL DESCRIPTION
-                    img: "/assets/img/biped.png".to_string(), // IMG URL
                 },
                 Thumbnail {
                     index: "quaternion".to_string(),          // URL INDEX
                     title: "quaternion".to_string(),          // THUMBNAIL TITLE
                     description: "quaternion".to_string(),    // THUMBNAIL DESCRIPTION
-                    img: "/assets/img/biped.png".to_string(), // IMG URL
                 },
             ];
             link.send_message(Msg::Init(list));
