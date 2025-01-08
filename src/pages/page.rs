@@ -7,7 +7,7 @@ pub struct Page {}
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub index: String,
+    pub title: String,
 }
 
 pub enum Msg {
@@ -27,18 +27,23 @@ impl Component for Page {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
-        let index = _ctx.props().index.clone();
+        let title = _ctx.props().title.clone();
 
-        let content = match index.as_str() {
+        let content = match title.as_str() {
             "unixtime" => html! { <Unixtime /> },
             "quaternion" => html! { <Quaternion /> },
             _ => html! { <p>{ "Content not found" }</p> },
         };
-        self.add_item(index.as_str());
+        self.add_item(title.as_str());
 
         html! {
                 <>
-                    <div> { content } </div>
+                    <div class="home-wrapper">
+                        <div class="home-welcome">
+                            { title }
+                        </div>
+                        <div> { content } </div>
+                    </div>
                 </>
         }
     }

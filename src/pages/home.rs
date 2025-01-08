@@ -62,12 +62,11 @@ impl Component for Home {
                 let html_list: Vec<Html> = list
                     .iter()
                     .map(|thumbnail| {
-                        let index = thumbnail.index.clone();
                         let title = thumbnail.title.clone();
                         let description = thumbnail.description.clone();
 
                         html! {
-                            <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { index: index.clone() }}>
+                            <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { title: title.clone() }}>
                                 <Thumbnail title={title.clone()} description={description.clone()} />
                             </Link<Route>>
                         }
@@ -81,12 +80,11 @@ impl Component for Home {
                     .filter_map(|item_title| {
                         // `html_list`에서 일치하는 제목의 항목 찾기
                         self.list.iter().find(|thumbnail| &thumbnail.title == item_title).map(|thumbnail| {
-                            let index = thumbnail.index.clone();
                             let title = thumbnail.title.clone();
                             let description = thumbnail.description.clone();
 
                             html! {
-                                <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { index: index.clone() }}>
+                                <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { title: title.clone() }}>
                                     <Thumbnail title={title.clone()} description={description.clone()} />
                                 </Link<Route>>
                             }
@@ -159,7 +157,7 @@ impl Component for Home {
                     { "Welcome to CompuTools" }
                 </div>
                 <div class="home-intro">
-                    { "Empowering engineers with tools to solve problems faster and innovate smarter."}
+                    { "Engineering made easy for everyone! Simplify calculations with our smart, powerful tools—anytime, anywhere."}
                 </div>
                 <div class="home-title">
                     { "Recently Used" }
@@ -207,12 +205,10 @@ impl Component for Home {
             let link = _ctx.link().clone();
             let list: Vec<Thumbnail> = vec![
                 Thumbnail {
-                    index: "unixtime".to_string(),       // URL INDEX
                     title: "unixtime".to_string(),       // THUMBNAIL TITLE
                     description: "unixtime".to_string(), // THUMBNAIL DESCRIPTION
                 },
                 Thumbnail {
-                    index: "quaternion".to_string(),       // URL INDEX
                     title: "quaternion".to_string(),       // THUMBNAIL TITLE
                     description: "quaternion".to_string(), // THUMBNAIL DESCRIPTION
                 },

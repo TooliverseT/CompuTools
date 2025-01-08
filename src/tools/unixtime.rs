@@ -22,7 +22,9 @@ impl Component for Unixtime {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
                 <>
-                    <p> {"Unixtime"} </p>
+                    <div class="home-intro">
+                        { "Unixtime Description" }
+                    </div>
                 </>
         }
     }

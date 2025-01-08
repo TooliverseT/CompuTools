@@ -32,8 +32,8 @@ fn switch(routes: Route) -> Html {
         Route::Home => {
             html! { <Home /> }
         }
-        Route::Page { index } => {
-            html! { <Page index={index.clone()} /> }
+        Route::Page { title } => {
+            html! { <Page title={title.clone()} /> }
         }
         Route::NotFound => {
             html! {
@@ -54,8 +54,8 @@ fn switch(routes: Route) -> Html {
 pub enum Route {
     #[at("/")]
     Home,
-    #[at("/tools/:index")]
-    Page { index: String },
+    #[at("/tools/:title")]
+    Page { title: String },
     #[not_found]
     #[at("/404")]
     NotFound,

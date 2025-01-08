@@ -5,7 +5,6 @@ use yew::prelude::*;
 
 #[derive(Clone)]
 pub struct Thumbnail {
-    pub index: String,
     pub title: String,
     pub description: String,
 }
@@ -24,7 +23,6 @@ impl Component for Thumbnail {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            index: "".to_string(),
             title: "".to_string(),
             description: "".to_string(),
         }

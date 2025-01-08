@@ -22,7 +22,9 @@ impl Component for Quaternion {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
                 <>
-                    <p> {"Quaternion"} </p>
+                    <div class="home-intro">
+                        { "Quaternion Description" }
+                    </div>
                 </>
         }
     }
