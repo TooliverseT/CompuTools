@@ -19,7 +19,6 @@ pub struct Home {
 
 pub enum Msg {
     Init(Vec<Thumbnail>),
-    AddItem(String),
     Update(Vec<Thumbnail>),
     Input(String),
     Search,
@@ -50,10 +49,6 @@ impl Component for Home {
                 cb.emit(self.list.clone());
                 true
             }
-            Msg::AddItem(item) => {
-                self.add_item(&item);
-                true
-            }
             Msg::Update(thumbnail) => {
                 self.last_list = thumbnail.clone();
                 let mut list = thumbnail;
@@ -64,8 +59,6 @@ impl Component for Home {
                     list.sort_by(|a, b| b.title.to_lowercase().cmp(&a.title.to_lowercase()));
                 }
 
-
-                let onclick = _ctx.link().callback(|title: String| Msg::AddItem(title));
                 let html_list: Vec<Html> = list
                     .iter()
                     .map(|thumbnail| {
@@ -73,15 +66,9 @@ impl Component for Home {
                         let title = thumbnail.title.clone();
                         let description = thumbnail.description.clone();
 
-                        let item_onclick = {
-                            let title = title.clone();
-                            onclick.clone().reform(move |_| title.clone())
-                        };
                         html! {
                             <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { index: index.clone() }}>
-                                <div onclick={item_onclick}> 
-                                    <Thumbnail title={title.clone()} description={description.clone()} />
-                                </div>
+                                <Thumbnail title={title.clone()} description={description.clone()} />
                             </Link<Route>>
                         }
                     })
@@ -98,15 +85,9 @@ impl Component for Home {
                             let title = thumbnail.title.clone();
                             let description = thumbnail.description.clone();
 
-                            let item_onclick = {
-                                let title = title.clone();
-                                onclick.clone().reform(move |_| title.clone())
-                            };
                             html! {
                                 <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { index: index.clone() }}>
-                                    <div onclick={item_onclick}>
-                                        <Thumbnail title={title.clone()} description={description.clone()} />
-                                    </div>
+                                    <Thumbnail title={title.clone()} description={description.clone()} />
                                 </Link<Route>>
                             }
                         })
@@ -226,14 +207,14 @@ impl Component for Home {
             let link = _ctx.link().clone();
             let list: Vec<Thumbnail> = vec![
                 Thumbnail {
-                    index: "unixtime".to_string(),            // URL INDEX
-                    title: "unixtime".to_string(),            // THUMBNAIL TITLE
-                    description: "unixtime".to_string(),      // THUMBNAIL DESCRIPTION
+                    index: "unixtime".to_string(),       // URL INDEX
+                    title: "unixtime".to_string(),       // THUMBNAIL TITLE
+                    description: "unixtime".to_string(), // THUMBNAIL DESCRIPTION
                 },
                 Thumbnail {
-                    index: "quaternion".to_string(),          // URL INDEX
-                    title: "quaternion".to_string(),          // THUMBNAIL TITLE
-                    description: "quaternion".to_string(),    // THUMBNAIL DESCRIPTION
+                    index: "quaternion".to_string(),       // URL INDEX
+                    title: "quaternion".to_string(),       // THUMBNAIL TITLE
+                    description: "quaternion".to_string(), // THUMBNAIL DESCRIPTION
                 },
             ];
             link.send_message(Msg::Init(list));
@@ -253,28 +234,6 @@ impl Home {
         }
     }
 
-    pub fn add_item(&self, item: &str) {
-        let mut items = self.get_recent_items();
-
-        // 중복 제거 및 리스트 갱신
-        if let Some(pos) = items.iter().position(|x| x == item) {
-            items.remove(pos);
-        }
-        items.insert(0, item.to_string());
-
-        // 최대 크기를 초과하는 경우 초과 항목 제거
-        if items.len() > 6 {
-            items.truncate(6);
-        }
-
-        // JSON으로 직렬화하여 저장
-        let json = serde_json::to_string(&items).unwrap();
-
-        let window = window().unwrap();
-        let local_storage = window.local_storage().unwrap().unwrap();
-        local_storage.set_item("recent-item", &json).unwrap();
-    }
-
     pub fn save_sort_order_to_storage(&self, sort_order: &str) {
         let window = window().unwrap();
         let local_storage = window.local_storage().unwrap().unwrap();
@@ -284,6 +243,9 @@ impl Home {
     pub fn get_sort_order_from_storage(&self) -> String {
         let window = window().unwrap();
         let local_storage = window.local_storage().unwrap().unwrap();
-        local_storage.get_item("sort_order").unwrap_or(Some("asc".to_string())).unwrap_or_else(|| "asc".to_string())
+        local_storage
+            .get_item("sort_order")
+            .unwrap_or(Some("asc".to_string()))
+            .unwrap_or_else(|| "asc".to_string())
     }
 }
