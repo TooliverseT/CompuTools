@@ -6,13 +6,11 @@ use yew::prelude::*;
 #[derive(Clone)]
 pub struct Thumbnail {
     pub title: String,
-    pub description: String,
 }
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub title: String,
-    pub description: String,
 }
 
 pub enum Msg {}
@@ -24,7 +22,6 @@ impl Component for Thumbnail {
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
             title: "".to_string(),
-            description: "".to_string(),
         }
     }
 
@@ -34,17 +31,11 @@ impl Component for Thumbnail {
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
         let title = _ctx.props().title.clone();
-        let description = _ctx.props().description.clone();
 
         html! {
             <>
                 <div class="thumbnail-contents">
-                    <div class="thumbnail-title">
-                        { title }
-                    </div>
-                    <div class="thumbnail-description">
-                        { description }
-                    </div>
+                    { title }
                 </div>
             </>
         }

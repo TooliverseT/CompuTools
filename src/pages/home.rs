@@ -63,11 +63,10 @@ impl Component for Home {
                     .iter()
                     .map(|thumbnail| {
                         let title = thumbnail.title.clone();
-                        let description = thumbnail.description.clone();
 
                         html! {
                             <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { title: title.clone() }}>
-                                <Thumbnail title={title.clone()} description={description.clone()} />
+                                <Thumbnail title={title.clone()} />
                             </Link<Route>>
                         }
                     })
@@ -81,11 +80,10 @@ impl Component for Home {
                         // `html_list`에서 일치하는 제목의 항목 찾기
                         self.list.iter().find(|thumbnail| &thumbnail.title == item_title).map(|thumbnail| {
                             let title = thumbnail.title.clone();
-                            let description = thumbnail.description.clone();
 
                             html! {
                                 <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { title: title.clone() }}>
-                                    <Thumbnail title={title.clone()} description={description.clone()} />
+                                    <Thumbnail title={title.clone()} />
                                 </Link<Route>>
                             }
                         })
@@ -204,13 +202,11 @@ impl Component for Home {
         if first_render {
             let link = _ctx.link().clone();
             let list: Vec<Thumbnail> = vec![
+                // Thumbnail {
+                //     title: "unixtime".to_string(),       // THUMBNAIL TITLE
+                // },
                 Thumbnail {
-                    title: "unixtime".to_string(),       // THUMBNAIL TITLE
-                    description: "unixtime".to_string(), // THUMBNAIL DESCRIPTION
-                },
-                Thumbnail {
-                    title: "quaternion".to_string(),       // THUMBNAIL TITLE
-                    description: "quaternion".to_string(), // THUMBNAIL DESCRIPTION
+                    title: "Quaternion to Euler Angle".to_string(), // THUMBNAIL TITLE
                 },
             ];
             link.send_message(Msg::Init(list));

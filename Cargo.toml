@@ -17,4 +17,5 @@ serde_yaml = "0.9.34+deprecated"
 regex = "1.10.5"
 wasm-logger = "0.2.0"
 log = "0.4.22"
-web-sys = "0.3.69"
+web-sys = { version = "0.3.69", features = ["HtmlSelectElement", "HtmlInputElement", "EventTarget"] }
+nalgebra = "0.29"

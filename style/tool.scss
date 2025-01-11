@@ -1,0 +1,97 @@
+@import 'index';
+
+.tool-wrapper {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 50px;
+    padding-left: 150px;
+    padding-right: 150px;
+    width: 100%;
+}
+
+.tool-change {
+    display: flex;
+    color: var(--color-fourth);
+    justify-content: right;
+    margin: 5px 10px 15px 0px;
+    cursor: pointer;
+}
+
+.tool-title {
+    font-family: $font-theme;
+    color: var(--color-fourth);
+    font-size: 1.9em;
+    font-weight: 400;
+}
+
+.tool-intro {
+    font-family: $font-theme;
+    color: var(--color-font);
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+.tool-container {
+    width: 100%;
+    height: fit-content;
+    font-family: $font-theme;
+    color: var(--color-font);
+    
+    padding: 10px;
+
+    background-color: var(--color-second);
+    border-radius: 15px;
+}
+
+.tool-inner {
+    background-color: var(--color-third);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.tool-subtitle {
+    font-size: 16px;
+    font-family: $font-contents;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--color-font);
+    margin-bottom: 5px;
+}
+
+.input-container {
+    display: flex; /* grid 대신 flex 사용 */
+    width: 100%;
+    border: 2px solid var(--color-second);
+    border-radius: 8px;
+    overflow: hidden; /* 내부 요소들이 border-radius를 넘어가지 않도록 */
+    background-color: var(--color-first);
+    transition: border-color 0.3s;
+}
+
+.input-container:focus-within {
+    border: 2px solid var(--color-fourth) !important;
+}
+
+.input-column {
+    font-family: $font-theme;
+    flex: 7;
+
+    input[type=number] {
+        margin-top: none !important;
+        border: none !important;
+    }
+}
+
+.result-column {
+    flex: 3;
+    display: flex;
+    align-items: center;
+    padding: 5px 15px;
+    border-left: 2px solid var(--color-second); /* 구분선 추가 */
+    color: var(--color-subfont);
+}
+
+.calculated-value {
+    font-size: 14px;
+    font-family: $font-theme;
+}
