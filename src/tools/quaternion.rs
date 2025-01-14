@@ -171,8 +171,17 @@ impl Component for ToolQuaternion {
                             </div>
                         </div>
                         <div class="tool-container">
-                            <div onclick={on_convert} class="tool-change">
-                                <i class="fa-solid fa-arrows-rotate"></i>
+                            <div style="display: flex; align-items: center; padding-left: 20px; padding-right: 20px; margin-bottom: 10px; margin-top: 5px;">
+                                <div style="width: 90%;">
+                                    if !convert {
+                                        {"Quaternion to Euler"}
+                                    } else {
+                                        {"Euler to Quaternion"}
+                                    }
+                                </div>
+                                <div onclick={on_convert} class="tool-change" style="width: 10%;">
+                                    <i class="fa-solid fa-arrows-rotate"></i>
+                                </div>
                             </div>
                             if !convert {
                                 <div class="tool-inner">
