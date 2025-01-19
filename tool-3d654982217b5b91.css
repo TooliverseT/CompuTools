@@ -155,6 +155,76 @@ input[type=number]:focus {
   border: 2px solid var(--color-fourth) !important;
 }
 
+/* Chrome, Safari, Edge, Opera */
+input[type=text]::-webkit-inner-spin-button,
+input[type=text]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=text] {
+  -moz-appearance: textfield;
+}
+
+/* Optional styling */
+input[type=text] {
+  width: 100%;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  line-height: 1.8;
+  font-size: 16px;
+  padding: 5px 15px 5px 15px;
+  background-color: var(--color-first);
+  color: var(--color-font);
+  border-radius: 8px;
+  border: 2px solid var(--color-second) !important;
+  overflow: auto;
+  transition: border-color 0.3s;
+}
+
+input[type=text]::placeholder {
+  color: var(--color-subfont);
+}
+
+input[type=text]:focus {
+  border: 2px solid var(--color-fourth) !important;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input[type=datetime-local]::-webkit-inner-spin-button,
+input[type=datetime-local]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=datetime-local] {
+  -moz-appearance: textfield;
+}
+
+/* Optional styling */
+input[type=datetime-local] {
+  width: 100%;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  line-height: 1.8;
+  font-size: 16px;
+  padding: 5px 15px 5px 15px;
+  background-color: var(--color-first);
+  color: var(--color-font);
+  border-radius: 8px;
+  border: 2px solid var(--color-second) !important;
+  overflow: auto;
+  transition: border-color 0.3s;
+}
+
+input[type=datetime-local]::placeholder {
+  color: var(--color-subfont);
+}
+
+input[type=datetime-local]:focus {
+  border: 2px solid var(--color-fourth) !important;
+}
+
 .tool-wrapper {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
@@ -172,6 +242,8 @@ input[type=number]:focus {
 }
 
 .tool-title {
+  display: flex;
+  justify-content: center;
   font-family: "JetBrains Mono", helvetica, sans-serif;
   color: var(--color-fourth);
   font-size: 1.9em;
@@ -245,4 +317,58 @@ input[type=number]:focus {
 .calculated-value {
   font-size: 14px;
   font-family: "JetBrains Mono", helvetica, sans-serif;
+}
+
+.datetime-input {
+  position: relative;
+  width: 200px;
+}
+
+.datetime-input input[type=datetime-local] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* input의 캘린더 아이콘 스타일링 (브라우저마다 다를 수 있음) */
+.datetime-input input[type=datetime-local]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+.formatted-date {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #666;
+}
+
+.unix-current {
+  font-family: "Oswald", helvetica, sans-serif;
+  font-size: 40px;
+  font-style: italic;
+}
+
+.date-current {
+  font-family: "Noto Sans", helvetica, sans-serif;
+  font-size: 20px;
+  font-style: italic;
+}
+
+.date-timezone select {
+  appearance: none;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  padding: 5px 15px 5px 15px;
+  background-color: var(--color-third);
+  color: var(--color-font);
+  border: 2px solid var(--color-second) !important;
+}
+
+.date-timezone select:focus {
+  outline: none;
+}
+
+.date-timezone select:hover {
+  border: 2px solid var(--color-fourth) !important;
 }

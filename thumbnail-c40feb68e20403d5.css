@@ -154,50 +154,97 @@ input[type=number]:focus {
   border: 2px solid var(--color-fourth) !important;
 }
 
-.search-outer {
-  display: flex;
-  justify-content: right;
-  align-items: flex-end;
-  width: 100%;
-  height: 50px;
-  margin-top: 10px;
-  padding-left: 10px;
+/* Chrome, Safari, Edge, Opera */
+input[type=text]::-webkit-inner-spin-button,
+input[type=text]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-.search-inner {
-  display: flex;
-  justify-content: center;
-  width: 100%;
+/* Firefox */
+input[type=text] {
+  -moz-appearance: textfield;
 }
 
-.search-input {
+/* Optional styling */
+input[type=text] {
   width: 100%;
-  font-family: "Noto Sans", helvetica, sans-serif;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
   line-height: 1.8;
   font-size: 16px;
   padding: 5px 15px 5px 15px;
-  border: 1px solid black;
-  background-color: var(--color-second);
+  background-color: var(--color-first);
   color: var(--color-font);
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
+  border-radius: 8px;
+  border: 2px solid var(--color-second) !important;
+  overflow: auto;
+  transition: border-color 0.3s;
 }
 
-.search-button {
-  width: 100px;
+input[type=text]::placeholder {
+  color: var(--color-subfont);
+}
+
+input[type=text]:focus {
+  border: 2px solid var(--color-fourth) !important;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input[type=datetime-local]::-webkit-inner-spin-button,
+input[type=datetime-local]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=datetime-local] {
+  -moz-appearance: textfield;
+}
+
+/* Optional styling */
+input[type=datetime-local] {
+  width: 100%;
   font-family: "JetBrains Mono", helvetica, sans-serif;
   line-height: 1.8;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid black;
+  font-size: 16px;
+  padding: 5px 15px 5px 15px;
+  background-color: var(--color-first);
   color: var(--color-font);
-  background-color: var(--color-fourth);
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  padding-left: 15px;
-  padding-right: 15px;
+  border-radius: 8px;
+  border: 2px solid var(--color-second) !important;
+  overflow: auto;
+  transition: border-color 0.3s;
 }
 
-.search-button:hover {
-  background-color: var(--color-third);
+input[type=datetime-local]::placeholder {
+  color: var(--color-subfont);
+}
+
+input[type=datetime-local]:focus {
+  border: 2px solid var(--color-fourth) !important;
+}
+
+.thumbnail {
+  position: relative;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  border: 1px solid var(--color-fourth);
+  height: 80px;
+  aspect-ratio: 1/1;
+}
+
+.thumbnail-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.thumbnail-contents {
+  color: var(--color-font);
+  font-size: 16px;
+  font-family: "Oswald", helvetica, sans-serif;
+  font-weight: 800;
 }
