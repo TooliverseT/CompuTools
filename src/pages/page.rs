@@ -1,4 +1,4 @@
-use crate::tools::{quaternion::ToolQuaternion, unixtime::Unixtime};
+use crate::tools::{quaternion::ToolQuaternion, unixtime::ToolUnixtime};
 use log::info;
 use web_sys::window;
 use yew::prelude::*;
@@ -30,8 +30,8 @@ impl Component for Page {
         let title = _ctx.props().title.clone();
 
         let content = match title.as_str() {
-            "unixtime" => html! { <Unixtime /> },
-            "Quaternion to Euler Angle" => html! { <ToolQuaternion /> },
+            "Unix Timestamp Converter" => html! { <ToolUnixtime /> },
+            "Quaternion Converter" => html! { <ToolQuaternion /> },
             _ => html! { <p>{ "Content not found" }</p> },
         };
         self.add_item(title.as_str());

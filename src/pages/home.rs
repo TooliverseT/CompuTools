@@ -202,11 +202,11 @@ impl Component for Home {
         if first_render {
             let link = _ctx.link().clone();
             let list: Vec<Thumbnail> = vec![
-                // Thumbnail {
-                //     title: "unixtime".to_string(),       // THUMBNAIL TITLE
-                // },
                 Thumbnail {
-                    title: "Quaternion to Euler Angle".to_string(), // THUMBNAIL TITLE
+                    title: "Unix Timestamp Converter".to_string(),
+                },
+                Thumbnail {
+                    title: "Quaternion Converter".to_string(),
                 },
             ];
             link.send_message(Msg::Init(list));

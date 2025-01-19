@@ -17,6 +17,8 @@
 }
 
 .tool-title {
+    display: flex;
+    justify-content: center;
     font-family: $font-theme;
     color: var(--color-fourth);
     font-size: 1.9em;
@@ -93,4 +95,58 @@
 .calculated-value {
     font-size: 14px;
     font-family: $font-theme;
+}
+
+.datetime-input {
+    position: relative;
+    width: 200px;
+}
+
+.datetime-input input[type="datetime-local"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* input의 캘린더 아이콘 스타일링 (브라우저마다 다를 수 있음) */
+.datetime-input input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+.formatted-date {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #666;
+}
+
+.unix-current {
+    font-family: $font-title;
+    font-size: 40px;
+    font-style: italic;
+}
+
+.date-current {
+    font-family: $font;
+    font-size: 20px;
+    font-style: italic;
+}
+
+.date-timezone select {
+    appearance: none;
+    font-family: $font-theme;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    padding: 5px 15px 5px 15px;
+    background-color: var(--color-third);
+    color: var(--color-font);
+    border: 2px solid var(--color-second) !important;
+}
+
+.date-timezone select:focus {
+    outline: none;
+}
+
+.date-timezone select:hover {
+    border: 2px solid var(--color-fourth) !important;
 }

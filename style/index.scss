@@ -173,3 +173,75 @@ input[type=number]::placeholder {
 input[type=number]:focus {
     border: 2px solid var(--color-fourth) !important;
 }
+
+
+/* Chrome, Safari, Edge, Opera */
+input[type=text]::-webkit-inner-spin-button, 
+input[type=text]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=text] {
+    -moz-appearance: textfield;
+}
+
+/* Optional styling */
+input[type=text] {
+    width: 100%;
+    font-family: $font-theme;
+    line-height: 1.8;
+    font-size: 16px;
+    padding: 5px 15px 5px 15px;
+    background-color: var(--color-first);
+    color: var(--color-font);
+    border-radius: 8px;
+    border: 2px solid var(--color-second) !important;
+    overflow: auto;
+    transition: border-color 0.3s;
+}
+
+input[type=text]::placeholder {
+    color: var(--color-subfont);
+}
+
+input[type=text]:focus {
+    border: 2px solid var(--color-fourth) !important;
+}
+
+
+/* Chrome, Safari, Edge, Opera */
+input[type=datetime-local]::-webkit-inner-spin-button, 
+input[type=datetime-local]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=datetime-local] {
+    -moz-appearance: textfield;
+}
+
+/* Optional styling */
+input[type=datetime-local] {
+    width: 100%;
+    font-family: $font-theme;
+    line-height: 1.8;
+    font-size: 16px;
+    padding: 5px 15px 5px 15px;
+    background-color: var(--color-first);
+    color: var(--color-font);
+    border-radius: 8px;
+    border: 2px solid var(--color-second) !important;
+    overflow: auto;
+    transition: border-color 0.3s;
+}
+
+input[type=datetime-local]::placeholder {
+    color: var(--color-subfont);
+}
+
+input[type=datetime-local]:focus {
+    border: 2px solid var(--color-fourth) !important;
+}

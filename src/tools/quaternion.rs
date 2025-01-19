@@ -145,7 +145,7 @@ impl Component for ToolQuaternion {
                     <div class="tool-wrapper">
                         <div>
                             <div class="tool-title">
-                                { "Quaternion to Euler Angle" }
+                                { "Quaternion Converter" }
                             </div>
                             <div class="tool-intro">
                                 <p>
