@@ -18,6 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap"
     rel="stylesheet">
 
+
   <link data-trunk rel="sass" href="style/index.scss" />
   <link data-trunk rel="sass" href="style/navbar.scss" />
   <link data-trunk rel="sass" href="style/search.scss" />
@@ -35,6 +36,14 @@
         const offset = new Date().getTimezoneOffset();
         return { timeZone, offset };
     }
+
+    (function() {
+        let redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.href) {
+            history.replaceState(null, null, redirect);
+        }
+    })();
 </script>
 </head>
 
