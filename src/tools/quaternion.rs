@@ -454,6 +454,12 @@ impl Component for ToolQuaternion {
                 let document = window.document();
                 if let Some(doc) = document {
                     doc.set_title("Quaternion Converter | CompuTools");
+
+                    if let Some(meta_tag) =
+                        doc.query_selector("meta[name=\"description\"]").unwrap()
+                    {
+                        meta_tag.set_attribute("content", "This page provides a simple and intuitive tool for converting quaternions to Euler angles roll, pitch, yaw and vice versa.").unwrap();
+                    }
                 }
             }
         }

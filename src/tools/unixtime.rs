@@ -344,6 +344,12 @@ impl Component for ToolUnixtime {
                 let document = window.document();
                 if let Some(doc) = document {
                     doc.set_title("Unix Timestamp Converter | CompuTools");
+
+                    if let Some(meta_tag) =
+                        doc.query_selector("meta[name=\"description\"]").unwrap()
+                    {
+                        meta_tag.set_attribute("content", "This tool allows you to convert Unix Timestamps to Date & Time formats and vice versa.").unwrap();
+                    }
                 }
             }
         }

@@ -204,6 +204,12 @@ impl Component for Home {
                 let document = window.document();
                 if let Some(doc) = document {
                     doc.set_title("CompuTools");
+
+                    if let Some(meta_tag) =
+                        doc.query_selector("meta[name=\"description\"]").unwrap()
+                    {
+                        meta_tag.set_attribute("content", "CompuTools: Engineering made easy for everyone! Simplify calculations with CompuTools' smart, powerful tools—anytime, anywhere.").unwrap();
+                    }
                 }
             }
 
