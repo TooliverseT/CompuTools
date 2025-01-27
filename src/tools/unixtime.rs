@@ -7,7 +7,8 @@ use js_sys::Date;
 use log::info;
 use std::time::Duration;
 use wasm_bindgen::prelude::*;
-use web_sys::{HtmlInputElement, HtmlSelectElement};
+use wasm_bindgen_futures::{spawn_local, JsFuture};
+use web_sys::{window, HtmlInputElement, HtmlSelectElement};
 use yew::prelude::*;
 
 #[wasm_bindgen]
@@ -41,6 +42,7 @@ pub enum Msg {
     UpdateDatetime(String),
     Convert,
     Tick,
+    CopyToClipboard(String),
 }
 
 impl Component for ToolUnixtime {
@@ -111,7 +113,6 @@ impl Component for ToolUnixtime {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::TimezoneSelect(value) => {
-                info!("{}", value.clone());
                 self.selected_timezone = value;
 
                 self.output_datetime = ToolUnixtime::unixtime_to_datetime_str_form1(
@@ -149,13 +150,11 @@ impl Component for ToolUnixtime {
                 true
             }
             Msg::UpdateDatetime(value) => {
-                info!("{}", value);
                 let mut value = value;
                 if value.len() <= 16 {
                     // "YYYY-MM-DDTHH:MM" 길이 확인
                     value.push_str(":00");
                 }
-                info!("{}", value);
 
                 self.input_datetime = value.clone();
                 self.output_unixtime = ToolUnixtime::datetime_str_to_unixtime(
@@ -170,13 +169,28 @@ impl Component for ToolUnixtime {
                 true
             }
             Msg::Tick => {
-                // 1초마다 유닉스 시간 갱신
                 self.current_unixtime = Date::now() as i64 / 1000;
                 self.current_datetime = ToolUnixtime::unixtime_to_datetime_str_form2(
                     self.current_unixtime,
                     self.selected_timezone.clone(),
                 );
                 true
+            }
+            Msg::CopyToClipboard(value) => {
+                if let Some(clipboard) = window().map(|w| w.navigator().clipboard()) {
+                    wasm_bindgen_futures::spawn_local(async move {
+                        let promise = clipboard.write_text(&value);
+                        let future = JsFuture::from(promise);
+
+                        match future.await {
+                            Ok(_) => {}
+                            Err(_) => {}
+                        }
+                    });
+                } else {
+                    {};
+                }
+                false // 리렌더링 필요 없음
             }
         }
     }
@@ -258,10 +272,6 @@ impl Component for ToolUnixtime {
                     if !convert {
                         <div class="tool-inner">
                             <div>
-                                // <div style="display: flex; margin-bottom: 5px;">
-                                //     <div class="tool-subtitle" style="width: 100%; margin-bottom: 0px;">{ "Unix Timestamp" } </div>
-                                //     <div style="display: flex; justify-content: flex-end; width: 100%;"> {{format!("{}, {}", current_offset_str, self.current_timezone.clone())}} </div>
-                                // </div>
                                 <div class="tool-subtitle">{ "Unix Timestamp" }</div>
                                 <input
                                     type="number"
@@ -274,14 +284,20 @@ impl Component for ToolUnixtime {
                                     })} />
                             </div>
                         </div>
+                        // TODO: Date Time 표현식 선택할 수 있게
                         <div class="tool-inner" style="margin-top: 10px;">
                             <div>
                                 <div class="tool-subtitle">{ "Date Time" }</div>
                                 <input
                                     type="text"
                                     name="date"
-                                    disabled=true
-                                    value={format!("{}", self.output_datetime.clone())} />
+                                    readonly=true
+                                    style="cursor: pointer;"
+                                    value={format!("{}", self.output_datetime.clone())}
+                                    onclick={_ctx.link().callback(|e: MouseEvent| {
+                                        let input: HtmlInputElement = e.target_unchecked_into();
+                                        Msg::CopyToClipboard(input.value())
+                                    })} />
                             </div>
                         </div>
                     } else {
@@ -291,9 +307,7 @@ impl Component for ToolUnixtime {
                                 <input
                                     type="datetime-local"
                                     name="year"
-                                    // placeholder={format!("{}", input_datetime.year)}
                                     autocomplete="off"
-                                    // value={format!("{}", input_datetime.year)}?
                                     value={self.input_datetime.clone()}
                                     step="1"
                                     oninput={_ctx.link().callback(|e: InputEvent| {
@@ -308,8 +322,13 @@ impl Component for ToolUnixtime {
                                 <input
                                     type="number"
                                     name="unixtime"
-                                    disabled=true
-                                    value={format!("{}", output_unixtime)} />
+                                    readonly=true
+                                    style="cursor: pointer;"
+                                    value={format!("{}", output_unixtime)}
+                                    onclick={_ctx.link().callback(|e: MouseEvent| {
+                                        let input: HtmlInputElement = e.target_unchecked_into();
+                                        Msg::CopyToClipboard(input.value())
+                                    })} />
                             </div>
                         </div>
                     }

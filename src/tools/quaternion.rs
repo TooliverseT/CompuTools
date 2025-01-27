@@ -1,6 +1,7 @@
 use log::info;
 use std::f64::consts::PI;
-use web_sys::{HtmlInputElement, HtmlSelectElement};
+use wasm_bindgen_futures::{spawn_local, JsFuture};
+use web_sys::{window, HtmlInputElement, HtmlSelectElement};
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq)]
@@ -32,6 +33,7 @@ pub enum Msg {
     UpdateQuaternion(String, String),
     UpdateEuler(String, String),
     Convert,
+    CopyToClipboard(String),
 }
 
 impl Component for ToolQuaternion {
@@ -110,24 +112,25 @@ impl Component for ToolQuaternion {
             }
             Msg::Convert => {
                 self.convert = !self.convert;
-                self.quaternion_res = Quaternion {
-                    w: 1.0,
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                };
-                self.convert_quat = Quaternion {
-                    w: 1.0,
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                };
-                self.euler = EulerAngles {
-                    roll: 0.0,
-                    pitch: 0.0,
-                    yaw: 0.0,
-                };
                 true
+            }
+            Msg::CopyToClipboard(value) => {
+                // input_ref에서 HtmlInputElement를 가져옴
+                if let Some(clipboard) = window().map(|w| w.navigator().clipboard()) {
+                    // 클립보드 작업 수행
+                    wasm_bindgen_futures::spawn_local(async move {
+                        let promise = clipboard.write_text(&value);
+                        let future = JsFuture::from(promise);
+
+                        match future.await {
+                            Ok(_) => {}
+                            Err(_) => {}
+                        }
+                    });
+                } else {
+                    {};
+                }
+                false // 리렌더링 필요 없음
             }
         }
     }
@@ -194,6 +197,7 @@ impl Component for ToolQuaternion {
                                                     name="w"
                                                     placeholder=1
                                                     autocomplete="off"
+                                                    value={format!("{}",self.quaternion.w.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("w".to_string(), input.value())
@@ -215,6 +219,7 @@ impl Component for ToolQuaternion {
                                                     name="x"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    value={format!("{}",self.quaternion.x.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("x".to_string(), input.value())
@@ -236,6 +241,7 @@ impl Component for ToolQuaternion {
                                                     name="y"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    value={format!("{}",self.quaternion.y.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("y".to_string(), input.value())
@@ -257,6 +263,7 @@ impl Component for ToolQuaternion {
                                                     name="z"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    value={format!("{}",self.quaternion.z.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("z".to_string(), input.value())
@@ -276,24 +283,39 @@ impl Component for ToolQuaternion {
                                         <input
                                             type="number"
                                             name="roll"
-                                            disabled=true
-                                            value={format!("{:.6}", euler.roll)} />
+                                            readonly=true
+                                            style="cursor: pointer;"
+                                            value={format!("{:.6}", euler.roll)}
+                                            onclick={_ctx.link().callback(|e: MouseEvent| {
+                                                let input: HtmlInputElement = e.target_unchecked_into();
+                                                Msg::CopyToClipboard(input.value())
+                                            })} />
                                     </div>
                                     <div>
                                         <div class="tool-subtitle" style="margin-top: 15px;">{ "Pitch (radian)" }</div>
                                         <input
                                             type="number"
                                             name="pitch"
-                                            disabled=true
-                                            value={format!("{:.6}", euler.pitch)} />
+                                            readonly=true
+                                            style="cursor: pointer;"
+                                            value={format!("{:.6}", euler.pitch)}
+                                            onclick={_ctx.link().callback(|e: MouseEvent| {
+                                                let input: HtmlInputElement = e.target_unchecked_into();
+                                                Msg::CopyToClipboard(input.value())
+                                            })} />
                                     </div>
                                     <div>
                                         <div class="tool-subtitle" style="margin-top: 15px;">{ "Yaw (radian)" }</div>
                                         <input
                                             type="number"
                                             name="yaw"
-                                            disabled=true
-                                            value={format!("{:.6}", euler.yaw)} />
+                                            readonly=true
+                                            style="cursor: pointer;"
+                                            value={format!("{:.6}", euler.yaw)}
+                                            onclick={_ctx.link().callback(|e: MouseEvent| {
+                                                let input: HtmlInputElement = e.target_unchecked_into();
+                                                Msg::CopyToClipboard(input.value())
+                                            })} />
                                     </div>
                                 </div>
                             } else {
@@ -307,6 +329,7 @@ impl Component for ToolQuaternion {
                                                     name="roll"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    value={format!("{}",self.convert_euler.roll.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateEuler("roll".to_string(), input.value())
@@ -328,6 +351,7 @@ impl Component for ToolQuaternion {
                                                     name="pitch"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    value={format!("{}",self.convert_euler.pitch.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateEuler("pitch".to_string(), input.value())
@@ -349,6 +373,7 @@ impl Component for ToolQuaternion {
                                                     name="yaw"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    value={format!("{}",self.convert_euler.yaw.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateEuler("yaw".to_string(), input.value())
@@ -368,32 +393,52 @@ impl Component for ToolQuaternion {
                                         <input
                                             type="number"
                                             name="w"
-                                            disabled=true
-                                            value={format!("{:.6}", quaternion.w)} />
+                                            readonly=true
+                                            style="cursor: pointer;"
+                                            value={format!("{:.6}", quaternion.w)}
+                                            onclick={_ctx.link().callback(|e: MouseEvent| {
+                                                let input: HtmlInputElement = e.target_unchecked_into();
+                                                Msg::CopyToClipboard(input.value())
+                                            })} />
                                     </div>
                                     <div>
                                         <div class="tool-subtitle" style="margin-top: 15px;">{ "X" }</div>
                                         <input
                                             type="number"
                                             name="x"
-                                            disabled=true
-                                            value={format!("{:.6}", quaternion.x)} />
+                                            readonly=true
+                                            style="cursor: pointer;"
+                                            value={format!("{:.6}", quaternion.x)}
+                                            onclick={_ctx.link().callback(|e: MouseEvent| {
+                                                let input: HtmlInputElement = e.target_unchecked_into();
+                                                Msg::CopyToClipboard(input.value())
+                                            })} />
                                     </div>
                                     <div>
                                         <div class="tool-subtitle" style="margin-top: 15px;">{ "Y" }</div>
                                         <input
                                             type="number"
                                             name="y"
-                                            disabled=true
-                                            value={format!("{:.6}", quaternion.y)} />
+                                            readonly=true
+                                            style="cursor: pointer;"
+                                            value={format!("{:.6}", quaternion.y)}
+                                            onclick={_ctx.link().callback(|e: MouseEvent| {
+                                                let input: HtmlInputElement = e.target_unchecked_into();
+                                                Msg::CopyToClipboard(input.value())
+                                            })} />
                                     </div>
                                     <div>
                                         <div class="tool-subtitle" style="margin-top: 15px;">{ "Z" }</div>
                                         <input
                                             type="number"
                                             name="z"
-                                            disabled=true
-                                            value={format!("{:.6}", quaternion.z)} />
+                                            readonly=true
+                                            style="cursor: pointer;"
+                                            value={format!("{:.6}", quaternion.z)}
+                                            onclick={_ctx.link().callback(|e: MouseEvent| {
+                                                let input: HtmlInputElement = e.target_unchecked_into();
+                                                Msg::CopyToClipboard(input.value())
+                                            })} />
                                     </div>
                                 </div>
                             }
