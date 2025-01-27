@@ -25,9 +25,9 @@
   <link rel="stylesheet" href="/tool-3d654982217b5b91.css" integrity="sha384&#x2D;trXYxTk4We6Vyzk9W53SdpsKv9Q9ItfH1LZR065g58Fc9Se2U5ZuLEJTu58VNwFT"/>
   
   
-<script type="module" nonce="0N8ni9S2lFk2tIdhH5NTZQ==">
-import init, * as bindings from '/computools-2913dc8d5887475a.js';
-const wasm = await init('/computools-2913dc8d5887475a_bg.wasm');
+<script type="module">
+import init, * as bindings from '/computools-8c0ec0f1dba7a13e.js';
+const wasm = await init({ module_or_path: '/computools-8c0ec0f1dba7a13e_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -47,7 +47,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         return { timeZone, offset };
     }
 </script>
-<link rel="modulepreload" href="/computools-2913dc8d5887475a.js" crossorigin=anonymous integrity="sha384-ZKe0XHVuUVKp/AuOy8sv2AoJyLwM4j/PheKaeAn/CFCD6fmBTmqCyx5oEURkxPaL"><link rel="preload" href="/computools-2913dc8d5887475a_bg.wasm" crossorigin=anonymous integrity="sha384-htKQl08/ifpq++mkZ/twRhnLq+gjZoZmiwNdGjkSmQQXamxBOzTQvtaK6YSpKHn9" as="fetch" type="application/wasm"></head>
+<link rel="modulepreload" href="/computools-8c0ec0f1dba7a13e.js" crossorigin="anonymous" integrity="sha384-WrrI/3WFaYRt562SzEFxNNGrGrJOlqu2TVhd0Se3r1yZbGHesDIE4jJizrMm7pC1"><link rel="preload" href="/computools-8c0ec0f1dba7a13e_bg.wasm" crossorigin="anonymous" integrity="sha384-cPXWH8h/x14FTLX98cU9q185MaK5kx+SOQQ16xQNqf4vcZTU2IjGiGPstqd0xVIp" as="fetch" type="application/wasm"></head>
 
 <body></body>
 
