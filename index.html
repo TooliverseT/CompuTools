@@ -18,6 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap"
     rel="stylesheet">
 
+
   <link rel="stylesheet" href="/index-3d829f1894ba3b54.css" integrity="sha384&#x2D;OyO7fxFPFLO&#x2F;7jQ8kiZqTOmM0xhAJcv4Ljn8&#x2F;O8DylqHHVjib7BYZTSanRI8WjqF"/>
   <link rel="stylesheet" href="/navbar-a791148328eb6136.css" integrity="sha384&#x2D;IT9ZN1pW8ld&#x2F;k6&#x2B;yQdGVzchN3Hx69EAjavlEJpNgXN6Fhouj1ae1gg8s4kfTYY7A"/>
   <link rel="stylesheet" href="/search-fdf245380e18c822.css" integrity="sha384&#x2D;ocT6ZMtV35LU0jpIwJBppPZQL1bxlLYk06Zheqp5Y0cnJNTJFR6Wq2xngrnrwVOm"/>
@@ -26,8 +27,8 @@
   
   
 <script type="module">
-import init, * as bindings from '/computools-8c0ec0f1dba7a13e.js';
-const wasm = await init({ module_or_path: '/computools-8c0ec0f1dba7a13e_bg.wasm' });
+import init, * as bindings from '/computools-cc9d39ab71d47831.js';
+const wasm = await init({ module_or_path: '/computools-cc9d39ab71d47831_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -46,8 +47,16 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         const offset = new Date().getTimezoneOffset();
         return { timeZone, offset };
     }
+
+    (function() {
+        let redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.href) {
+            history.replaceState(null, null, redirect);
+        }
+    })();
 </script>
-<link rel="modulepreload" href="/computools-8c0ec0f1dba7a13e.js" crossorigin="anonymous" integrity="sha384-WrrI/3WFaYRt562SzEFxNNGrGrJOlqu2TVhd0Se3r1yZbGHesDIE4jJizrMm7pC1"><link rel="preload" href="/computools-8c0ec0f1dba7a13e_bg.wasm" crossorigin="anonymous" integrity="sha384-cPXWH8h/x14FTLX98cU9q185MaK5kx+SOQQ16xQNqf4vcZTU2IjGiGPstqd0xVIp" as="fetch" type="application/wasm"></head>
+<link rel="modulepreload" href="/computools-cc9d39ab71d47831.js" crossorigin="anonymous" integrity="sha384-K2kj8JZVRlThNk3KDpyoTSqBWimUyFXk33eq8SeSryU9lUFRBw7LoDTBN+mYao8+"><link rel="preload" href="/computools-cc9d39ab71d47831_bg.wasm" crossorigin="anonymous" integrity="sha384-2Qiz4DjupYjmgL8IevRfHv2757zLfoBqXVy0kEs2/h+vlhnnjgJRKDEoYyuh0Cz2" as="fetch" type="application/wasm"></head>
 
 <body></body>
 
