@@ -32,10 +32,16 @@ impl Component for Thumbnail {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         let title = _ctx.props().title.clone();
 
+        let content = match title.as_str() {
+            "unix-timestamp" => "Unix Timestamp Converter",
+            "quaternion" => "Quaternion Converter",
+            _ => "Content not found",
+        };
+
         html! {
             <>
                 <div class="thumbnail-contents">
-                    { title }
+                    { content }
                 </div>
             </>
         }

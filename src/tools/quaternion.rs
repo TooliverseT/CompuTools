@@ -453,7 +453,7 @@ impl Component for ToolQuaternion {
             if let Some(window) = window() {
                 let document = window.document();
                 if let Some(doc) = document {
-                    doc.set_title("Quaternion Converter");
+                    doc.set_title("Quaternion Converter | CompuTools");
                 }
             }
         }

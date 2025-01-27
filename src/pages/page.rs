@@ -30,8 +30,8 @@ impl Component for Page {
         let title = _ctx.props().title.clone();
 
         let content = match title.as_str() {
-            "Unix Timestamp Converter" => html! { <ToolUnixtime /> },
-            "Quaternion Converter" => html! { <ToolQuaternion /> },
+            "unix-timestamp" => html! { <ToolUnixtime /> },
+            "quaternion" => html! { <ToolQuaternion /> },
             _ => html! { <p>{ "Content not found" }</p> },
         };
         self.add_item(title.as_str());

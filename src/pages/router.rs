@@ -54,7 +54,7 @@ fn switch(routes: Route) -> Html {
 pub enum Route {
     #[at("/")]
     Home,
-    #[at("/tools/:title")]
+    #[at("/:title")]
     Page { title: String },
     #[not_found]
     #[at("/404")]

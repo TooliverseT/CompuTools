@@ -343,7 +343,7 @@ impl Component for ToolUnixtime {
             if let Some(window) = window() {
                 let document = window.document();
                 if let Some(doc) = document {
-                    doc.set_title("Unix Timestamp Converter");
+                    doc.set_title("Unix Timestamp Converter | CompuTools");
                 }
             }
         }
