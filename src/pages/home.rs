@@ -155,7 +155,7 @@ impl Component for Home {
                     { "Welcome to CompuTools" }
                 </div>
                 <div class="home-intro">
-                    { "Engineering made easy for everyone! Simplify calculations with our smart, powerful tools—anytime, anywhere."}
+                    { "CompuTools: Engineering made easy for everyone! Simplify calculations with CompuTools' smart, powerful tools—anytime, anywhere."}
                 </div>
                 <div class="home-title">
                     { "Recently Used" }
