@@ -337,6 +337,17 @@ impl Component for ToolUnixtime {
                 </>
         }
     }
+
+    fn rendered(&mut self, _ctx: &Context<Self>, first_render: bool) {
+        if first_render {
+            if let Some(window) = window() {
+                let document = window.document();
+                if let Some(doc) = document {
+                    doc.set_title("Unix Timestamp Converter");
+                }
+            }
+        }
+    }
 }
 
 impl ToolUnixtime {

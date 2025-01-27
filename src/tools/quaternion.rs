@@ -448,7 +448,16 @@ impl Component for ToolQuaternion {
         }
     }
 
-    fn rendered(&mut self, _ctx: &Context<Self>, first_render: bool) {}
+    fn rendered(&mut self, _ctx: &Context<Self>, first_render: bool) {
+        if first_render {
+            if let Some(window) = window() {
+                let document = window.document();
+                if let Some(doc) = document {
+                    doc.set_title("Quaternion Converter");
+                }
+            }
+        }
+    }
 }
 
 impl ToolQuaternion {

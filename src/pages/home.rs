@@ -200,6 +200,13 @@ impl Component for Home {
 
     fn rendered(&mut self, _ctx: &Context<Self>, first_render: bool) {
         if first_render {
+            if let Some(window) = window() {
+                let document = window.document();
+                if let Some(doc) = document {
+                    doc.set_title("CompuTools");
+                }
+            }
+
             let link = _ctx.link().clone();
             let list: Vec<Thumbnail> = vec![
                 Thumbnail {
