@@ -82,7 +82,18 @@ impl Component for ToolQuaternion {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::UpdateQuaternion(field, value) => {
-                let parsed_value = value.parse::<f64>().unwrap_or(0.0);
+                let parsed_value =
+                    value
+                        .trim()
+                        .parse::<f64>()
+                        .unwrap_or_else(|_| match field.as_str() {
+                            "w" => self.quaternion.w,
+                            "x" => self.quaternion.x,
+                            "y" => self.quaternion.y,
+                            "z" => self.quaternion.z,
+                            _ => 0.0,
+                        });
+
                 match field.as_str() {
                     "w" => self.quaternion.w = parsed_value,
                     "x" => self.quaternion.x = parsed_value,
@@ -97,7 +108,17 @@ impl Component for ToolQuaternion {
                 true
             }
             Msg::UpdateEuler(field, value) => {
-                let parsed_value = value.parse::<f64>().unwrap_or(0.0);
+                let parsed_value =
+                    value
+                        .trim()
+                        .parse::<f64>()
+                        .unwrap_or_else(|_| match field.as_str() {
+                            "roll" => self.convert_euler.roll,
+                            "pitch" => self.convert_euler.pitch,
+                            "yaw" => self.convert_euler.yaw,
+                            _ => 0.0,
+                        });
+
                 match field.as_str() {
                     "roll" => self.convert_euler.roll = parsed_value,
                     "pitch" => self.convert_euler.pitch = parsed_value,
@@ -197,6 +218,7 @@ impl Component for ToolQuaternion {
                                                     name="w"
                                                     placeholder=1
                                                     autocomplete="off"
+                                                    step="any"
                                                     value={format!("{}",self.quaternion.w.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
@@ -219,6 +241,7 @@ impl Component for ToolQuaternion {
                                                     name="x"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    step="any"
                                                     value={format!("{}",self.quaternion.x.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
@@ -241,6 +264,7 @@ impl Component for ToolQuaternion {
                                                     name="y"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    step="any"
                                                     value={format!("{}",self.quaternion.y.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
@@ -263,6 +287,7 @@ impl Component for ToolQuaternion {
                                                     name="z"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    step="any"
                                                     value={format!("{}",self.quaternion.z.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
@@ -329,6 +354,7 @@ impl Component for ToolQuaternion {
                                                     name="roll"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    step="any"
                                                     value={format!("{}",self.convert_euler.roll.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
@@ -351,6 +377,7 @@ impl Component for ToolQuaternion {
                                                     name="pitch"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    step="any"
                                                     value={format!("{}",self.convert_euler.pitch.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
@@ -373,6 +400,7 @@ impl Component for ToolQuaternion {
                                                     name="yaw"
                                                     placeholder=0
                                                     autocomplete="off"
+                                                    step="any"
                                                     value={format!("{}",self.convert_euler.yaw.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();

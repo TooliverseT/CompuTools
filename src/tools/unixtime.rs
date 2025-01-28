@@ -134,7 +134,7 @@ impl Component for ToolUnixtime {
                 true
             }
             Msg::UpdateUnixtime(value) => {
-                let mut parsed_value = value.parse::<i64>().unwrap_or(0);
+                let mut parsed_value = value.trim().parse::<i64>().unwrap_or(0);
 
                 if parsed_value < 0 {
                     parsed_value = 0;

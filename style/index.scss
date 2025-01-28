@@ -331,6 +331,8 @@ input[type=datetime-local]::-webkit-outer-spin-button {
 /* Firefox */
 input[type=datetime-local] {
     -moz-appearance: textfield;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 /* Optional styling */
