@@ -324,10 +324,6 @@ input[type=datetime-local] {
   -moz-appearance: textfield;
   -webkit-appearance: none;
   appearance: none;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
 }
 
 /* Optional styling */
@@ -343,7 +339,6 @@ input[type=datetime-local] {
   border: 2px solid var(--color-second) !important;
   overflow: auto;
   transition: border-color 0.3s;
-  text-align: left;
 }
 @media (max-width: 1200px) {
   input[type=datetime-local] {
@@ -374,43 +369,76 @@ input[type=datetime-local]:focus {
   border: 2px solid var(--color-fourth) !important;
 }
 
-.thumbnail {
-  position: relative;
-  border-radius: 0.7rem;
-  overflow: hidden;
-  border: 1px solid var(--color-fourth);
-  height: 80px;
-  aspect-ratio: 1/1;
+.navbar-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.thumbnail-img {
-  position: absolute;
-  top: 0;
-  left: 0;
+.navbar-container {
+  height: 6.5vh;
+  display: grid;
+  grid-template-columns: 150px 20fr 1fr;
+  max-width: 1400px;
+  padding-left: 30px;
+  padding-right: 30px;
   width: 100%;
-  height: 100%;
-  z-index: -1;
 }
 
-.thumbnail-contents {
-  color: var(--color-font);
-  font-size: 18px;
+.navbar-content {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
   font-family: "Oswald", helvetica, sans-serif;
-  font-weight: 800;
+  color: var(--color-font);
 }
-@media (max-width: 1200px) {
-  .thumbnail-contents {
-    font-size: 16px;
-  }
+.navbar-content.icon {
+  font-size: 16px;
+  justify-content: right;
 }
-@media (max-width: 1024px) {
-  .thumbnail-contents {
-    font-size: 15px;
-    font-weight: 400;
-  }
+.navbar-content.subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  margin-left: 50px;
 }
-@media (max-width: 768px) {
-  .thumbnail-contents {
-    font-size: 13px;
-  }
+.navbar-content:hover {
+  color: var(--color-font);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.subtitle-content {
+  padding: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-font);
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.subtitle-content:hover {
+  color: var(--color-font);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  padding: unset;
+}
+
+.toggle-btn i {
+  color: var(--color-third);
+}
+
+[data-theme=dark] .toggle-btn i {
+  color: var(--color-third);
 }
