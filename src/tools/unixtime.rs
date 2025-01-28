@@ -276,8 +276,9 @@ impl Component for ToolUnixtime {
                                 <input
                                     type="number"
                                     name="unixtime"
+                                    inputmode="decimal"
+                                    placeholder={format!("{}", self.input_unixtime)}
                                     autocomplete="off"
-                                    value={format!("{}", self.input_unixtime)}
                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                         let input: HtmlInputElement = e.target_unchecked_into();
                                         Msg::UpdateUnixtime(input.value())

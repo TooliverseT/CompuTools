@@ -206,7 +206,6 @@ impl Component for ToolQuaternion {
                                                     placeholder=1
                                                     autocomplete="off"
                                                     step="any"
-                                                    // value={format!("{}",self.quaternion.w.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("w".to_string(), input.value())
@@ -230,7 +229,6 @@ impl Component for ToolQuaternion {
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
-                                                    // value={format!("{}",self.quaternion.x.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("x".to_string(), input.value())
@@ -254,7 +252,6 @@ impl Component for ToolQuaternion {
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
-                                                    // value={format!("{}",self.quaternion.y.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("y".to_string(), input.value())
@@ -278,7 +275,6 @@ impl Component for ToolQuaternion {
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
-                                                    // value={format!("{}",self.quaternion.z.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("z".to_string(), input.value())
@@ -346,7 +342,6 @@ impl Component for ToolQuaternion {
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
-                                                    value={format!("{}",self.convert_euler.roll.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateEuler("roll".to_string(), input.value())
@@ -370,7 +365,6 @@ impl Component for ToolQuaternion {
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
-                                                    value={format!("{}",self.convert_euler.pitch.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateEuler("pitch".to_string(), input.value())
@@ -394,7 +388,6 @@ impl Component for ToolQuaternion {
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
-                                                    value={format!("{}",self.convert_euler.yaw.clone())}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateEuler("yaw".to_string(), input.value())
