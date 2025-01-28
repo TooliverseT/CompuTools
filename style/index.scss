@@ -60,6 +60,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+
+    @include respond-to(small) {
+        margin-top: 10px;
+    }
 }
 
 .main-content {
@@ -88,6 +92,33 @@ body {
     align-items: center;
 }
 
+.home-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding-left: 150px;
+    padding-right: 150px;
+    width: 100%;
+
+    @include respond-to(xlarge) {
+        padding-left: 55px;
+        padding-right: 55px;
+    }
+    @include respond-to(large) {
+        padding-left: 35px;
+        padding-right: 35px;
+    }
+    @include respond-to(medium) {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    @include respond-to(small) {
+        font-size: 14px;
+    }
+}
+
 .home-welcome {
     font-family: $font-theme;
     color: var(--color-fourth);
@@ -109,23 +140,25 @@ body {
     padding-right: 150px;
 
     @include respond-to(xlarge) {
+        font-size: 15px;
         padding-left: 100px;
         padding-right: 100px;
         margin-bottom: 20px;
     }
     @include respond-to(large) {
+        font-size: 14px;
         padding-left: 50px;
         padding-right: 50px;
         margin-bottom: 10px;
     }
     @include respond-to(medium) {
+        font-size: 13px;
         padding-left: 0px;
         padding-right: 0px;
         margin-bottom: 0px;
-        font-size: 145x;
     }
     @include respond-to(small) {
-        font-size: 14px;
+        font-size: 12px;
     }
 }
 

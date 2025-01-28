@@ -151,48 +151,50 @@ impl Component for Home {
 
         html! {
             <div class="home-wrapper">
-                <div class="home-welcome">
-                    { "Welcome to CompuTools" }
-                </div>
-                <div class="home-intro">
-                    { "CompuTools: Engineering made easy for everyone! Simplify calculations with CompuTools' smart, powerful tools—anytime, anywhere."}
-                </div>
-                <div class="home-title">
-                    { "Recently Used" }
-                </div>
-                <div class="home-list">
-                    { for recent_items }
-                </div>
-                <div class="search-title">
-                    <div class="home-title home-all">
-                        <div style="width: 90%;">
-                        { "All" }
+                <div class="home-inner">
+                    <div class="home-welcome">
+                        { "Welcome to CompuTools" }
+                    </div>
+                    <div class="home-intro">
+                        { "CompuTools: Engineering made easy for everyone! Simplify calculations with CompuTools' smart, powerful tools—anytime, anywhere."}
+                    </div>
+                    <div class="home-title">
+                        { "Recently Used" }
+                    </div>
+                    <div class="home-list">
+                        { for recent_items }
+                    </div>
+                    <div class="search-title">
+                        <div class="home-title home-all">
+                            <div style="width: 90%;">
+                            { "All" }
+                            </div>
+                            <div onclick={ascending} class="ascending-icon">
+                                if self.asc == "asc".to_string() {
+                                    <i class="fa-solid fa-arrow-up-z-a"></i>
+                                } else {
+                                    <i class="fa-solid fa-arrow-down-z-a"></i>
+                                }
+                            </div>
                         </div>
-                        <div onclick={ascending} class="ascending-icon">
-                            if self.asc == "asc".to_string() {
-                                <i class="fa-solid fa-arrow-up-z-a"></i>
-                            } else {
-                                <i class="fa-solid fa-arrow-down-z-a"></i>
-                            }
+                        <div class="search-outer">
+                            <div class="search-inner">
+                                <input
+                                    // ref={self.input_ref.clone()}
+                                    class="search-input"
+                                    placeholder="Search Your Tools"
+                                    {oninput}
+                                    {onkeydown}
+                                />
+                                <button class="search-button" {onclick}>
+                                    { "SEARCH" }
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="search-outer">
-                        <div class="search-inner">
-                            <input
-                                // ref={self.input_ref.clone()}
-                                class="search-input"
-                                placeholder="Search Your Tools"
-                                {oninput}
-                                {onkeydown}
-                            />
-                            <button class="search-button" {onclick}>
-                                { "SEARCH" }
-                            </button>
-                        </div>
+                    <div class="home-list">
+                        { for thumbnail }
                     </div>
-                </div>
-                <div class="home-list">
-                    { for thumbnail }
                 </div>
             </div>
         }
