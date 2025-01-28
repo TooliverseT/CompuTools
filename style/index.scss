@@ -17,6 +17,19 @@ $dark-color-fourth: #AD8B73;
 $dark-color-font: #F1F1F1;
 $dark-color-subfont: #C8C8C8;
 
+$breakpoints: (
+    small: 480px,
+    medium: 768px,
+    large: 1024px,
+    xlarge: 1200px
+);
+
+@mixin respond-to($size) {
+    @media (max-width: map-get($breakpoints, $size)) {
+        @content;
+    }
+}
+
 html[data-theme="light"] {
     --color-first: #{$light-color-first};
     --color-second: #{$light-color-second};
@@ -43,7 +56,7 @@ body {
 
 .main-wrapper {
     margin-top: 30px;
-    margin-bottom: 150px;
+    // margin-bottom: 150px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -54,6 +67,18 @@ body {
     padding-left: 30px;
     padding-right: 30px;
     width: 100%;
+
+    @include respond-to(xlarge) {
+    }
+    @include respond-to(large) {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    @include respond-to(medium) {
+        
+    }
+    @include respond-to(small) {
+    }
 }
 
 .home-wrapper {
@@ -68,6 +93,10 @@ body {
     color: var(--color-fourth);
     font-size: 1.9em;
     font-weight: 400;
+
+    @include respond-to(small) {
+        font-size: 1.5em;
+    }
 }
 
 .home-intro {
@@ -76,8 +105,28 @@ body {
     font-size: 16px;
     margin-top: 15px;
     margin-bottom: 40px;
-    padding-left: 200px;
-    padding-right: 200px;
+    padding-left: 150px;
+    padding-right: 150px;
+
+    @include respond-to(xlarge) {
+        padding-left: 100px;
+        padding-right: 100px;
+        margin-bottom: 20px;
+    }
+    @include respond-to(large) {
+        padding-left: 50px;
+        padding-right: 50px;
+        margin-bottom: 10px;
+    }
+    @include respond-to(medium) {
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-bottom: 0px;
+        font-size: 145x;
+    }
+    @include respond-to(small) {
+        font-size: 14px;
+    }
 }
 
 .home-title {
@@ -86,9 +135,17 @@ body {
     font-size: 20px;
     width: 100%;
     padding-bottom: 5px;
-    margin-top: 30px;
-    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 15px;
     border-bottom: 1px solid var(--color-fourth);
+
+    @include respond-to(medium) {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    @include respond-to(small) {
+        font-size: 18px;
+    }
 }
 
 .home-all {
@@ -103,14 +160,29 @@ body {
 }
 
 .home-list {
-    font-size: 20px;
+    font-size: 18px;
     font-family: $font;
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     grid-auto-rows: 80px;
     gap: 15px;
+
+    @include respond-to(xlarge) {
+        font-size: 16px;
+    }
+    @include respond-to(large) {
+        gap: 10px;
+    }
+    @include respond-to(medium) {
+        font-size: 14x;
+        grid-template-columns: repeat(3, 1fr);
+    }
+    @include respond-to(small) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+    }
 }
 
 .home-thumbnail {
@@ -128,6 +200,18 @@ body {
         cursor: pointer;
         background-color: var(--color-fourth);
         transform: scale(1.02);
+    }
+
+    @include respond-to(xlarge) {
+        height: 75px;
+    }
+    @include respond-to(large) {
+        height: 65px;
+    }
+    @include respond-to(medium) {
+        height: 55px;
+    }
+    @include respond-to(small) {
     }
 }
 
@@ -164,6 +248,19 @@ input[type=number] {
     border: 2px solid var(--color-second) !important;
     overflow: auto;
     transition: border-color 0.3s;
+
+    @include respond-to(xlarge) {
+        font-size: 15px;
+    }
+    @include respond-to(large) {
+        font-size: 14px;
+    }
+    @include respond-to(medium) {
+        font-size: 13px;
+    }
+    @include respond-to(small) {
+        font-size: 12px;
+    }
 }
 
 input[type=number]::placeholder {
@@ -200,6 +297,19 @@ input[type=text] {
     border: 2px solid var(--color-second) !important;
     overflow: auto;
     transition: border-color 0.3s;
+
+    @include respond-to(xlarge) {
+        font-size: 15px;
+    }
+    @include respond-to(large) {
+        font-size: 14px;
+    }
+    @include respond-to(medium) {
+        font-size: 13px;
+    }
+    @include respond-to(small) {
+        font-size: 12px;
+    }
 }
 
 input[type=text]::placeholder {
@@ -236,6 +346,19 @@ input[type=datetime-local] {
     border: 2px solid var(--color-second) !important;
     overflow: auto;
     transition: border-color 0.3s;
+
+    @include respond-to(xlarge) {
+        font-size: 15px;
+    }
+    @include respond-to(large) {
+        font-size: 14px;
+    }
+    @include respond-to(medium) {
+        font-size: 13px;
+    }
+    @include respond-to(small) {
+        font-size: 12px;
+    }
 }
 
 input[type=datetime-local]::placeholder {

@@ -163,7 +163,7 @@ impl Component for Home {
                 <div class="home-list">
                     { for recent_items }
                 </div>
-                <div style="display: grid; grid-template-columns: 2.4fr 1fr; width: 100%; margin-top: 20px;">
+                <div class="search-title">
                     <div class="home-title home-all">
                         <div style="width: 90%;">
                         { "All" }

@@ -7,6 +7,25 @@
     padding-left: 150px;
     padding-right: 150px;
     width: 100%;
+
+    @include respond-to(xlarge) {
+        grid-template-columns: none;
+        gap: 0px;
+        padding-left: 55px;
+        padding-right: 55px;
+    }
+    @include respond-to(large) {
+        padding-left: 35px;
+        padding-right: 35px;
+    }
+    @include respond-to(medium) {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    @include respond-to(small) {
+        font-size: 14px;
+        gap: 5px;
+    }
 }
 
 .tool-change {
@@ -23,6 +42,10 @@
     color: var(--color-fourth);
     font-size: 1.9em;
     font-weight: 400;
+
+    @include respond-to(small) {
+        font-size: 1.5em;
+    }
 }
 
 .tool-intro {
@@ -30,6 +53,43 @@
     color: var(--color-font);
     font-size: 16px;
     margin-top: 15px;
+
+    p {
+        font-size: 16px;
+        @include respond-to(xlarge) {
+            font-size: 15px;
+        }
+        @include respond-to(large) {
+            font-size: 14px;
+        }
+        @include respond-to(medium) {
+            font-size: 13px;
+        }
+        @include respond-to(small) {
+            font-size: 12px;
+        }
+    }
+
+    li {
+        font-size: 16px;
+        @include respond-to(xlarge) {
+            font-size: 15px;
+        }
+        @include respond-to(large) {
+            font-size: 14px;
+        }
+        @include respond-to(medium) {
+            font-size: 13px;
+        }
+        @include respond-to(small) {
+            font-size: 12px;
+        }
+    }
+
+    @include respond-to(small) {
+        max-height: 250px;
+        overflow-y: auto;
+    }
 }
 
 .tool-container {
@@ -42,12 +102,40 @@
 
     background-color: var(--color-second);
     border-radius: 15px;
+
+    font-size: 16px;
+    @include respond-to(xlarge) {
+        font-size: 15px;
+    }
+    @include respond-to(large) {
+        font-size: 14px;
+        padding: 8px;
+    }
+    @include respond-to(medium) {
+        font-size: 13px;
+    }
+    @include respond-to(small) {
+        font-size: 12px;
+    }
 }
 
 .tool-inner {
     background-color: var(--color-third);
     padding: 20px;
     border-radius: 15px;
+
+    @include respond-to(xlarge) {
+        padding: 18px;
+    }
+    @include respond-to(large) {
+        padding: 16px;
+    }
+    @include respond-to(medium) {
+        padding: 15px;
+    }
+    @include respond-to(small) {
+        padding: 14px;
+    }
 }
 
 .tool-subtitle {
@@ -57,6 +145,19 @@
     font-weight: 600;
     color: var(--color-font);
     margin-bottom: 5px;
+
+    @include respond-to(xlarge) {
+        font-size: 15px;
+    }
+    @include respond-to(large) {
+        font-size: 14px;
+    }
+    @include respond-to(medium) {
+        font-size: 13px;
+    }
+    @include respond-to(small) {
+        font-size: 12px;
+    }
 }
 
 .input-container {
@@ -124,23 +225,64 @@
     font-family: $font-title;
     font-size: 40px;
     font-style: italic;
+
+    @include respond-to(xlarge) {
+        font-size: 35px;
+    }
+    @include respond-to(large) {
+        font-size: 20px;
+    }
+    @include respond-to(medium) {
+        font-size: 20px;
+    }
+    @include respond-to(small) {
+        font-size: 20px;
+    }
 }
 
 .date-current {
     font-family: $font;
     font-size: 20px;
     font-style: italic;
+
+    @include respond-to(xlarge) {
+        font-size: 17px;
+    }
+    @include respond-to(large) {
+        font-size: 16px;
+    }
+    @include respond-to(medium) {
+        font-size: 15px;
+    }
+    @include respond-to(small) {
+        font-size: 14px;
+    }
 }
 
 .date-timezone select {
     appearance: none;
     font-family: $font-theme;
+    font-size: 16px;
     margin-bottom: 10px;
     border-radius: 8px;
     padding: 5px 15px 5px 15px;
     background-color: var(--color-third);
     color: var(--color-font);
     border: 2px solid var(--color-second) !important;
+    width: 100%;
+
+    @include respond-to(xlarge) {
+        font-size: 15px;
+    }
+    @include respond-to(large) {
+        font-size: 14px;
+    }
+    @include respond-to(medium) {
+        font-size: 13px;
+    }
+    @include respond-to(small) {
+        font-size: 12px;
+    }
 }
 
 .date-timezone select:focus {
