@@ -334,6 +334,9 @@ input[type=datetime-local] {
     -webkit-appearance: none;
     appearance: none;
     text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 /* Optional styling */
@@ -349,6 +352,7 @@ input[type=datetime-local] {
     border: 2px solid var(--color-second) !important;
     overflow: auto;
     transition: border-color 0.3s;
+    text-align: left;
 
     @include respond-to(xlarge) {
         font-size: 15px;
