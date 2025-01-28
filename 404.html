@@ -4,21 +4,18 @@
 <head>
     <meta charset="utf-8">
     <script>
-        // 유효한 라우트 목록을 정의
         const validRoutes = ['/', '/unix-timestamp', '/quaternion'];
         const path = window.location.pathname;
         
-        // 유효한 라우트인 경우에만 리다이렉션 수행
         if (validRoutes.includes(path)) {
             sessionStorage.redirect = location.href;
             window.location.href = '/';
         }
-        // 유효하지 않은 라우트는 404 페이지로 유지
     </script>
-    <!-- 404 페이지용 스타일과 컨텐츠 -->
     <title>404 - Page Not Found</title>
 </head>
 <body>
+    <!-- TODO: Style -->
     <h1>404 - Page Not Found</h1>
     <p>The page you're looking for doesn't exist.</p>
     <a href="/">Go to Home</a>

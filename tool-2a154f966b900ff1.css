@@ -25,7 +25,6 @@ body {
 
 .main-wrapper {
   margin-top: 30px;
-  margin-bottom: 150px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -37,7 +36,12 @@ body {
   padding-right: 30px;
   width: 100%;
 }
-
+@media (max-width: 1024px) {
+  .main-content {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
 .home-wrapper {
   display: flex;
   flex-direction: column;
@@ -51,6 +55,11 @@ body {
   font-size: 1.9em;
   font-weight: 400;
 }
+@media (max-width: 480px) {
+  .home-welcome {
+    font-size: 1.5em;
+  }
+}
 
 .home-intro {
   font-family: "JetBrains Mono", helvetica, sans-serif;
@@ -58,8 +67,35 @@ body {
   font-size: 16px;
   margin-top: 15px;
   margin-bottom: 40px;
-  padding-left: 200px;
-  padding-right: 200px;
+  padding-left: 150px;
+  padding-right: 150px;
+}
+@media (max-width: 1200px) {
+  .home-intro {
+    padding-left: 100px;
+    padding-right: 100px;
+    margin-bottom: 20px;
+  }
+}
+@media (max-width: 1024px) {
+  .home-intro {
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-bottom: 10px;
+  }
+}
+@media (max-width: 768px) {
+  .home-intro {
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-bottom: 0px;
+    font-size: 145x;
+  }
+}
+@media (max-width: 480px) {
+  .home-intro {
+    font-size: 14px;
+  }
 }
 
 .home-title {
@@ -68,9 +104,20 @@ body {
   font-size: 20px;
   width: 100%;
   padding-bottom: 5px;
-  margin-top: 30px;
-  margin-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 15px;
   border-bottom: 1px solid var(--color-fourth);
+}
+@media (max-width: 768px) {
+  .home-title {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+}
+@media (max-width: 480px) {
+  .home-title {
+    font-size: 18px;
+  }
 }
 
 .home-all {
@@ -85,14 +132,36 @@ body {
 }
 
 .home-list {
-  font-size: 20px;
+  font-size: 18px;
   font-family: "Noto Sans", helvetica, sans-serif;
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: 80px;
   gap: 15px;
+}
+@media (max-width: 1200px) {
+  .home-list {
+    font-size: 16px;
+  }
+}
+@media (max-width: 1024px) {
+  .home-list {
+    gap: 10px;
+  }
+}
+@media (max-width: 768px) {
+  .home-list {
+    font-size: 14x;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .home-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+  }
 }
 
 .home-thumbnail {
@@ -111,7 +180,21 @@ body {
   background-color: var(--color-fourth);
   transform: scale(1.02);
 }
-
+@media (max-width: 1200px) {
+  .home-thumbnail {
+    height: 75px;
+  }
+}
+@media (max-width: 1024px) {
+  .home-thumbnail {
+    height: 65px;
+  }
+}
+@media (max-width: 768px) {
+  .home-thumbnail {
+    height: 55px;
+  }
+}
 button:focus {
   outline: none;
 }
@@ -145,6 +228,26 @@ input[type=number] {
   border: 2px solid var(--color-second) !important;
   overflow: auto;
   transition: border-color 0.3s;
+}
+@media (max-width: 1200px) {
+  input[type=number] {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  input[type=number] {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  input[type=number] {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  input[type=number] {
+    font-size: 12px;
+  }
 }
 
 input[type=number]::placeholder {
@@ -181,6 +284,26 @@ input[type=text] {
   overflow: auto;
   transition: border-color 0.3s;
 }
+@media (max-width: 1200px) {
+  input[type=text] {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  input[type=text] {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  input[type=text] {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  input[type=text] {
+    font-size: 12px;
+  }
+}
 
 input[type=text]::placeholder {
   color: var(--color-subfont);
@@ -216,6 +339,26 @@ input[type=datetime-local] {
   overflow: auto;
   transition: border-color 0.3s;
 }
+@media (max-width: 1200px) {
+  input[type=datetime-local] {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  input[type=datetime-local] {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  input[type=datetime-local] {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  input[type=datetime-local] {
+    font-size: 12px;
+  }
+}
 
 input[type=datetime-local]::placeholder {
   color: var(--color-subfont);
@@ -233,6 +376,32 @@ input[type=datetime-local]:focus {
   padding-right: 150px;
   width: 100%;
 }
+@media (max-width: 1200px) {
+  .tool-wrapper {
+    grid-template-columns: none;
+    gap: 0px;
+    padding-left: 55px;
+    padding-right: 55px;
+  }
+}
+@media (max-width: 1024px) {
+  .tool-wrapper {
+    padding-left: 35px;
+    padding-right: 35px;
+  }
+}
+@media (max-width: 768px) {
+  .tool-wrapper {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+@media (max-width: 480px) {
+  .tool-wrapper {
+    font-size: 14px;
+    gap: 5px;
+  }
+}
 
 .tool-change {
   display: flex;
@@ -249,12 +418,69 @@ input[type=datetime-local]:focus {
   font-size: 1.9em;
   font-weight: 400;
 }
+@media (max-width: 480px) {
+  .tool-title {
+    font-size: 1.5em;
+  }
+}
 
 .tool-intro {
   font-family: "JetBrains Mono", helvetica, sans-serif;
   color: var(--color-font);
   font-size: 16px;
   margin-top: 15px;
+}
+.tool-intro p {
+  font-size: 16px;
+}
+@media (max-width: 1200px) {
+  .tool-intro p {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  .tool-intro p {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  .tool-intro p {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  .tool-intro p {
+    font-size: 12px;
+  }
+}
+.tool-intro li {
+  font-size: 16px;
+}
+@media (max-width: 1200px) {
+  .tool-intro li {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  .tool-intro li {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  .tool-intro li {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  .tool-intro li {
+    font-size: 12px;
+  }
+}
+@media (max-width: 480px) {
+  .tool-intro {
+    max-height: 250px;
+    overflow-y: auto;
+  }
 }
 
 .tool-container {
@@ -265,12 +491,54 @@ input[type=datetime-local]:focus {
   padding: 10px;
   background-color: var(--color-second);
   border-radius: 15px;
+  font-size: 16px;
+}
+@media (max-width: 1200px) {
+  .tool-container {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  .tool-container {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+@media (max-width: 768px) {
+  .tool-container {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  .tool-container {
+    font-size: 12px;
+  }
 }
 
 .tool-inner {
   background-color: var(--color-third);
   padding: 20px;
   border-radius: 15px;
+}
+@media (max-width: 1200px) {
+  .tool-inner {
+    padding: 18px;
+  }
+}
+@media (max-width: 1024px) {
+  .tool-inner {
+    padding: 16px;
+  }
+}
+@media (max-width: 768px) {
+  .tool-inner {
+    padding: 15px;
+  }
+}
+@media (max-width: 480px) {
+  .tool-inner {
+    padding: 14px;
+  }
 }
 
 .tool-subtitle {
@@ -280,6 +548,26 @@ input[type=datetime-local]:focus {
   font-weight: 600;
   color: var(--color-font);
   margin-bottom: 5px;
+}
+@media (max-width: 1200px) {
+  .tool-subtitle {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  .tool-subtitle {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  .tool-subtitle {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  .tool-subtitle {
+    font-size: 12px;
+  }
 }
 
 .input-container {
@@ -347,22 +635,84 @@ input[type=datetime-local]:focus {
   font-size: 40px;
   font-style: italic;
 }
+@media (max-width: 1200px) {
+  .unix-current {
+    font-size: 35px;
+  }
+}
+@media (max-width: 1024px) {
+  .unix-current {
+    font-size: 20px;
+  }
+}
+@media (max-width: 768px) {
+  .unix-current {
+    font-size: 20px;
+  }
+}
+@media (max-width: 480px) {
+  .unix-current {
+    font-size: 20px;
+  }
+}
 
 .date-current {
   font-family: "Noto Sans", helvetica, sans-serif;
   font-size: 20px;
   font-style: italic;
 }
+@media (max-width: 1200px) {
+  .date-current {
+    font-size: 17px;
+  }
+}
+@media (max-width: 1024px) {
+  .date-current {
+    font-size: 16px;
+  }
+}
+@media (max-width: 768px) {
+  .date-current {
+    font-size: 15px;
+  }
+}
+@media (max-width: 480px) {
+  .date-current {
+    font-size: 14px;
+  }
+}
 
 .date-timezone select {
   appearance: none;
   font-family: "JetBrains Mono", helvetica, sans-serif;
+  font-size: 16px;
   margin-bottom: 10px;
   border-radius: 8px;
   padding: 5px 15px 5px 15px;
   background-color: var(--color-third);
   color: var(--color-font);
   border: 2px solid var(--color-second) !important;
+  width: 100%;
+}
+@media (max-width: 1200px) {
+  .date-timezone select {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  .date-timezone select {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  .date-timezone select {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  .date-timezone select {
+    font-size: 12px;
+  }
 }
 
 .date-timezone select:focus {
