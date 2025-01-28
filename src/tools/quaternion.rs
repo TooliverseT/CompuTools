@@ -215,6 +215,7 @@ impl Component for ToolQuaternion {
                                             <div class="input-column">
                                                 <input
                                                     type="number"
+                                                    inputmode="decimal"
                                                     name="w"
                                                     placeholder=1
                                                     autocomplete="off"
@@ -238,6 +239,7 @@ impl Component for ToolQuaternion {
                                             <div class="input-column">
                                                 <input
                                                     type="number"
+                                                    inputmode="decimal"
                                                     name="x"
                                                     placeholder=0
                                                     autocomplete="off"
@@ -261,6 +263,7 @@ impl Component for ToolQuaternion {
                                             <div class="input-column">
                                                 <input
                                                     type="number"
+                                                    inputmode="decimal"
                                                     name="y"
                                                     placeholder=0
                                                     autocomplete="off"
@@ -284,6 +287,7 @@ impl Component for ToolQuaternion {
                                             <div class="input-column">
                                                 <input
                                                     type="number"
+                                                    inputmode="decimal"
                                                     name="z"
                                                     placeholder=0
                                                     autocomplete="off"
@@ -351,6 +355,7 @@ impl Component for ToolQuaternion {
                                             <div class="input-column">
                                                 <input
                                                     type="number"
+                                                    inputmode="decimal"
                                                     name="roll"
                                                     placeholder=0
                                                     autocomplete="off"
@@ -374,6 +379,7 @@ impl Component for ToolQuaternion {
                                             <div class="input-column">
                                                 <input
                                                     type="number"
+                                                    inputmode="decimal"
                                                     name="pitch"
                                                     placeholder=0
                                                     autocomplete="off"
@@ -397,6 +403,7 @@ impl Component for ToolQuaternion {
                                             <div class="input-column">
                                                 <input
                                                     type="number"
+                                                    inputmode="decimal"
                                                     name="yaw"
                                                     placeholder=0
                                                     autocomplete="off"
