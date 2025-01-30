@@ -1,14 +1,11 @@
 name: Deploy to GitHub Pages
-
 on:
   push:
     branches:
       - main
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -23,8 +20,21 @@ jobs:
       - name: Install Trunk
         run: cargo install trunk
 
+      - name: Install jq
+        run: sudo apt-get install jq
+
       - name: Build project
         run: trunk build --release --public-url /
+
+      - name: Generate static pages for routes
+        run: |
+          cd dist
+          while IFS= read -r route; do
+            echo "Generating static page for route: $route"
+            mkdir -p "$route"
+            cp index.html "$route/index.html"
+          done < <(jq -r '.routes[]' ../routes.json)
+          cd ..
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
