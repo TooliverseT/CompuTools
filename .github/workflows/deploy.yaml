@@ -36,6 +36,20 @@ jobs:
           done < <(jq -r '.routes[]' ../routes.json)
           cd ..
 
+      - name: Verify generated pages
+        run: |
+          cd dist
+          echo "Checking generated pages..."
+          while IFS= read -r route; do
+            if [ -f "$route/index.html" ]; then
+              echo "✓ $route/index.html exists"
+            else
+              echo "✗ $route/index.html missing"
+              exit 1
+            fi
+          done < <(jq -r '.routes[]' ../routes.json)
+          cd ..
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
