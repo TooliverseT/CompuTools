@@ -1,4 +1,3 @@
-<!-- 404.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,14 +7,14 @@
         const path = window.location.pathname;
         
         if (validRoutes.includes(path)) {
-            sessionStorage.redirect = location.href;
-            window.location.href = '/';
+            // URL에 ?redirect=false 파라미터 추가
+            const redirectUrl = '/' + (path !== '/' ? '?page=' + path.slice(1) : '');
+            window.location.href = redirectUrl;
         }
     </script>
     <title>404 - Page Not Found</title>
 </head>
 <body>
-    <!-- TODO: Style -->
     <h1>404 - Page Not Found</h1>
     <p>The page you're looking for doesn't exist.</p>
     <a href="/">Go to Home</a>
