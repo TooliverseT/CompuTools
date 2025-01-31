@@ -1,34 +1,33 @@
 <!-- 404.html -->
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Page Redirect</title>
-        <script>
-            (function() {
-                const currentUrl = new URL(window.location.href);
-                
-                // 현재 경로에서 trailing slash 제거
-                let normalizedPath = currentUrl.pathname.replace(/\/+$/, '');
-                
-                // 유효한 경로 확인
-                const validRoutes = ['/', '/unix-timestamp', '/quaternion'];
-                
-                if (validRoutes.includes(normalizedPath)) {
-                    // 경로가 유효하면 trailing slash 없는 URL로 리다이렉트
-                    currentUrl.pathname = normalizedPath;
-                    
-                    const meta = document.createElement('meta');
-                    meta.setAttribute('http-equiv', 'refresh');
-                    meta.setAttribute('content', `0; url=${currentUrl.toString()}`);
-                    document.head.appendChild(meta);
-                } else {
-                    // 유효하지 않은 경로는 홈으로
-                    window.location.href = '/';
-                }
-            })();
-        </script>
-    </head>
+<head>
+    <meta charset="utf-8">
+    <title>Page Redirect</title>
+    <script>
+        (function() {
+            const validRoutes = ['/', '/unix-timestamp', '/quaternion'];
+            
+            const segment = window.location.pathname;
+            
+            function createMetaTag(path) {
+                const meta = document.createElement('meta');
+                meta.setAttribute('http-equiv', 'refresh');
+                meta.setAttribute('content', `0; url=${path}`);
+                document.getElementsByTagName('head')[0].appendChild(meta);
+            }
+            
+            if (validRoutes.includes(segment)) {
+                createMetaTag(segment);
+            } else {
+                createMetaTag('/');
+            }
+            
+            // 현재 URL을 세션 스토리지에 저장 (클라이언트 사이드 라우팅용)
+            sessionStorage.redirect = window.location.href;
+        })();
+    </script>
+</head>
 <body>
     <h1>404 - Page Not Found</h1>
     <p>The page you're looking for doesn't exist.</p>
