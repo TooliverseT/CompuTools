@@ -49,20 +49,21 @@
   <link data-trunk rel="icon" href="favicon.ico">
 
   <script>
+      (function() {
+          const redirect = sessionStorage.redirect;
+          delete sessionStorage.redirect;
+          if (redirect && redirect !== window.location.href) {
+              history.replaceState(null, null, redirect);
+          }
+      })();
+  </script>
+  <script>
     // JavaScript에서 getTimeZoneOffset 함수 정의
     function getTimeZoneOffset() {
         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const offset = new Date().getTimezoneOffset();
         return { timeZone, offset };
     }
-
-    (function() {
-        let redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect != location.href) {
-            history.replaceState(null, null, redirect);
-        }
-    })();
   </script>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1G0CMRC310"></script>
