@@ -60,20 +60,21 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
   <link rel="icon" href="/favicon-1a8ba4d4617517ad.ico" integrity="sha384&#x2D;sh&#x2B;KkiOvcFXwh29z2PE6y5W6JoL&#x2F;C2uPj8MHwWodi4oVC6f4XcUmhJGk6dmH2Teg"/>
 
   <script>
+      (function() {
+          const redirect = sessionStorage.redirect;
+          delete sessionStorage.redirect;
+          if (redirect && redirect !== window.location.href) {
+              history.replaceState(null, null, redirect);
+          }
+      })();
+  </script>
+  <script>
     // JavaScript에서 getTimeZoneOffset 함수 정의
     function getTimeZoneOffset() {
         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const offset = new Date().getTimezoneOffset();
         return { timeZone, offset };
     }
-
-    (function() {
-        let redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect != location.href) {
-            history.replaceState(null, null, redirect);
-        }
-    })();
   </script>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1G0CMRC310"></script>

@@ -1,18 +1,32 @@
+<!-- 404.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
+    <title>Page Redirect</title>
     <script>
-        const validRoutes = ['/', '/unix-timestamp', '/quaternion'];
-        const path = window.location.pathname;
-        
-        if (validRoutes.includes(path)) {
-            // URL에 ?redirect=false 파라미터 추가
-            const redirectUrl = '/' + (path !== '/' ? '?page=' + path.slice(1) : '');
-            window.location.href = redirectUrl;
-        }
+        (function() {
+            const validRoutes = ['/', '/unix-timestamp', '/quaternion'];
+            
+            const segment = window.location.pathname;
+            
+            function createMetaTag(path) {
+                const meta = document.createElement('meta');
+                meta.setAttribute('http-equiv', 'refresh');
+                meta.setAttribute('content', `0; url=${path}`);
+                document.getElementsByTagName('head')[0].appendChild(meta);
+            }
+            
+            if (validRoutes.includes(segment)) {
+                createMetaTag(segment);
+            } else {
+                createMetaTag('/');
+            }
+            
+            // 현재 URL을 세션 스토리지에 저장 (클라이언트 사이드 라우팅용)
+            sessionStorage.redirect = window.location.href;
+        })();
     </script>
-    <title>404 - Page Not Found</title>
 </head>
 <body>
     <h1>404 - Page Not Found</h1>
