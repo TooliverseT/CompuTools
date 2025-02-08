@@ -1,4 +1,4 @@
-use crate::tools::{quaternion::ToolQuaternion, unixtime::ToolUnixtime};
+use crate::tools::{crc::ToolCrc, quaternion::ToolQuaternion, unixtime::ToolUnixtime};
 use log::info;
 use web_sys::window;
 use yew::prelude::*;
@@ -32,6 +32,7 @@ impl Component for Page {
         let content = match title.as_str() {
             "unix-timestamp" => html! { <ToolUnixtime /> },
             "quaternion" => html! { <ToolQuaternion /> },
+            "crc" => html! { <ToolCrc /> },
             _ => html! { <p>{ "Content not found" }</p> },
         };
         self.add_item(title.as_str());

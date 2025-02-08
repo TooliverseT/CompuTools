@@ -1,6 +1,7 @@
 {
   "routes": [
     "quaternion",
-    "unix-timestamp"
+    "unix-timestamp",
+    "crc"
   ]
 }

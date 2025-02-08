@@ -223,6 +223,9 @@ impl Component for Home {
                 Thumbnail {
                     title: "quaternion".to_string(),
                 },
+                Thumbnail {
+                    title: "crc".to_string(),
+                },
             ];
             link.send_message(Msg::Init(list));
         }

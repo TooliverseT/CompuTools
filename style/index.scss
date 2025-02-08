@@ -403,3 +403,52 @@ input[type=datetime-local]::placeholder {
 input[type=datetime-local]:focus {
     border: 2px solid var(--color-fourth) !important;
 }
+
+/* Chrome, Safari, Edge, Opera */
+textarea::-webkit-inner-spin-button, 
+textarea::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+textarea {
+    -moz-appearance: textfield;
+}
+
+/* Optional styling */
+textarea {
+    width: 100%;
+    font-family: $font-theme;
+    line-height: 1.8;
+    font-size: 16px;
+    padding: 5px 15px 5px 15px;
+    background-color: var(--color-first);
+    color: var(--color-font);
+    border-radius: 8px;
+    border: 2px solid var(--color-second) !important;
+    overflow: auto;
+    transition: border-color 0.3s;
+    outline: none;
+
+    @include respond-to(xlarge) {
+        font-size: 15px;
+    }
+    @include respond-to(large) {
+        font-size: 14px;
+    }
+    @include respond-to(medium) {
+        font-size: 13px;
+    }
+    @include respond-to(small) {
+        font-size: 12px;
+    }
+}
+
+textarea::placeholder {
+    color: var(--color-subfont);
+}
+
+textarea:focus {
+    border: 2px solid var(--color-fourth) !important;
+}
