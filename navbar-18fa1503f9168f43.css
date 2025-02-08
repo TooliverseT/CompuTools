@@ -409,6 +409,62 @@ input[type=datetime-local]:focus {
   border: 2px solid var(--color-fourth) !important;
 }
 
+/* Chrome, Safari, Edge, Opera */
+textarea::-webkit-inner-spin-button,
+textarea::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+textarea {
+  -moz-appearance: textfield;
+}
+
+/* Optional styling */
+textarea {
+  width: 100%;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  line-height: 1.8;
+  font-size: 16px;
+  padding: 5px 15px 5px 15px;
+  background-color: var(--color-first);
+  color: var(--color-font);
+  border-radius: 8px;
+  border: 2px solid var(--color-second) !important;
+  overflow: auto;
+  transition: border-color 0.3s;
+  outline: none;
+}
+@media (max-width: 1200px) {
+  textarea {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  textarea {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  textarea {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  textarea {
+    font-size: 12px;
+  }
+}
+
+textarea::placeholder {
+  color: var(--color-subfont);
+}
+
+textarea:focus {
+  border: 2px solid var(--color-fourth) !important;
+}
+
 .navbar-wrapper {
   display: flex;
   justify-content: center;
