@@ -432,7 +432,7 @@ textarea {
   color: var(--color-font);
   border-radius: 8px;
   border: 2px solid var(--color-second) !important;
-  overflow: auto;
+  overflow: hidden;
   transition: border-color 0.3s;
   outline: none;
 }
