@@ -303,6 +303,7 @@ select {
     color: var(--color-font);
     border: 2px solid var(--color-second) !important;
     width: 100%;
+    cursor: pointer;
 
     @include respond-to(xlarge) {
         font-size: 15px;

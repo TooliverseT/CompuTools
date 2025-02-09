@@ -1127,7 +1127,7 @@ impl Component for ToolCrc {
                         <div class="tool-inner">
                             <div>
                                 <div class="tool-subtitle" style="margin-bottom: 5px;">{ "Input" }</div>
-                                <input
+                                <textarea
                                     type="text"
                                     value={self.input.clone()}
                                     oninput={link.callback(|e: InputEvent| {
