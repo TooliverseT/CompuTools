@@ -2,6 +2,7 @@
   "routes": [
     "quaternion",
     "unix-timestamp",
-    "crc"
+    "crc",
+    "ascii"
   ]
 }

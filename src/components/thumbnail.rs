@@ -36,6 +36,7 @@ impl Component for Thumbnail {
             "unix-timestamp" => "Unix Timestamp Converter",
             "quaternion" => "Quaternion Converter",
             "crc" => "CRC Converter",
+            "ascii" => "ASCII Converter",
             _ => "Content not found",
         };
 

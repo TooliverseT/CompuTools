@@ -1,4 +1,6 @@
-use crate::tools::{crc::ToolCrc, quaternion::ToolQuaternion, unixtime::ToolUnixtime};
+use crate::tools::{
+    ascii::ToolAscii, crc::ToolCrc, quaternion::ToolQuaternion, unixtime::ToolUnixtime,
+};
 use log::info;
 use web_sys::window;
 use yew::prelude::*;
@@ -33,6 +35,7 @@ impl Component for Page {
             "unix-timestamp" => html! { <ToolUnixtime /> },
             "quaternion" => html! { <ToolQuaternion /> },
             "crc" => html! { <ToolCrc /> },
+            "ascii" => html! { <ToolAscii /> },
             _ => html! { <p>{ "Content not found" }</p> },
         };
         self.add_item(title.as_str());
