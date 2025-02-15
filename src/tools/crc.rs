@@ -382,451 +382,451 @@ impl CrcAlgorithm {
         }
     }
 
-    fn calculate(&self, data: &[u8]) -> u64 {
+    fn calculate(&self, data: &[u8]) -> (u64, u8) {
         match self {
             CrcAlgorithm::Crc3Gsm => {
                 let crc = Crc::<u8>::new(&CRC_3_GSM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 3)
             }
             CrcAlgorithm::Crc3Rohc => {
                 let crc = Crc::<u8>::new(&CRC_3_ROHC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 3)
             }
             CrcAlgorithm::Crc4G704 => {
                 let crc = Crc::<u8>::new(&CRC_4_G_704);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 4)
             }
             CrcAlgorithm::Crc4Interlaken => {
                 let crc = Crc::<u8>::new(&CRC_4_INTERLAKEN);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 4)
             }
             CrcAlgorithm::Crc5EpcC1g2 => {
                 let crc = Crc::<u8>::new(&CRC_5_EPC_C1G2);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 5)
             }
             CrcAlgorithm::Crc5G704 => {
                 let crc = Crc::<u8>::new(&CRC_5_G_704);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 5)
             }
             CrcAlgorithm::Crc5Usb => {
                 let crc = Crc::<u8>::new(&CRC_5_USB);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 5)
             }
             CrcAlgorithm::Crc6Cdma2000A => {
                 let crc = Crc::<u8>::new(&CRC_6_CDMA2000_A);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 6)
             }
             CrcAlgorithm::Crc6Cdma2000B => {
                 let crc = Crc::<u8>::new(&CRC_6_CDMA2000_B);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 6)
             }
             CrcAlgorithm::Crc6Darc => {
                 let crc = Crc::<u8>::new(&CRC_6_DARC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 6)
             }
             CrcAlgorithm::Crc6Gsm => {
                 let crc = Crc::<u8>::new(&CRC_6_GSM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 6)
             }
             CrcAlgorithm::Crc6G704 => {
                 let crc = Crc::<u8>::new(&CRC_6_G_704);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 6)
             }
             CrcAlgorithm::Crc7Mmc => {
                 let crc = Crc::<u8>::new(&CRC_7_MMC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 7)
             }
             CrcAlgorithm::Crc7Rohc => {
                 let crc = Crc::<u8>::new(&CRC_7_ROHC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 7)
             }
             CrcAlgorithm::Crc7Umts => {
                 let crc = Crc::<u8>::new(&CRC_7_UMTS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 7)
             }
             CrcAlgorithm::Crc8Autosar => {
                 let crc = Crc::<u8>::new(&CRC_8_AUTOSAR);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Bluetooth => {
                 let crc = Crc::<u8>::new(&CRC_8_BLUETOOTH);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Cdma2000 => {
                 let crc = Crc::<u8>::new(&CRC_8_CDMA2000);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Darc => {
                 let crc = Crc::<u8>::new(&CRC_8_DARC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8DvbS2 => {
                 let crc = Crc::<u8>::new(&CRC_8_DVB_S2);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8GsmA => {
                 let crc = Crc::<u8>::new(&CRC_8_GSM_A);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8GsmB => {
                 let crc = Crc::<u8>::new(&CRC_8_GSM_B);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Hitag => {
                 let crc = Crc::<u8>::new(&CRC_8_HITAG);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8I4321 => {
                 let crc = Crc::<u8>::new(&CRC_8_I_432_1);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8ICode => {
                 let crc = Crc::<u8>::new(&CRC_8_I_CODE);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Lte => {
                 let crc = Crc::<u8>::new(&CRC_8_LTE);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8MaximDow => {
                 let crc = Crc::<u8>::new(&CRC_8_MAXIM_DOW);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8MifareMad => {
                 let crc = Crc::<u8>::new(&CRC_8_MIFARE_MAD);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Nrsc5 => {
                 let crc = Crc::<u8>::new(&CRC_8_NRSC_5);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Opensafety => {
                 let crc = Crc::<u8>::new(&CRC_8_OPENSAFETY);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Rohc => {
                 let crc = Crc::<u8>::new(&CRC_8_ROHC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8SaeJ1850 => {
                 let crc = Crc::<u8>::new(&CRC_8_SAE_J1850);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Smbus => {
                 let crc = Crc::<u8>::new(&CRC_8_SMBUS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Tech3250 => {
                 let crc = Crc::<u8>::new(&CRC_8_TECH_3250);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc8Wcdma => {
                 let crc = Crc::<u8>::new(&CRC_8_WCDMA);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 8)
             }
             CrcAlgorithm::Crc10Atm => {
                 let crc = Crc::<u16>::new(&CRC_10_ATM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 10)
             }
             CrcAlgorithm::Crc10Cdma2000 => {
                 let crc = Crc::<u16>::new(&CRC_10_CDMA2000);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 10)
             }
             CrcAlgorithm::Crc10Gsm => {
                 let crc = Crc::<u16>::new(&CRC_10_GSM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 10)
             }
             CrcAlgorithm::Crc11Flexray => {
                 let crc = Crc::<u16>::new(&CRC_11_FLEXRAY);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 11)
             }
             CrcAlgorithm::Crc11Umts => {
                 let crc = Crc::<u16>::new(&CRC_11_UMTS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 11)
             }
             CrcAlgorithm::Crc12Cdma2000 => {
                 let crc = Crc::<u16>::new(&CRC_12_CDMA2000);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 12)
             }
             CrcAlgorithm::Crc12Dect => {
                 let crc = Crc::<u16>::new(&CRC_12_DECT);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 12)
             }
             CrcAlgorithm::Crc12Gsm => {
                 let crc = Crc::<u16>::new(&CRC_12_GSM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 12)
             }
             CrcAlgorithm::Crc12Umts => {
                 let crc = Crc::<u16>::new(&CRC_12_UMTS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 12)
             }
             CrcAlgorithm::Crc13Bbc => {
                 let crc = Crc::<u16>::new(&CRC_13_BBC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 13)
             }
             CrcAlgorithm::Crc14Darc => {
                 let crc = Crc::<u16>::new(&CRC_14_DARC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 14)
             }
             CrcAlgorithm::Crc14Gsm => {
                 let crc = Crc::<u16>::new(&CRC_14_GSM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 14)
             }
             CrcAlgorithm::Crc15Can => {
                 let crc = Crc::<u16>::new(&CRC_15_CAN);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 15)
             }
             CrcAlgorithm::Crc15Mpt1327 => {
                 let crc = Crc::<u16>::new(&CRC_15_MPT1327);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 15)
             }
             CrcAlgorithm::Crc16Arc => {
                 let crc = Crc::<u16>::new(&CRC_16_ARC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Cdma2000 => {
                 let crc = Crc::<u16>::new(&CRC_16_CDMA2000);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Cms => {
                 let crc = Crc::<u16>::new(&CRC_16_CMS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Dds110 => {
                 let crc = Crc::<u16>::new(&CRC_16_DDS_110);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16DectR => {
                 let crc = Crc::<u16>::new(&CRC_16_DECT_R);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16DectX => {
                 let crc = Crc::<u16>::new(&CRC_16_DECT_X);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Dnp => {
                 let crc = Crc::<u16>::new(&CRC_16_DNP);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16En13757 => {
                 let crc = Crc::<u16>::new(&CRC_16_EN_13757);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Genibus => {
                 let crc = Crc::<u16>::new(&CRC_16_GENIBUS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Gsm => {
                 let crc = Crc::<u16>::new(&CRC_16_GSM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Ibm3740 => {
                 let crc = Crc::<u16>::new(&CRC_16_IBM_3740);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16IbmSdlc => {
                 let crc = Crc::<u16>::new(&CRC_16_IBM_SDLC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16IsoIec144433A => {
                 let crc = Crc::<u16>::new(&CRC_16_ISO_IEC_14443_3_A);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Kermit => {
                 let crc = Crc::<u16>::new(&CRC_16_KERMIT);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Lj1200 => {
                 let crc = Crc::<u16>::new(&CRC_16_LJ1200);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16M17 => {
                 let crc = Crc::<u16>::new(&CRC_16_M17);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16MaximDow => {
                 let crc = Crc::<u16>::new(&CRC_16_MAXIM_DOW);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Mcrf4xx => {
                 let crc = Crc::<u16>::new(&CRC_16_MCRF4XX);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Modbus => {
                 let crc = Crc::<u16>::new(&CRC_16_MODBUS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Nrsc5 => {
                 let crc = Crc::<u16>::new(&CRC_16_NRSC_5);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16OpensafetyA => {
                 let crc = Crc::<u16>::new(&CRC_16_OPENSAFETY_A);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16OpensafetyB => {
                 let crc = Crc::<u16>::new(&CRC_16_OPENSAFETY_B);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Profibus => {
                 let crc = Crc::<u16>::new(&CRC_16_PROFIBUS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Riello => {
                 let crc = Crc::<u16>::new(&CRC_16_RIELLO);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16SpiFujitsu => {
                 let crc = Crc::<u16>::new(&CRC_16_SPI_FUJITSU);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16T10Dif => {
                 let crc = Crc::<u16>::new(&CRC_16_T10_DIF);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Teledisk => {
                 let crc = Crc::<u16>::new(&CRC_16_TELEDISK);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Tms37157 => {
                 let crc = Crc::<u16>::new(&CRC_16_TMS37157);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Umts => {
                 let crc = Crc::<u16>::new(&CRC_16_UMTS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Usb => {
                 let crc = Crc::<u16>::new(&CRC_16_USB);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc16Xmodem => {
                 let crc = Crc::<u16>::new(&CRC_16_XMODEM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 16)
             }
             CrcAlgorithm::Crc17CanFd => {
                 let crc = Crc::<u32>::new(&CRC_17_CAN_FD);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 17)
             }
             CrcAlgorithm::Crc21CanFd => {
                 let crc = Crc::<u32>::new(&CRC_21_CAN_FD);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 21)
             }
             CrcAlgorithm::Crc24Ble => {
                 let crc = Crc::<u32>::new(&CRC_24_BLE);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 24)
             }
             CrcAlgorithm::Crc24FlexrayA => {
                 let crc = Crc::<u32>::new(&CRC_24_FLEXRAY_A);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 24)
             }
             CrcAlgorithm::Crc24FlexrayB => {
                 let crc = Crc::<u32>::new(&CRC_24_FLEXRAY_B);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 24)
             }
             CrcAlgorithm::Crc24Interlaken => {
                 let crc = Crc::<u32>::new(&CRC_24_INTERLAKEN);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 24)
             }
             CrcAlgorithm::Crc24LteA => {
                 let crc = Crc::<u32>::new(&CRC_24_LTE_A);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 24)
             }
             CrcAlgorithm::Crc24LteB => {
                 let crc = Crc::<u32>::new(&CRC_24_LTE_B);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 24)
             }
             CrcAlgorithm::Crc24Openpgp => {
                 let crc = Crc::<u32>::new(&CRC_24_OPENPGP);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 24)
             }
             CrcAlgorithm::Crc24Os9 => {
                 let crc = Crc::<u32>::new(&CRC_24_OS_9);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 24)
             }
             CrcAlgorithm::Crc30Cdma => {
                 let crc = Crc::<u32>::new(&CRC_30_CDMA);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 30)
             }
             CrcAlgorithm::Crc31Philips => {
                 let crc = Crc::<u32>::new(&CRC_31_PHILIPS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 31)
             }
             CrcAlgorithm::Crc32Aixm => {
                 let crc = Crc::<u32>::new(&CRC_32_AIXM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32Autosar => {
                 let crc = Crc::<u32>::new(&CRC_32_AUTOSAR);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32Base91D => {
                 let crc = Crc::<u32>::new(&CRC_32_BASE91_D);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32Bzip2 => {
                 let crc = Crc::<u32>::new(&CRC_32_BZIP2);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32CdRomEdc => {
                 let crc = Crc::<u32>::new(&CRC_32_CD_ROM_EDC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32Cksum => {
                 let crc = Crc::<u32>::new(&CRC_32_CKSUM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32Iscsi => {
                 let crc = Crc::<u32>::new(&CRC_32_ISCSI);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32IsoHdlc => {
                 let crc = Crc::<u32>::new(&CRC_32_ISO_HDLC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32Jamcrc => {
                 let crc = Crc::<u32>::new(&CRC_32_JAMCRC);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32Mef => {
                 let crc = Crc::<u32>::new(&CRC_32_MEF);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32Mpeg2 => {
                 let crc = Crc::<u32>::new(&CRC_32_MPEG_2);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc32Xfer => {
                 let crc = Crc::<u32>::new(&CRC_32_XFER);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 32)
             }
             CrcAlgorithm::Crc40Gsm => {
                 let crc = Crc::<u64>::new(&CRC_40_GSM);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 40)
             }
             CrcAlgorithm::Crc64Ecma182 => {
                 let crc = Crc::<u64>::new(&CRC_64_ECMA_182);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 64)
             }
             CrcAlgorithm::Crc64GoIso => {
                 let crc = Crc::<u64>::new(&CRC_64_GO_ISO);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 64)
             }
             CrcAlgorithm::Crc64Ms => {
                 let crc = Crc::<u64>::new(&CRC_64_MS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 64)
             }
             CrcAlgorithm::Crc64Redis => {
                 let crc = Crc::<u64>::new(&CRC_64_REDIS);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 64)
             }
             CrcAlgorithm::Crc64We => {
                 let crc = Crc::<u64>::new(&CRC_64_WE);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 64)
             }
             CrcAlgorithm::Crc64Xz => {
                 let crc = Crc::<u64>::new(&CRC_64_XZ);
-                crc.checksum(data) as u64
+                (crc.checksum(data) as u64, 64)
             }
         }
     }
@@ -956,6 +956,7 @@ pub struct ToolCrc {
     bytes_string: String,
     crc_result: u64,
     error_message: String,
+    width: u8,
 }
 
 pub enum Msg {
@@ -979,6 +980,7 @@ impl Component for ToolCrc {
             bytes_string: String::new(),
             crc_result: 0,
             error_message: String::new(),
+            width: 32,
         }
     }
 
@@ -1049,6 +1051,9 @@ impl Component for ToolCrc {
             let select: HtmlInputElement = e.target_unchecked_into();
             Msg::SelectAlgorithm(select.value()) // 이 부분을 적절히 처리해야 합니다
         });
+
+        let digits = ((self.width as f32 / 4.0).ceil()) as usize; // 4비트 = 1자리
+        let formatted_crc = format!("0x{:0width$X}", self.crc_result, width = digits);
 
         html! {
             <>
@@ -1169,7 +1174,7 @@ impl Component for ToolCrc {
                                     name="crc"
                                     readonly=true
                                     style="cursor: pointer;"
-                                    value={format!("0x{:X}", self.crc_result)}
+                                    value={formatted_crc}
                                     onclick={_ctx.link().callback(|e: MouseEvent| {
                                         let input: HtmlInputElement = e.target_unchecked_into();
                                         Msg::CopyToClipboard(input.value())
@@ -1348,7 +1353,7 @@ impl ToolCrc {
         match input_bytes {
             Ok(bytes) => {
                 self.bytes = bytes;
-                self.crc_result = self.selected_algorithm.calculate(&self.bytes);
+                (self.crc_result, self.width) = self.selected_algorithm.calculate(&self.bytes);
             }
             Err(e) => {
                 self.error_message = format!("Error: {}", e);
