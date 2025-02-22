@@ -37,6 +37,7 @@ impl Component for Thumbnail {
             "quaternion" => "Quaternion Converter",
             "crc" => "CRC Converter",
             "ascii" => "ASCII Converter",
+            "json" => "JSON Formatter",
             _ => "Content not found",
         };
 

@@ -3,7 +3,7 @@
 .tool-wrapper {
     display: grid;
     grid-template-columns: 1.4fr 1fr;
-    gap: 50px;
+    gap: 10px;
     padding-left: 150px;
     padding-right: 150px;
     width: 100%;
@@ -25,6 +25,11 @@
     @include respond-to(small) {
         font-size: 14px;
         gap: 5px;
+    }
+
+    &.ver2 {
+        display: flex;
+        flex-direction: column;
     }
 }
 
@@ -116,6 +121,17 @@
     }
     @include respond-to(small) {
         font-size: 12px;
+    }
+
+    &.ver2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+
+        @include respond-to(medium) {
+            display: flex;
+            flex-direction: column;
+        }
     }
 }
 

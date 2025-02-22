@@ -1,5 +1,6 @@
 use crate::tools::{
-    ascii::ToolAscii, crc::ToolCrc, quaternion::ToolQuaternion, unixtime::ToolUnixtime,
+    ascii::ToolAscii, crc::ToolCrc, json::ToolJson, quaternion::ToolQuaternion,
+    unixtime::ToolUnixtime,
 };
 use log::info;
 use web_sys::window;
@@ -36,6 +37,7 @@ impl Component for Page {
             "quaternion" => html! { <ToolQuaternion /> },
             "crc" => html! { <ToolCrc /> },
             "ascii" => html! { <ToolAscii /> },
+            "json" => html! { <ToolJson /> },
             _ => html! { <p>{ "Content not found" }</p> },
         };
         self.add_item(title.as_str());

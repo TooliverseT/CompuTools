@@ -3,6 +3,7 @@
     "quaternion",
     "unix-timestamp",
     "crc",
-    "ascii"
+    "ascii",
+    "json"
   ]
 }

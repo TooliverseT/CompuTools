@@ -229,6 +229,9 @@ impl Component for Home {
                 Thumbnail {
                     title: "ascii".to_string(),
                 },
+                Thumbnail {
+                    title: "json".to_string(),
+                },
             ];
             link.send_message(Msg::Init(list));
         }
