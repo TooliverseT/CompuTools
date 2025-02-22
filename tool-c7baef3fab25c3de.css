@@ -469,7 +469,7 @@ textarea:focus {
 .tool-wrapper {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
-  gap: 50px;
+  gap: 10px;
   padding-left: 150px;
   padding-right: 150px;
   width: 100%;
@@ -499,6 +499,10 @@ textarea:focus {
     font-size: 14px;
     gap: 5px;
   }
+}
+.tool-wrapper.ver2 {
+  display: flex;
+  flex-direction: column;
 }
 
 .tool-change {
@@ -610,6 +614,17 @@ textarea:focus {
 @media (max-width: 480px) {
   .tool-container {
     font-size: 12px;
+  }
+}
+.tool-container.ver2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 768px) {
+  .tool-container.ver2 {
+    display: flex;
+    flex-direction: column;
   }
 }
 
