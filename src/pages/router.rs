@@ -22,6 +22,13 @@ impl Component for Router {
                         <Switch<Route> render={switch} />
                     </div>
                 </div>
+                <footer>
+                    <p>
+                        {"Have suggestions or questions? We'd love to hear from you! For feedback or inquiries, please contact us at "}
+                        <a href="mailto:tooliverse0520@gmail.com">{"tooliverse0520@gmail.com"}</a>
+                        {". We appreciate your input and strive to improve our service!"}
+                    </p>
+                </footer>
             </BrowserRouter>
         }
     }
