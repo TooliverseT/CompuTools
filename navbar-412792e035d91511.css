@@ -36,6 +36,7 @@ body {
 
 .main-content {
   max-width: 1400px;
+  margin-bottom: 100px;
   padding-left: 30px;
   padding-right: 30px;
   width: 100%;
@@ -234,6 +235,31 @@ body {
     height: 55px;
   }
 }
+footer {
+  display: block;
+  background-color: var(--color-third);
+  color: var(--color-font);
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  font-size: 12px;
+  width: 100%;
+  height: auto;
+  margin-top: 100px;
+  padding: 10px 20px 5px 20px;
+}
+@media (max-width: 768px) {
+  footer {
+    font-size: 11px;
+  }
+}
+@media (max-width: 480px) {
+  footer {
+    font-size: 10px;
+  }
+}
+footer p {
+  margin-bottom: 3px;
+}
+
 button:focus {
   outline: none;
 }
@@ -463,4 +489,89 @@ textarea::placeholder {
 
 textarea:focus {
   border: 2px solid var(--color-fourth) !important;
+}
+
+.navbar-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar-container {
+  height: 6.5vh;
+  display: grid;
+  grid-template-columns: 150px 20fr 1fr;
+  max-width: 1400px;
+  padding-left: 30px;
+  padding-right: 30px;
+  width: 100%;
+}
+@media (max-width: 480px) {
+  .navbar-container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-family: "Oswald", helvetica, sans-serif;
+  color: var(--color-font);
+}
+@media (max-width: 480px) {
+  .navbar-content {
+    font-size: 24px;
+  }
+}
+.navbar-content.icon {
+  font-size: 16px;
+  justify-content: right;
+}
+.navbar-content.subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  margin-left: 50px;
+}
+.navbar-content:hover {
+  color: var(--color-font);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.subtitle-content {
+  padding: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-font);
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.subtitle-content:hover {
+  color: var(--color-font);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  padding: unset;
+}
+
+.toggle-btn i {
+  color: var(--color-third);
+}
+
+[data-theme=dark] .toggle-btn i {
+  color: var(--color-third);
 }
