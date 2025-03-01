@@ -5,21 +5,6 @@ use web_sys::{window, HtmlInputElement, HtmlSelectElement};
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq)]
-struct Quaternion {
-    w: f64,
-    x: f64,
-    y: f64,
-    z: f64,
-}
-
-#[derive(Clone, PartialEq)]
-struct EulerAngles {
-    roll: f64,
-    pitch: f64,
-    yaw: f64,
-}
-
-#[derive(Clone, PartialEq)]
 pub enum AsciiMode {
     Decimal,
     Hex,
@@ -219,7 +204,7 @@ impl Component for ToolAscii {
                             </div>
                             <div style="display: flex; align-items: center; padding-left: 20px; padding-right: 20px; margin-bottom: 10px; margin-top: 5px;">
                                 <div style="width: 90%;">
-                                    {"Input Method: "}
+                                    {"Output Format: "}
                                 </div>
                                 <select
                                     id="input-mode-select"

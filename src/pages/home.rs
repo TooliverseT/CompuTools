@@ -232,6 +232,9 @@ impl Component for Home {
                 Thumbnail {
                     title: "json".to_string(),
                 },
+                Thumbnail {
+                    title: "base64".to_string(),
+                },
             ];
             link.send_message(Msg::Init(list));
         }
@@ -244,7 +247,9 @@ impl Home {
         let local_storage = window.local_storage().unwrap().unwrap();
 
         if let Ok(Some(json)) = local_storage.get_item("recent-item") {
-            serde_json::from_str(&json).unwrap_or_else(|_| vec![])
+            let mut items: Vec<String> = serde_json::from_str(&json).unwrap_or_else(|_| vec![]);
+            items.truncate(4); // 최대 4개까지만 유지
+            items
         } else {
             vec![]
         }

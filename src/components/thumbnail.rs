@@ -38,6 +38,7 @@ impl Component for Thumbnail {
             "crc" => "CRC Converter",
             "ascii" => "ASCII Converter",
             "json" => "JSON Formatter",
+            "base64" => "Base64 Converter",
             _ => "Content not found",
         };
 

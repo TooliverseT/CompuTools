@@ -177,7 +177,7 @@ impl Component for ToolJson {
                                 <div>
                                     <textarea
                                         type="text"
-                                        style="overflow: auto; height: 500px;"
+                                        style="overflow: auto; height: 800px;"
                                         wrap="off"
                                         value={self.input.clone()}
                                         placeholder={"Enter JSON here"}
@@ -212,7 +212,7 @@ impl Component for ToolJson {
                                         type="text"
                                         readonly=true
                                         wrap="off"
-                                        style={if self.compact { "cursor: pointer; overflow-y: auto; overflow-x: hidden; height: 500px; white-space: pre-wrap; word-wrap: break-word;" } else {"cursor: pointer; overflow: auto; height: 500px;"}}
+                                        style={if self.compact { "cursor: pointer; overflow-y: auto; overflow-x: hidden; height: 800px; white-space: pre-wrap; word-wrap: break-word;" } else {"cursor: pointer; overflow: auto; height: 800px;"}}
                                         value={self.view_output()}
                                         onclick={_ctx.link().callback(|e: MouseEvent| {
                                             let input: HtmlInputElement = e.target_unchecked_into();
