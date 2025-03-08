@@ -92,20 +92,17 @@ impl Component for ToolAscii {
                 true
             }
             Msg::UpdateText(value) => {
-                info!("update {}", value);
                 self.input_text = value;
 
                 let input_bytes = self.input_text.as_bytes().to_vec();
 
                 if self.mode == AsciiMode::Decimal {
-                    info!("decimal");
                     self.output_ascii = input_bytes
                         .iter()
                         .map(|byte| byte.to_string())
                         .collect::<Vec<String>>()
                         .join(" ");
                 } else {
-                    info!("hex");
                     self.output_ascii = input_bytes
                         .iter()
                         .map(|byte| format!("0x{:02X}", byte))

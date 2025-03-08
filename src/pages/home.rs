@@ -237,6 +237,9 @@ impl Component for Home {
                 Thumbnail {
                     title: "base64".to_string(),
                 },
+                Thumbnail {
+                    title: "base".to_string(),
+                },
             ];
             link.send_message(Msg::Init(list));
         }

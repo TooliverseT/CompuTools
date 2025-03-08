@@ -39,6 +39,7 @@ impl Component for Thumbnail {
             "ascii" => "ASCII Converter",
             "json" => "JSON Formatter",
             "base64" => "Base64 Converter",
+            "base" => "Base Converter",
             _ => "Content not found",
         };
 

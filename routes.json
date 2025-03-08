@@ -5,6 +5,7 @@
     "crc",
     "ascii",
     "json",
-    "base64"
+    "base64",
+    "base"
   ]
 }

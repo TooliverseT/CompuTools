@@ -165,7 +165,6 @@ impl Component for ToolJson {
                             <p>
                                 { "Simplify your JSON workflow with this easy-to-use formatter and validator." }
                             </p>
-
                         </div>
                     </div>
                     <div class="tool-container ver2">

@@ -134,6 +134,10 @@
             flex-direction: column;
         }
     }
+
+    &.ver3 {
+        display: flex;
+    }
 }
 
 .tool-inner {
@@ -342,4 +346,17 @@ select:focus {
 
 select:hover {
     border: 2px solid var(--color-fourth) !important;
+}
+
+.base-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+
+    @include respond-to(medium) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    @include respond-to(small) {
+        grid-template-columns: repeat(1, 1fr);
+    }
 }
