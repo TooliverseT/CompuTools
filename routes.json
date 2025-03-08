@@ -4,6 +4,7 @@
     "unix-timestamp",
     "crc",
     "ascii",
-    "json"
+    "json",
+    "base64"
   ]
 }

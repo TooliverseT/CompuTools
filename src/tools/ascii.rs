@@ -305,7 +305,7 @@ impl Component for ToolAscii {
                     if let Some(meta_tag) =
                         doc.query_selector("meta[name=\"description\"]").unwrap()
                     {
-                        meta_tag.set_attribute("content", "This tool converts text to ASCII codes and vice versa, useful for analyzing or manipulating character data.").unwrap();
+                        meta_tag.set_attribute("content", "This tool converts text to ASCII codes and vice versa, useful for analyzing or manipulating character data. ASCII (American Standard Code for Information Interchange) is widely used in computing and communication systems.").unwrap();
                     }
                 }
             }

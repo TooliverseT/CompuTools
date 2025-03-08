@@ -48,18 +48,25 @@ html[data-theme="dark"] {
     --color-subfont: #{$dark-color-subfont};
 }
 
+html {
+    height: 100%;
+}
+
 body {
     margin: 0;
     background-color: var(--color-first);
     color: var(--light-color-font);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .main-wrapper {
     margin-top: 30px;
-    // margin-bottom: 150px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: nromal;
+    flex: 1;
 
     @include respond-to(small) {
         margin-top: 10px;

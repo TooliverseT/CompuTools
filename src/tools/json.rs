@@ -237,7 +237,7 @@ impl Component for ToolJson {
                     if let Some(meta_tag) =
                         doc.query_selector("meta[name=\"description\"]").unwrap()
                     {
-                        meta_tag.set_attribute("content", "This tool helps you format and validate JSON data easily. JSON (JavaScript Object Notation) is a lightweight data format commonly used for data exchange between systems.").unwrap();
+                        meta_tag.set_attribute("content", "This tool helps you format and validate JSON data easily. JSON (JavaScript Object Notation) is a lightweight data format commonly used for data exchange between systems. Simplify your JSON workflow with this easy-to-use formatter and validator.").unwrap();
                     }
                 }
             }

@@ -349,7 +349,7 @@ impl Component for ToolUnixtime {
                     if let Some(meta_tag) =
                         doc.query_selector("meta[name=\"description\"]").unwrap()
                     {
-                        meta_tag.set_attribute("content", "This tool allows you to convert Unix Timestamps to Date & Time formats and vice versa.").unwrap();
+                        meta_tag.set_attribute("content", "This tool allows you to convert Unix Timestamps to Date & Time formats and vice versa. Unix Timestamps represent the number of seconds since January 1, 1970 (UTC), while Date & Time offers a more readable format for daily use.").unwrap();
                     }
                 }
             }

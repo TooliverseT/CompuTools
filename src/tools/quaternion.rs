@@ -472,7 +472,7 @@ impl Component for ToolQuaternion {
                     if let Some(meta_tag) =
                         doc.query_selector("meta[name=\"description\"]").unwrap()
                     {
-                        meta_tag.set_attribute("content", "This page provides a simple and intuitive tool for converting quaternions to Euler angles roll, pitch, yaw and vice versa.").unwrap();
+                        meta_tag.set_attribute("content", "This page provides a simple and intuitive tool for converting quaternions to Euler angles roll, pitch, yaw and vice versa. Quaternions, commonly used in 3D graphics, robotics, and aerospace, offer a robust way to represent rotations without the issues of gimbal lock. Euler angles, on the other hand, are often more intuitive for human interpretation.").unwrap();
                     }
                 }
             }

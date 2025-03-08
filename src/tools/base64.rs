@@ -200,7 +200,7 @@ impl Component for ToolBase64 {
                     if let Some(meta_tag) =
                         doc.query_selector("meta[name=\"description\"]").unwrap()
                     {
-                        meta_tag.set_attribute("content", "This tool converts text to Base64 encoding and vice versa, useful for encoding binary data or ensuring safe text transmission.").unwrap();
+                        meta_tag.set_attribute("content", "This tool converts text to Base64 encoding and vice versa, useful for encoding binary data or ensuring safe text transmission. Base64 is widely used in data storage, cryptography, and web applications. Base64 encoding ensures data remains intact during transmission by converting binary data into a text-based format.").unwrap();
                     }
                 }
             }
