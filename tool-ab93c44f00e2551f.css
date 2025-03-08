@@ -662,6 +662,9 @@ textarea:focus {
     flex-direction: column;
   }
 }
+.tool-container.ver3 {
+  display: flex;
+}
 
 .tool-inner {
   background-color: var(--color-third);
@@ -910,4 +913,20 @@ select:focus {
 
 select:hover {
   border: 2px solid var(--color-fourth) !important;
+}
+
+.base-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+@media (max-width: 768px) {
+  .base-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .base-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
