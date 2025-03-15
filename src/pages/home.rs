@@ -153,9 +153,9 @@ impl Component for Home {
             <>
                 <div class="home-wrapper">
                     <div class="home-inner">
-                        <div class="home-welcome">
+                        <h1 class="home-welcome">
                             { "Welcome to CompuTools" }
-                        </div>
+                        </h1>
                         <div class="home-intro">
                             { "CompuTools: Engineering made easy for everyone! Simplify calculations with CompuTools' smart, powerful tools—anytime, anywhere."}
                         </div>

@@ -141,9 +141,9 @@ impl Component for ToolJson {
             <>
                 <div class="tool-wrapper ver2">
                     <div>
-                        <div class="tool-title">
+                        <h1 class="tool-title">
                             { "JSON Formatter" }
-                        </div>
+                        </h1>
                         <div class="tool-intro">
                             <p>
                                 { "This tool helps you format and validate JSON data easily. JSON (JavaScript Object Notation) is a lightweight data format commonly used for data exchange between systems." }

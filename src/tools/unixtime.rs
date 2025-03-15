@@ -208,9 +208,9 @@ impl Component for ToolUnixtime {
                 <>
                 <div class="tool-wrapper">
                 <div>
-                    <div class="tool-title">
+                    <h1 class="tool-title">
                         { "Unix Timestamp Converter" }
-                    </div>
+                    </h1>
                     <div class="tool-intro" style="margin-top: 0px;">
                         <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                             <div class="unix-current">

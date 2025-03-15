@@ -154,9 +154,9 @@ impl Component for ToolQuaternion {
                 <>
                     <div class="tool-wrapper">
                         <div>
-                            <div class="tool-title">
+                            <h1 class="tool-title">
                                 { "Quaternion Converter" }
-                            </div>
+                            </h1>
                             <div class="tool-intro">
                                 <p>
                                     { "This page provides a simple and intuitive tool for converting quaternions to Euler angles roll, pitch, yaw and vice versa. Quaternions, commonly used

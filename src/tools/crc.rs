@@ -1059,9 +1059,9 @@ impl Component for ToolCrc {
             <>
                 <div class="tool-wrapper">
                     <div>
-                        <div class="tool-title">
+                        <h1 class="tool-title">
                             { "CRC Converter" }
-                        </div>
+                        </h1>
                         <div class="tool-intro">
                             <p>
                                 {"This page provides a simple tool for calculating CRC (Cyclic Redundancy Check) values to verify data integrity and detect errors. CRC is widely used in networking, storage, and embedded systems."}
@@ -1161,11 +1161,6 @@ impl Component for ToolCrc {
                                     })} />
                             </div>
                         </div>
-                        // if !self.error_message.is_empty() {
-                        //     <div class="error">
-                        //         { &self.error_message }
-                        //     </div>
-                        // }
                         <div class="tool-inner" style="margin-top: 10px;">
                             <div>
                                 <div class="tool-subtitle">{ format!("{} Result", self.selected_algorithm.name()) }</div>

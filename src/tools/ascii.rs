@@ -155,9 +155,9 @@ impl Component for ToolAscii {
                 <>
                     <div class="tool-wrapper">
                         <div>
-                            <div class="tool-title">
+                            <h1 class="tool-title">
                                 { "ASCII Converter" }
-                            </div>
+                            </h1>
                             <div class="tool-intro">
                                 <p>
                                     {"This tool converts text to ASCII codes and vice versa, useful for analyzing or manipulating character data. ASCII (American Standard Code for Information Interchange) is widely used in computing and communication systems."}

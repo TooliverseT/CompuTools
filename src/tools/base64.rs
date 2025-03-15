@@ -80,9 +80,9 @@ impl Component for ToolBase64 {
             <>
                 <div class="tool-wrapper">
                     <div>
-                        <div class="tool-title">
+                        <h1 class="tool-title">
                             { "Base64 Converter" }
-                        </div>
+                        </h1>
                         <div class="tool-intro">
                             <p>
                                 {"This tool converts text to Base64 encoding and vice versa, useful for encoding binary data or ensuring safe text transmission. Base64 is widely used in data storage, cryptography, and web applications."}

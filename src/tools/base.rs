@@ -50,9 +50,9 @@ impl Component for ToolBase {
             <>
                 <div class="tool-wrapper ver2">
                     <div>
-                        <div class="tool-title">
+                        <h1 class="tool-title">
                             { "Base Converter" }
-                        </div>
+                        </h1>
                         <div class="tool-intro">
                             <p>
                                 { "This tool provides convenient number base conversion across multiple numeral systems. Number bases are different ways to represent numerical values using various digit sets." }
