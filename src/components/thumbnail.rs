@@ -40,6 +40,7 @@ impl Component for Thumbnail {
             "json" => "JSON Formatter",
             "base64" => "Base64 Converter",
             "base" => "Base Converter",
+            "file-hash" => "File Hash Generator",
             _ => "Content not found",
         };
 

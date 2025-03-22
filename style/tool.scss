@@ -348,6 +348,40 @@ select:hover {
     border: 2px solid var(--color-fourth) !important;
 }
 
+.tool-btn {
+    appearance: none;
+    font-family: $font-theme;
+    font-size: 16px;
+    border-radius: 8px;
+    padding: 5px 10px 5px 10px;
+    background-color: var(--color-third);
+    color: var(--color-font);
+    border: 2px solid var(--color-second) !important;
+    width: 100%;
+    cursor: pointer;
+
+    @include respond-to(xlarge) {
+        font-size: 15px;
+    }
+    @include respond-to(large) {
+        font-size: 14px;
+    }
+    @include respond-to(medium) {
+        font-size: 13px;
+    }
+    @include respond-to(small) {
+        font-size: 12px;
+    }
+}
+
+.tool-btn:focus {
+    outline: none;
+}
+
+.tool-btn:hover {
+    border: 2px solid var(--color-fourth) !important;
+}
+
 .base-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

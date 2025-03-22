@@ -6,6 +6,7 @@
     "ascii",
     "json",
     "base64",
-    "base"
+    "base",
+    "file-hash"
   ]
 }

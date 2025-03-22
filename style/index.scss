@@ -391,6 +391,42 @@ input[type=text]:focus {
 }
 
 
+/* Optional styling */
+.input-div {
+    width: 100%;
+    font-family: $font-theme;
+    line-height: 1.8;
+    font-size: 16px;
+    padding: 5px 15px 5px 15px;
+    background-color: var(--color-first);
+    color: var(--color-font);
+    border-radius: 8px;
+    border: 2px solid var(--color-second) !important;
+    overflow: auto;
+    transition: border-color 0.3s;
+
+    @include respond-to(xlarge) {
+        font-size: 15px;
+    }
+    @include respond-to(large) {
+        font-size: 14px;
+    }
+    @include respond-to(medium) {
+        font-size: 13px;
+    }
+    @include respond-to(small) {
+        font-size: 12px;
+    }
+}
+
+.input-div::placeholder {
+    color: var(--color-subfont);
+}
+
+.input-div:focus {
+    border: 2px solid var(--color-fourth) !important;
+}
+
 /* Chrome, Safari, Edge, Opera */
 input[type=datetime-local]::-webkit-inner-spin-button, 
 input[type=datetime-local]::-webkit-outer-spin-button { 
@@ -488,4 +524,8 @@ textarea::placeholder {
 
 textarea:focus {
     border: 2px solid var(--color-fourth) !important;
+}
+
+input[type="checkbox"] {
+    accent-color: var(--color-fourth); /* 체크박스 색상 변경 */
 }

@@ -1,6 +1,6 @@
 use crate::tools::{
     ascii::ToolAscii, base::ToolBase, base64::ToolBase64, crc::ToolCrc, json::ToolJson, quaternion::ToolQuaternion,
-    unixtime::ToolUnixtime,
+    unixtime::ToolUnixtime, file_hash::ToolFileHash,
 };
 use log::info;
 use web_sys::window;
@@ -40,6 +40,7 @@ impl Component for Page {
             "json" => html! { <ToolJson /> },
             "base64" => html! { <ToolBase64 /> },
             "base" => html! { <ToolBase /> },
+            "file-hash" => html! { <ToolFileHash /> },
             _ => html! { <p>{ "Content not found" }</p> },
         };
         self.add_item(title.as_str());
