@@ -65,12 +65,12 @@ impl Component for ToolFileHash {
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::FileSelected(file) => {
                 let file_size = format!("{} bytes", file.size());
                 let file_name = file.name();
-                let link = ctx.link().clone();
+                let link = _ctx.link().clone();
                 let file_reader = GlooFile::from(file.clone());
                 
                 // 계산 시작 상태로 변경
@@ -177,7 +177,7 @@ impl Component for ToolFileHash {
         }
     }
 
-    fn view(&self, ctx: &Context<Self>) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         let hashes = vec![
             ("md5", "MD5", &self.hash_md5),
             ("sha1", "SHA-1", &self.hash_sha1),
@@ -237,7 +237,7 @@ impl Component for ToolFileHash {
                                                         type="checkbox"
                                                         id={id.clone()} // ID 적용
                                                         checked={checked}
-                                                        onclick={ctx.link().callback(move |_| Msg::Toggle(key_clone.clone()))} 
+                                                        onclick={_ctx.link().callback(move |_| Msg::Toggle(key_clone.clone()))} 
                                                     />
                                                     <label for={id.clone()} style="cursor: pointer; margin-bottom: 0px;">{ key.clone() }</label> // 라벨 클릭 가능
                                                 </div>
@@ -247,7 +247,7 @@ impl Component for ToolFileHash {
                                 </div>
                                 <div class="input-div" style="display: grid; grid-template-columns: 2.6fr 1fr; gap: 5px;">
                                     <input id="file-input" type="file" style="display: none;"
-                                        onchange={ctx.link().callback(|e: Event| {
+                                        onchange={_ctx.link().callback(|e: Event| {
                                             let input: web_sys::HtmlInputElement = e.target_unchecked_into();
                                             if let Some(files) = input.files() {
                                                 if let Some(file) = files.get(0) {
@@ -262,7 +262,7 @@ impl Component for ToolFileHash {
                                     <button
                                         class="tool-btn"
                                         disabled={self.is_computing}
-                                        onclick={ctx.link().callback(|_| {
+                                        onclick={_ctx.link().callback(|_| {
                                             let document = web_sys::window().unwrap().document().unwrap();
                                             if let Some(input) = document.get_element_by_id("file-input") {
                                                 input.dyn_ref::<web_sys::HtmlInputElement>().unwrap().click();
@@ -296,7 +296,7 @@ impl Component for ToolFileHash {
                                         readonly=true
                                         style="cursor: pointer;"
                                         value={self.file_size.clone()}                                        
-                                        onclick={ctx.link().callback(|e: MouseEvent| {
+                                        onclick={_ctx.link().callback(|e: MouseEvent| {
                                             let input: HtmlInputElement = e.target_unchecked_into();
                                             Msg::CopyToClipboard(input.value())
                                         })}
@@ -311,7 +311,7 @@ impl Component for ToolFileHash {
                                             readonly=true
                                             style="cursor: pointer;"
                                             value={format!("{:}", value.clone())}
-                                            onclick={ctx.link().callback(|e: MouseEvent| {
+                                            onclick={_ctx.link().callback(|e: MouseEvent| {
                                                 let input: HtmlInputElement = e.target_unchecked_into();
                                                 Msg::CopyToClipboard(input.value())
                                             })}
@@ -324,6 +324,23 @@ impl Component for ToolFileHash {
                     </div>
                 </div>
             </>
+        }
+    }
+
+    fn rendered(&mut self, _ctx: &Context<Self>, first_render: bool) {
+        if first_render {
+            if let Some(window) = window() {
+                let document = window.document();
+                if let Some(doc) = document {
+                    doc.set_title("File Hash Generator | CompuTools");
+
+                    if let Some(meta_tag) =
+                        doc.query_selector("meta[name=\"description\"]").unwrap()
+                    {
+                        meta_tag.set_attribute("content", "This tool allows you to calculate cryptographic hash values for files, ensuring data integrity and security. It supports multiple hash algorithms commonly used for verification and authentication purposes. Compute hash values for any file using MD5, SHA-1, SHA-256, and SHA-512. Simply select a file, and the tool will compute its hash values efficiently.").unwrap();
+                    }
+                }
+            }
         }
     }
 }
