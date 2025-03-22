@@ -1,3 +1,4 @@
+@charset "UTF-8";
 html[data-theme=light] {
   --color-first: #FFFBE9;
   --color-second: #ebdbc5;
@@ -386,6 +387,49 @@ input[type=text]:focus {
   border: 2px solid var(--color-fourth) !important;
 }
 
+/* Optional styling */
+.input-div {
+  width: 100%;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  line-height: 1.8;
+  font-size: 16px;
+  padding: 5px 15px 5px 15px;
+  background-color: var(--color-first);
+  color: var(--color-font);
+  border-radius: 8px;
+  border: 2px solid var(--color-second) !important;
+  overflow: auto;
+  transition: border-color 0.3s;
+}
+@media (max-width: 1200px) {
+  .input-div {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  .input-div {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  .input-div {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  .input-div {
+    font-size: 12px;
+  }
+}
+
+.input-div::placeholder {
+  color: var(--color-subfont);
+}
+
+.input-div:focus {
+  border: 2px solid var(--color-fourth) !important;
+}
+
 /* Chrome, Safari, Edge, Opera */
 input[type=datetime-local]::-webkit-inner-spin-button,
 input[type=datetime-local]::-webkit-outer-spin-button {
@@ -497,4 +541,93 @@ textarea::placeholder {
 
 textarea:focus {
   border: 2px solid var(--color-fourth) !important;
+}
+
+input[type=checkbox] {
+  accent-color: var(--color-fourth); /* 체크박스 색상 변경 */
+}
+
+.navbar-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar-container {
+  height: 6.5vh;
+  display: grid;
+  grid-template-columns: 150px 20fr 1fr;
+  max-width: 1400px;
+  padding-left: 30px;
+  padding-right: 30px;
+  width: 100%;
+}
+@media (max-width: 480px) {
+  .navbar-container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-family: "Oswald", helvetica, sans-serif;
+  color: var(--color-font);
+}
+@media (max-width: 480px) {
+  .navbar-content {
+    font-size: 24px;
+  }
+}
+.navbar-content.icon {
+  font-size: 16px;
+  justify-content: right;
+}
+.navbar-content.subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  margin-left: 50px;
+}
+.navbar-content:hover {
+  color: var(--color-font);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.subtitle-content {
+  padding: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-font);
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.subtitle-content:hover {
+  color: var(--color-font);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  padding: unset;
+}
+
+.toggle-btn i {
+  color: var(--color-third);
+}
+
+[data-theme=dark] .toggle-btn i {
+  color: var(--color-third);
 }

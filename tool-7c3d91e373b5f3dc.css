@@ -387,6 +387,49 @@ input[type=text]:focus {
   border: 2px solid var(--color-fourth) !important;
 }
 
+/* Optional styling */
+.input-div {
+  width: 100%;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  line-height: 1.8;
+  font-size: 16px;
+  padding: 5px 15px 5px 15px;
+  background-color: var(--color-first);
+  color: var(--color-font);
+  border-radius: 8px;
+  border: 2px solid var(--color-second) !important;
+  overflow: auto;
+  transition: border-color 0.3s;
+}
+@media (max-width: 1200px) {
+  .input-div {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  .input-div {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  .input-div {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  .input-div {
+    font-size: 12px;
+  }
+}
+
+.input-div::placeholder {
+  color: var(--color-subfont);
+}
+
+.input-div:focus {
+  border: 2px solid var(--color-fourth) !important;
+}
+
 /* Chrome, Safari, Edge, Opera */
 input[type=datetime-local]::-webkit-inner-spin-button,
 input[type=datetime-local]::-webkit-outer-spin-button {
@@ -498,6 +541,10 @@ textarea::placeholder {
 
 textarea:focus {
   border: 2px solid var(--color-fourth) !important;
+}
+
+input[type=checkbox] {
+  accent-color: var(--color-fourth); /* 체크박스 색상 변경 */
 }
 
 .tool-wrapper {
@@ -912,6 +959,47 @@ select:focus {
 }
 
 select:hover {
+  border: 2px solid var(--color-fourth) !important;
+}
+
+.tool-btn {
+  appearance: none;
+  font-family: "JetBrains Mono", helvetica, sans-serif;
+  font-size: 16px;
+  border-radius: 8px;
+  padding: 5px 10px 5px 10px;
+  background-color: var(--color-third);
+  color: var(--color-font);
+  border: 2px solid var(--color-second) !important;
+  width: 100%;
+  cursor: pointer;
+}
+@media (max-width: 1200px) {
+  .tool-btn {
+    font-size: 15px;
+  }
+}
+@media (max-width: 1024px) {
+  .tool-btn {
+    font-size: 14px;
+  }
+}
+@media (max-width: 768px) {
+  .tool-btn {
+    font-size: 13px;
+  }
+}
+@media (max-width: 480px) {
+  .tool-btn {
+    font-size: 12px;
+  }
+}
+
+.tool-btn:focus {
+  outline: none;
+}
+
+.tool-btn:hover {
   border: 2px solid var(--color-fourth) !important;
 }
 
