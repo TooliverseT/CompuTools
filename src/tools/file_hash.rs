@@ -17,8 +17,10 @@ use yew::prelude::*;
 
 // 청크 처리를 위한 상수 - 성능 향상을 위해 청크 크기 증가
 const CHUNK_SIZE: usize = 16 * 1024 * 1024;
-const PROGRESS_UPDATE_INTERVAL: usize = 1;
+const PROGRESS_UPDATE_INTERVAL: u32 = 1;
 const UI_UPDATE_DELAY_MS: u32 = 10;
+const PROGRESS_UPDATE_RETURN: u32 = 20;
+const UPDATE_DELAY_MS: u32 = 5;
 
 pub struct ToolFileHash {
     file_name: String,
@@ -28,7 +30,7 @@ pub struct ToolFileHash {
     hash_sha256: String,
     hash_sha512: String,
     is_computing: bool,
-    step: String,
+    step: bool,
     progress: f64,
     selected: IndexMap<String, bool>,
 }
@@ -63,7 +65,7 @@ impl Component for ToolFileHash {
             hash_sha256: "".to_string(),
             hash_sha512: "".to_string(),
             is_computing: false,
-            step: "".to_string(),
+            step: false,
             progress: 0.0,
             selected,
         }
@@ -75,17 +77,16 @@ impl Component for ToolFileHash {
                 let file_size = format!("{} bytes", file.size());
                 let file_name = file.name();
                 let link = _ctx.link().clone();
-                let file_reader = GlooFile::from(file.clone());
-
+                
                 // 계산 시작 상태로 변경
                 link.send_message(Msg::ComputeStarted);
-
+                
                 // 선택된 해시 알고리즘 확인
                 let selected = self.selected.clone();
-
+                
                 // 해시 계산을 청크 단위로 수행하여 UI 블로킹 방지
                 spawn_local(async move {
-                    let mut md5_hasher =
+                    let mut md5_hasher = 
                         selected.get("md5").copied().unwrap_or(false).then(Md5::new);
                     let mut sha1_hasher = selected
                         .get("sha1")
@@ -102,55 +103,92 @@ impl Component for ToolFileHash {
                         .copied()
                         .unwrap_or(false)
                         .then(Sha512::new);
+                    
+                    let total_size = file.size() as f64;
+                    let mut bytes_processed: f64 = 0.0;
+                    let mut chunk_counter: u32 = 0;
 
-                    let mut bytes_processed = 0;
-                    let total_size = file.size() as usize;
+                    link.send_message(Msg::ProgressUpdate(false, 0.0));
+                    
+                    let total_chunks = (total_size / CHUNK_SIZE as f64).ceil() as usize;
 
-                    let stream = read_file_in_chunks(&file, CHUNK_SIZE, link.clone());
-                    let mut bytes_processed = 0;
-                    let mut chunk_counter = 0;
-
-                    // 스트림에서 청크 처리
-                    for chunk_result in stream.await {
-                        if let Ok(chunk) = chunk_result {
-                            // 해시 업데이트
-                            if let Some(h) = &mut md5_hasher {
-                                h.update(&chunk);
+                    // 파일을 청크 단위로 처리
+                    for i in 0..total_chunks {
+                        let start = (i as f64) * (CHUNK_SIZE as f64);
+                        let end = (start + CHUNK_SIZE as f64).min(total_size);
+                        
+                        // 현재 청크 슬라이스 생성
+                        let chunk = match file.slice_with_f64_and_f64(start as f64, end as f64) {
+                            Ok(slice) => slice,
+                            Err(_) => {
+                                // 슬라이스 생성 실패 처리
+                                link.send_message(Msg::HashesComputed(
+                                    String::new(),
+                                    String::new(),
+                                    String::new(),
+                                    String::new()
+                                ));
+                                return;
                             }
-                            if let Some(h) = &mut sha1_hasher {
-                                h.update(&chunk);
-                            }
-                            if let Some(h) = &mut sha256_hasher {
-                                h.update(&chunk);
-                            }
-                            if let Some(h) = &mut sha512_hasher {
-                                h.update(&chunk);
-                            }
+                        };
 
-                            // 처리 바이트 수 업데이트
-                            bytes_processed += chunk.len();
-                            chunk_counter += 1;
-
-                            // 진행 상황 업데이트 (일정 간격으로만)
-                            if chunk_counter % PROGRESS_UPDATE_INTERVAL == 0 {
-                                let progress = bytes_processed as f64 / total_size as f64;
-                                link.send_message(Msg::ProgressUpdate(true, progress));
-
-                                // UI 업데이트를 위한 짧은 지연
-                                TimeoutFuture::new(UI_UPDATE_DELAY_MS).await;
+                        // 청크 데이터 읽기
+                        let chunk_data = match read_slice_as_array_buffer(&chunk).await {
+                            Ok(data) => data,
+                            Err(_) => {
+                                // 읽기 실패 처리
+                                link.send_message(Msg::HashesComputed(
+                                    String::new(),
+                                    String::new(),
+                                    String::new(),
+                                    String::new()
+                                ));
+                                return;
                             }
+                        };
+
+                        // 해시 업데이트
+                        if let Some(h) = &mut md5_hasher {
+                            h.update(&chunk_data);
+                        }
+                        if let Some(h) = &mut sha1_hasher {
+                            h.update(&chunk_data);
+                        }
+                        if let Some(h) = &mut sha256_hasher {
+                            h.update(&chunk_data);
+                        }
+                        if let Some(h) = &mut sha512_hasher {
+                            h.update(&chunk_data);
+                        }
+                        
+                        // 처리 바이트 수 업데이트
+                        bytes_processed += chunk_data.len() as f64;
+                        chunk_counter = chunk_counter.wrapping_add(1);  // 오버플로우 방지
+                        
+                        // 진행 상황 업데이트 (일정 간격으로만)
+                        if chunk_counter % PROGRESS_UPDATE_INTERVAL == 0 {
+                            let progress = bytes_processed as f64 / total_size as f64;
+                            link.send_message(Msg::ProgressUpdate(true, progress));
+                            
+                            // UI 업데이트를 위한 짧은 지연
+                            TimeoutFuture::new(UI_UPDATE_DELAY_MS).await;
+                        }
+
+                        if chunk_counter % PROGRESS_UPDATE_RETURN == 0 {
+                            TimeoutFuture::new(UPDATE_DELAY_MS).await;  // 5ms 지연으로 브라우저에 제어권 반환
                         }
                     }
-
+                    
+                    // 최종 진행률 업데이트
                     link.send_message(Msg::ProgressUpdate(true, 1.0));
-
+                    
                     // 최종 해시 값 계산
                     let md5_result = md5_hasher.map(|h| format!("{:x}", h.finalize()));
                     let sha1_result = sha1_hasher.map(|h| format!("{:x}", h.finalize()));
                     let sha256_result = sha256_hasher.map(|h| format!("{:x}", h.finalize()));
                     let sha512_result = sha512_hasher.map(|h| format!("{:x}", h.finalize()));
-
-                    // None 값을 빈 문자열로 변환하여 Msg 전송
+                    
+                    // 해시 값 전송
                     link.send_message(Msg::HashesComputed(
                         md5_result.unwrap_or_default(),
                         sha1_result.unwrap_or_default(),
@@ -158,8 +196,7 @@ impl Component for ToolFileHash {
                         sha512_result.unwrap_or_default(),
                     ));
                 });
-
-                // self.file = Some(file);
+                
                 self.file_name = file_name;
                 self.file_size = file_size;
                 true
@@ -170,11 +207,7 @@ impl Component for ToolFileHash {
                 true
             }
             Msg::ProgressUpdate(step, progress) => {
-                if step {
-                    self.step = "Processing (2/2)".to_string();
-                } else {
-                    self.step = "Chunking (1/2)".to_string();
-                }
+                self.step = step;
                 self.progress = progress;
                 true
             }
@@ -322,7 +355,11 @@ impl Component for ToolFileHash {
                                     </div>
                                 </div>
                                 <div style="text-align: center; margin-top: 5px;">
-                                    { format!("{:?}: {:.1}%", self.step, self.progress * 100.0) }
+                                    if self.step {
+                                        { format!("Processing: {:.1}%", self.progress * 100.0) }
+                                    } else {
+                                        { format!("Loading...") }
+                                    }
                                 </div>
                             </div>
                         } else if self.progress == 1.0 {
@@ -383,92 +420,31 @@ impl Component for ToolFileHash {
     }
 }
 
-// 파일을 청크로 읽는 유틸리티 함수
-async fn read_file_in_chunks(
-    file: &File,
-    chunk_size: usize,
-    link: html::Scope<ToolFileHash>,
-) -> Vec<Result<Vec<u8>, JsValue>> {
-    let file_size = file.size() as usize;
-    let chunks = (file_size + chunk_size - 1) / chunk_size; // 올림
-    let mut results = Vec::new();
-
-    let mut bytes_processed = 0;
-    let mut chunk_counter = 0;
-
-    for i in 0..chunks {
-        let start = i * chunk_size;
-        let end = std::cmp::min(start + chunk_size, file_size);
-
-        // 현재 청크 슬라이스 생성
-        let chunk = match file.slice_with_i32_and_i32(start as i32, end as i32) {
-            Ok(slice) => slice,
-            Err(e) => {
-                continue;
-            }
-        };
-
-        // 청크 읽기
-        let chunk_data = read_slice_as_array_buffer(&chunk).await;
-
-        // 읽은 청크 추가
-        results.push(chunk_data.clone());
-
-        // 처리 바이트 수 업데이트
-        bytes_processed += chunk_data.as_ref().map_or(0, |chunk| chunk.len());
-        chunk_counter += 1;
-
-        // 진행 상황 업데이트
-        if chunk_counter % PROGRESS_UPDATE_INTERVAL == 0 {
-            let progress = bytes_processed as f64 / file_size as f64;
-            link.send_message(Msg::ProgressUpdate(false, progress));
-
-            // 일정 간격마다 UI 업데이트를 위한 짧은 지연
-            TimeoutFuture::new(UI_UPDATE_DELAY_MS).await;
-        }
-    }
-
-    results
-}
-
-// 파일 슬라이스를 ArrayBuffer로 읽기
 async fn read_slice_as_array_buffer(slice: &Blob) -> Result<Vec<u8>, JsValue> {
     let promise = js_sys::Promise::new(&mut |resolve, reject| {
         let reader = WebFileReader::new().unwrap();
-
-        // 로드 이벤트 핸들러
         let onload = Closure::once(Box::new(move |event: ProgressEvent| {
             let reader: WebFileReader = event.target().unwrap().dyn_into().unwrap();
             let array_buffer = reader.result().unwrap();
-            let uint8_array = js_sys::Uint8Array::new(&array_buffer);
-            let rust_array = uint8_array.to_vec();
-            let _ = resolve.call1(
-                &JsValue::NULL,
-                &JsValue::from(js_sys::Uint8Array::from(&rust_array[..])),
-            );
+            // Just pass the ArrayBuffer directly to resolve
+            let _ = resolve.call1(&JsValue::NULL, &array_buffer);
         }) as Box<dyn FnOnce(ProgressEvent)>);
 
-        // 에러 이벤트 핸들러
         let onerror = Closure::once(Box::new(move |event: ProgressEvent| {
             let reader: WebFileReader = event.target().unwrap().dyn_into().unwrap();
-            let _ = reject.call1(&JsValue::NULL, &reader.error().unwrap());
+            let error = reader.error().unwrap();
+            let _ = reject.call1(&JsValue::NULL, &error);
         }) as Box<dyn FnOnce(ProgressEvent)>);
 
         reader.set_onload(Some(onload.as_ref().unchecked_ref()));
         reader.set_onerror(Some(onerror.as_ref().unchecked_ref()));
 
-        // ArrayBuffer로 읽기 시작
         reader.read_as_array_buffer(slice).unwrap();
-
-        // 클로저 메모리 누수 방지
         onload.forget();
         onerror.forget();
     });
 
-    // Promise를 Future로 변환
     let result = wasm_bindgen_futures::JsFuture::from(promise).await?;
-
-    // JsValue(Uint8Array)를 Vec<u8>로 변환
     let uint8_array = js_sys::Uint8Array::new(&result);
     let rust_array = uint8_array.to_vec();
 
