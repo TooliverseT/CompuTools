@@ -709,6 +709,12 @@ input[type=checkbox] {
     flex-direction: column;
   }
 }
+.tool-container.ver2.column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 30px;
+}
 .tool-container.ver3 {
   display: flex;
 }
