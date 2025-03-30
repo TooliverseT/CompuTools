@@ -243,6 +243,9 @@ impl Component for Home {
                 Thumbnail {
                     title: "file-hash".to_string(),
                 },
+                Thumbnail {
+                    title: "html".to_string(),
+                },
             ];
             link.send_message(Msg::Init(list));
         }

@@ -7,6 +7,7 @@
     "json",
     "base64",
     "base",
-    "file-hash"
+    "file-hash",
+    "html"
   ]
 }

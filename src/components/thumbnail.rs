@@ -41,6 +41,7 @@ impl Component for Thumbnail {
             "base64" => "Base64 Converter",
             "base" => "Base Converter",
             "file-hash" => "File Hash Generator",
+            "html" => "HTML Converter",
             _ => "Content not found",
         };
 
