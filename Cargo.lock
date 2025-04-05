@@ -200,6 +200,7 @@ dependencies = [
  "serde_yaml",
  "sha1",
  "sha2",
+ "urlencoding",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-logger",

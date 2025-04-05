@@ -8,6 +8,7 @@
     "base64",
     "base",
     "file-hash",
-    "html"
+    "html",
+    "url"
   ]
 }
