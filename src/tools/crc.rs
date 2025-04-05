@@ -1192,7 +1192,7 @@ impl Component for ToolCrc {
                     if let Some(meta_tag) =
                         doc.query_selector("meta[name=\"description\"]").unwrap()
                     {
-                        meta_tag.set_attribute("content", "This page provides a simple and efficient tool for calculating CRC (Cyclic Redundancy Check) values for data integrity verification and error detection. CRC is widely used in networking, storage, and embedded systems. crc3, crc4, crc5, crc6, crc7, crc8, crc10, crc11, crc12, crc13, crc14, crc15, crc16, crc17, crc21, crc24, crc30, crc31,crc32, crc40, crc64").unwrap();
+                        meta_tag.set_attribute("content", "This page provides a simple and efficient tool for calculating CRC (Cyclic Redundancy Check) values for data integrity verification and error detection. CRC is widely used in networking, storage, and embedded systems. crc3, crc4, crc5, crc6, crc7, crc8, crc10, crc11, crc12, crc13, crc14, crc15, crc16, crc17, crc21, crc24, crc30, crc31,crc32, crc40, crc64. CTC Tool").unwrap();
                     }
                 }
             }
