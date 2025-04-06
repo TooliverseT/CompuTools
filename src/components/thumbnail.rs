@@ -43,6 +43,7 @@ impl Component for Thumbnail {
             "file-hash" => "File Hash Generator",
             "html" => "HTML Converter",
             "url" => "URL Converter",
+            "uuid" => "UUID Generator",
             _ => "Content not found",
         };
 

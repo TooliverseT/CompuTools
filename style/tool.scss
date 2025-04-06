@@ -249,6 +249,25 @@
     color: #666;
 }
 
+.uuid-value {
+    font-family: $font-title;
+    font-size: 40px;
+    font-style: italic;
+
+    @include respond-to(xlarge) {
+        font-size: 35px;
+    }
+    @include respond-to(large) {
+        font-size: 20px;
+    }
+    @include respond-to(medium) {
+        font-size: 20px;
+    }
+    @include respond-to(small) {
+        font-size: 20px;
+    }
+}
+
 .unix-current {
     font-family: $font-title;
     font-size: 40px;

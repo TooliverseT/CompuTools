@@ -8,3 +8,4 @@ pub mod base;
 pub mod file_hash;
 pub mod html;
 pub mod url;
+pub mod uuid;

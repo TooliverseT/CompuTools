@@ -249,6 +249,9 @@ impl Component for Home {
                 Thumbnail {
                     title: "url".to_string(),
                 },
+                Thumbnail {
+                    title: "uuid".to_string(),
+                },
             ];
             link.send_message(Msg::Init(list));
         }
