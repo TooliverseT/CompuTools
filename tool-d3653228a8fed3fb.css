@@ -834,6 +834,32 @@ input[type=checkbox] {
   color: #666;
 }
 
+.uuid-value {
+  font-family: "Oswald", helvetica, sans-serif;
+  font-size: 40px;
+  font-style: italic;
+}
+@media (max-width: 1200px) {
+  .uuid-value {
+    font-size: 35px;
+  }
+}
+@media (max-width: 1024px) {
+  .uuid-value {
+    font-size: 20px;
+  }
+}
+@media (max-width: 768px) {
+  .uuid-value {
+    font-size: 20px;
+  }
+}
+@media (max-width: 480px) {
+  .uuid-value {
+    font-size: 20px;
+  }
+}
+
 .unix-current {
   font-family: "Oswald", helvetica, sans-serif;
   font-size: 40px;
