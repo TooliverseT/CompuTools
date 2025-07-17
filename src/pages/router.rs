@@ -23,7 +23,7 @@ impl Component for Router {
                     </div>
                 </div>
                 <footer>
-                    <p style="margin-top: 10px; font-size: 0.9em;">
+                    <p style="font-size: 0.9em;">
                         <a href="/about/" style="margin-right: 15px;">{"About"}</a>
                         <a href="/privacy/" style="margin-right: 15px;">{"Privacy Policy"}</a>
                         <a href="/terms/" style="margin-right: 15px;">{"Terms of Service"}</a>
