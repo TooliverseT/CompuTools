@@ -82,8 +82,8 @@ impl Page {
         items.insert(0, item.to_string());
 
         // 최대 크기를 초과하는 경우 초과 항목 제거
-        if items.len() > 4 {
-            items.truncate(4);
+        if items.len() > 6 {
+            items.truncate(6);
         }
 
         // JSON으로 직렬화하여 저장

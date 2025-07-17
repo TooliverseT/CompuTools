@@ -3,7 +3,7 @@ use log::info;
 use yew::platform::*;
 use yew::prelude::*;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Thumbnail {
     pub title: String,
 }
