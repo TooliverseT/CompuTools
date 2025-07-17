@@ -46,25 +46,14 @@ impl Component for Navbar {
                     <Link<Route> classes={classes!("navbar-content")} to={Route::Home}>
                         { "CompuTools" }
                     </Link<Route>>
-                    <div>
+                    <div class="navbar-content subtitle" style="justify-content: right;">
+                        <Link<Route> classes={classes!("subtitle-content")} to={Route::About}>
+                            { "About" }
+                        </Link<Route>>
+                        <Link<Route> classes={classes!("subtitle-content")} to={Route::Contact}>
+                            { "Contact" }
+                        </Link<Route>>
                     </div>
-                    // <div class="navbar-content subtitle" style="justify-content: right;">
-                    //     <Link<Route> classes={classes!("subtitle-content")} to={Route::Post}>
-                    //         { "POST" }
-                    //     </Link<Route>>
-                    //     <Link<Route> classes={classes!("subtitle-content")} to={Route::Portfolio}>
-                    //         { "PORTFOLIO" }
-                    //     </Link<Route>>
-                    //     <Link<Route> classes={classes!("subtitle-content")} to={Route::Archive}>
-                    //         { "ARCHIVE" }
-                    //     </Link<Route>>
-                    //     <Link<Route> classes={classes!("subtitle-content")} to={Route::About}>
-                    //         { "ABOUT" }
-                    //     </Link<Route>>
-                    // </div>
-                    // <Link<Route> classes={classes!("navbar-content", "icon")} to={Route::Search}>
-                        // <i class="fa-solid fa-magnifying-glass"></i>
-                    // </Link<Route>>
                     <button class="toggle-btn" onclick={_ctx.link().callback(|_| Msg::ToggleTheme)}>
                         <i class="fa-solid fa-circle-half-stroke"></i>
                     </button>

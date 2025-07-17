@@ -1,4 +1,4 @@
-use super::{home::Home, navbar::Navbar, page::Page};
+use super::{home::Home, navbar::Navbar, page::Page, about::About, privacy::Privacy, terms::Terms, contact::Contact};
 use log::info;
 use yew::prelude::*;
 use yew_router::prelude::*;
@@ -23,10 +23,11 @@ impl Component for Router {
                     </div>
                 </div>
                 <footer>
-                    <p>
-                        {"Have suggestions or questions? We'd love to hear from you! For feedback or inquiries, please contact us at "}
-                        <a href="mailto:tooliverse0520@gmail.com">{"tooliverse0520@gmail.com"}</a>
-                        {". We appreciate your input and strive to improve our service!"}
+                    <p style="margin-top: 10px; font-size: 0.9em;">
+                        <a href="/about/" style="margin-right: 15px;">{"About"}</a>
+                        <a href="/privacy/" style="margin-right: 15px;">{"Privacy Policy"}</a>
+                        <a href="/terms/" style="margin-right: 15px;">{"Terms of Service"}</a>
+                        <a href="/contact/">{"Contact"}</a>
                     </p>
                 </footer>
             </BrowserRouter>
@@ -38,6 +39,18 @@ fn switch(routes: Route) -> Html {
     match routes {
         Route::Home => {
             html! { <Home /> }
+        }
+        Route::About => {
+            html! { <About /> }
+        }
+        Route::Privacy => {
+            html! { <Privacy /> }
+        }
+        Route::Terms => {
+            html! { <Terms /> }
+        }
+        Route::Contact => {
+            html! { <Contact /> }
         }
         Route::Page { title } => {
             html! { <Page title={title.clone()} /> }
@@ -61,6 +74,14 @@ fn switch(routes: Route) -> Html {
 pub enum Route {
     #[at("/")]
     Home,
+    #[at("/about/")]
+    About,
+    #[at("/privacy/")]
+    Privacy,
+    #[at("/terms/")]
+    Terms,
+    #[at("/contact/")]
+    Contact,
     #[at("/:title/")]
     Page { title: String },
     #[not_found]
