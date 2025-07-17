@@ -1,5 +1,9 @@
 {
   "routes": [
+    "about",
+    "contact",
+    "privacy",
+    "terms",
     "quaternion",
     "unix-timestamp",
     "crc",
