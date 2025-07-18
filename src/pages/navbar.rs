@@ -18,6 +18,7 @@ pub enum Msg {
     SearchInput(String),
     Search,
     CloseModal,
+    ScrollToTop, // 새로운 메시지 추가
 }
 
 #[derive(Clone, PartialEq)]
@@ -165,6 +166,20 @@ impl Component for Navbar {
                 self.search_results = Vec::new();
                 true
             }
+            Msg::ScrollToTop => {
+                if let Some(window) = window() {
+                    // 더 안정적인 스크롤 방법 사용
+                    let _ = window.scroll_to_with_x_and_y(0.0, 0.0);
+                    
+                    // 또는 document의 scrollIntoView 사용
+                    if let Some(document) = window.document() {
+                        if let Some(body) = document.body() {
+                            let _ = body.scroll_into_view();
+                        }
+                    }
+                }
+                true
+            }
         }
     }
 
@@ -222,6 +237,19 @@ impl Component for Navbar {
                             </button>
                         </div>
                     </div>
+                </div>
+
+                // 새로운 플로팅 아이콘들 (오른쪽 하단 고정)
+                <div class="floating-icons">
+                    <button class="floating-icon-btn search-btn" onclick={_ctx.link().callback(|_| Msg::ToggleSearchModal)} title="Search Tools">
+                        <i class="fa-solid fa-search"></i>
+                    </button>
+                    <button class="floating-icon-btn toggle-btn" onclick={_ctx.link().callback(|_| Msg::ToggleTheme)} title="Toggle Theme">
+                        <i class="fa-solid fa-circle-half-stroke"></i>
+                    </button>
+                    <button class="floating-icon-btn scroll-btn" onclick={_ctx.link().callback(|_| Msg::ScrollToTop)} title="Scroll to Top">
+                        <i class="fa-solid fa-angle-up"></i>
+                    </button>
                 </div>
 
                 if self.show_search_modal {

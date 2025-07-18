@@ -4,15 +4,25 @@
     display: grid;
     grid-template-columns: 1.4fr 1fr;
     gap: 10px;
-    padding-left: 150px;
-    padding-right: 150px;
+    padding-left: 100px;
+    padding-right: 100px;
     width: 100%;
+    align-items: start; // 추가: 그리드 아이템들을 상단 정렬
 
     @include respond-to(xlarge) {
         grid-template-columns: none;
         gap: 0px;
         padding-left: 55px;
         padding-right: 55px;
+        
+        // 반응형 레이아웃에서 도구 컨테이너를 위로 올리기
+        > :first-child {
+            order: 2; // 설명 섹션을 아래로
+        }
+        
+        > :nth-child(2) {
+            order: 1; // 도구 컨테이너를 위로
+        }
     }
     @include respond-to(large) {
         padding-left: 35px;
@@ -43,10 +53,11 @@
 .tool-title {
     display: flex;
     justify-content: center;
-    font-family: $font-theme;
+    font-family: $font-title;
     color: var(--color-fourth);
-    font-size: 1.9em;
+    font-size: 3.2em;
     font-weight: 400;
+    margin-bottom: 30px;
 
     @include respond-to(small) {
         font-size: 1.5em;
@@ -57,7 +68,6 @@
     font-family: $font-theme;
     color: var(--color-font);
     font-size: 16px;
-    margin-top: 15px;
 
     p {
         font-size: 16px;
@@ -93,7 +103,6 @@
 
     @include respond-to(small) {
         max-height: 250px;
-        overflow-y: auto;
     }
 }
 
@@ -103,10 +112,49 @@
     font-family: $font-theme;
     color: var(--color-font);
     
-    padding: 10px;
+    padding: 25px; // content-section과 동일한 패딩
+    margin-bottom: 10px; // content-section과 동일한 마진
 
-    background-color: var(--color-second);
-    border-radius: 15px;
+    background-color: var(--color-second); // content-section과 동일한 배경색
+    border-radius: 12px; // content-section과 동일한 border-radius
+    border-left: 4px solid var(--color-fourth); // content-section과 동일한 왼쪽 테두리
+
+    // Sticky positioning for better UX with long content
+    position: sticky;
+    top: 20px; // 화면 상단에서 20px 떨어진 위치에 고정
+    max-height: calc(100vh - 40px); // 화면 높이에서 여백 제외
+    overflow-y: auto; // 내용이 길면 스크롤 가능
+    z-index: 10; // 다른 요소들 위에 표시
+    
+    // 부드러운 트랜지션 효과
+    transition: all 0.3s ease;
+    scroll-behavior: smooth; // 부드러운 스크롤링
+
+    // 스크롤바 커스텀 스타일링
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: var(--color-first);
+        border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: var(--color-fourth);
+        border-radius: 3px;
+        
+        &:hover {
+            background: var(--color-third);
+        }
+    }
+
+    // 모바일에서는 sticky 해제 (레이아웃이 세로로 변경되므로)
+    @include respond-to(xlarge) {
+        position: static;
+        max-height: none;
+        overflow-y: visible;
+    }
 
     font-size: 16px;
     @include respond-to(xlarge) {
@@ -114,13 +162,14 @@
     }
     @include respond-to(large) {
         font-size: 14px;
-        padding: 8px;
+        padding: 20px; // 작은 화면에서 패딩 조정
     }
     @include respond-to(medium) {
         font-size: 13px;
     }
     @include respond-to(small) {
         font-size: 12px;
+        padding: 15px; // 모바일에서 패딩 조정
     }
 
     &.ver2 {
@@ -418,5 +467,210 @@ select:hover {
     }
     @include respond-to(small) {
         grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+// 새로운 콘텐츠 섹션 스타일 추가
+.content-section {
+    margin: 0px 0px 10px 0px;
+    padding: 25px;
+    background-color: var(--color-second);
+    border-radius: 12px;
+    border-left: 4px solid var(--color-fourth);
+    
+    h2 {
+        color: var(--color-fourth);
+        font-family: $font-title;
+        font-size: 1.4em;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    
+    h3 {
+        color: var(--color-font);
+        font-family: $font-theme;
+        font-size: 1.2em;
+        margin: 20px 0 10px 0;
+        font-weight: 500;
+    }
+    
+    p {
+        line-height: 1.6;
+        margin-bottom: 15px;
+        color: var(--color-font);
+    }
+    
+    ul, ol {
+        margin: 10px 0 15px 20px;
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            color: var(--color-font);
+            
+            strong {
+                color: var(--color-fourth);
+                font-weight: 600;
+            }
+        }
+    }
+    
+    @include respond-to(small) {
+        margin: 20px 0;
+        padding: 15px;
+        
+        h2 {
+            font-size: 1.2em;
+        }
+        
+        h3 {
+            font-size: 1.1em;
+        }
+    }
+}
+
+.use-case {
+    background-color: var(--color-first);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 1px solid var(--color-fourth);
+    
+    h3 {
+        color: var(--color-fourth);
+        margin-top: 0 !important;
+        margin-bottom: 15px;
+        font-size: 1.1em;
+    }
+    
+    ul {
+        margin-left: 15px;
+        
+        li {
+            margin-bottom: 10px;
+        }
+    }
+    
+    @include respond-to(small) {
+        padding: 15px;
+        margin: 10px 0;
+    }
+}
+
+.tutorial-step {
+    background-color: var(--color-first);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border: 1px solid var(--color-fourth);
+    
+    h3 {
+        color: var(--color-fourth);
+        margin-top: 0 !important;
+        margin-bottom: 15px;
+        font-size: 1.1em;
+    }
+    
+    ol {
+        margin-left: 15px;
+        
+        li {
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+    }
+    
+    @include respond-to(small) {
+        padding: 15px;
+        margin: 15px 0;
+    }
+}
+
+.example-box {
+    background-color: var(--color-third);
+    padding: 15px;
+    border-radius: 6px;
+    margin: 15px 0;
+    border-left: 3px solid var(--color-fourth);
+    font-family: $font-theme;
+    
+    p {
+        margin-bottom: 8px;
+        color: var(--color-font);
+        font-size: 0.95em;
+        
+        strong {
+            color: var(--color-font);
+            font-weight: 600;
+        }
+    }
+    
+    ul {
+        margin: 8px 0 8px 15px;
+        
+        li {
+            color: var(--color-font);
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+    }
+    
+    @include respond-to(small) {
+        padding: 12px;
+        font-size: 0.9em;
+    }
+}
+
+.faq-item {
+    background-color: var(--color-first);
+    padding: 18px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 1px solid var(--color-fourth);
+    transition: all 0.3s ease;
+    
+    &:hover {
+        border-color: var(--color-fourth);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    h3 {
+        color: var(--color-fourth);
+        margin-top: 0 !important;
+        margin-bottom: 12px;
+        font-size: 1.05em;
+        font-weight: 600;
+    }
+    
+    p {
+        margin-bottom: 0;
+        line-height: 1.6;
+        color: var(--color-font);
+    }
+    
+    @include respond-to(small) {
+        padding: 14px;
+        margin: 12px 0;
+        
+        h3 {
+            font-size: 1em;
+        }
+    }
+}
+
+// 관련 도구 링크 스타일링
+.content-section {
+    a {
+        color: var(--color-fourth);
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid transparent;
+        transition: all 0.3s ease;
+        
+        &:hover {
+            color: var(--color-third);
+            border-bottom-color: var(--color-third);
+            text-decoration: none;
+        }
     }
 }

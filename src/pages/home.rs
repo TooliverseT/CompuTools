@@ -415,7 +415,7 @@ impl Home {
 
         if let Ok(Some(json)) = local_storage.get_item("recent-item") {
             let mut items: Vec<String> = serde_json::from_str(&json).unwrap_or_else(|_| vec![]);
-            items.truncate(6); // 최대 6개까지만 유지
+            items.truncate(8); // 최대 8개까지만 유지
             items
         } else {
             vec![]
