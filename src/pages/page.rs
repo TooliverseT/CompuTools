@@ -57,7 +57,11 @@ impl Component for Page {
         }
     }
 
-    fn rendered(&mut self, _ctx: &Context<Self>, first_render: bool) {}
+    fn rendered(&mut self, _ctx: &Context<Self>, _first_render: bool) {
+        if let Some(window) = web_sys::window() {
+            window.scroll_to_with_x_and_y(0.0, 0.0);
+        }
+    }
 }
 
 impl Page {

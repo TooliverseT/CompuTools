@@ -139,44 +139,186 @@ impl Component for ToolJson {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <>
-                <div class="tool-wrapper ver2">
-                    <div>
-                        <h1 class="tool-title">
-                            { "JSON Formatter" }
-                        </h1>
-                        <div class="tool-intro">
-                            <p>
-                                { "This tool helps you format and validate JSON data easily. JSON (JavaScript Object Notation) is a lightweight data format commonly used for data exchange between systems." }
-                            </p>
-                            <p>{ "With this tool, you can:" }</p>
+                <h1 class="tool-title">
+                    { "JSON Formatter" }
+                </h1>
+                <div class="tool-wrapper">
+                    <div class="tool-intro">
+                        <div class="content-section">
+                            <h2>{"🔤 What is JSON?"}</h2>
+                            <p>{"JSON (JavaScript Object Notation) is a lightweight, text-based data format used for data interchange between systems. It is easy for humans to read and write, and easy for machines to parse and generate."}</p>
+                            <p>{"JSON is widely used in web APIs, configuration files, and data storage due to its simplicity and compatibility with most programming languages."}</p>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"⚙️ How This JSON Formatter Works"}</h2>
+                            <p>{"This tool formats and validates JSON data, making it easier to read, debug, and share. It also highlights syntax errors and allows you to customize the indentation style for your needs."}</p>
+                            <h3>{"Supported Features:"}</h3>
                             <ul>
-                                <li>{ "Format unstructured JSON into a human-readable, pretty-printed format." }</li>
-                                <li>{ "Validate JSON input and detect syntax errors with detailed error messages." }</li>
-                                <li>{ "Customize the indentation style to suit your preference, choosing between 2 spaces, 3 spaces, 4 spaces, no indent, or tab-based indentation." }</li>
+                                <li><strong>{"Pretty Printing:"}</strong> {"Format unstructured JSON into a human-readable, indented format."}</li>
+                                <li><strong>{"Validation:"}</strong> {"Detect syntax errors and display detailed error messages with line and column numbers."}</li>
+                                <li><strong>{"Indentation Options:"}</strong> {"Choose between 2, 3, 4 spaces, tab, or compact (no indent)."}</li>
+                                <li><strong>{"Copy with Notification:"}</strong> {"Click any output field to copy results with visual feedback."}</li>
+                                <li><strong>{"Local Processing:"}</strong> {"All formatting and validation happens in your browser for privacy and speed."}</li>
                             </ul>
-                            <p>
-                                { "This tool is especially useful for developers working with APIs, configuration files, or any JSON-based data structure." }
-                            </p>
-                            <p>{ "Note:" }</p>
+                            <h3>{"Input Format Example:"}</h3>
+                            <div class="example-box">
+                                <p><strong>{"Unformatted JSON input:"}</strong></p>
+                                <ul>
+                                    <li>{"{\"name\":\"Alice\",\"age\":30,\"skills\":[\"Rust\",\"Yew\"]}"}</li>
+                                </ul>
+                                <p><strong>{"Formatted output (4 spaces):"}</strong></p>
+                                <pre style="color: var(--color-font); white-space: pre; font-family: inherit; margin: 0; padding-left: 40px;">
+{r#"{
+    "name": "Alice",
+    "age": 30,
+    "skills": [
+        "Rust",
+        "Yew"
+    ]
+}"#}
+                                </pre>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"💡 Common Use Cases"}</h2>
+                            <div class="use-case">
+                                <h3>{"1. API Development & Debugging"}</h3>
+                                <ul>
+                                    <li><strong>{"Request/Response Inspection:"}</strong> {"Format and validate JSON payloads when working with REST or GraphQL APIs."}</li>
+                                    <li><strong>{"Error Diagnosis:"}</strong> {"Quickly spot syntax errors and fix malformed JSON."}</li>
+                                </ul>
+                            </div>
+                            <div class="use-case">
+                                <h3>{"2. Configuration & Data Files"}</h3>
+                                <ul>
+                                    <li><strong>{"Config Editing:"}</strong> {"Edit and validate JSON-based configuration files for applications and services."}</li>
+                                    <li><strong>{"Data Migration:"}</strong> {"Format and check data before importing/exporting between systems."}</li>
+                                </ul>
+                            </div>
+                            <div class="use-case">
+                                <h3>{"3. Education & Learning"}</h3>
+                                <ul>
+                                    <li><strong>{"Teaching JSON Syntax:"}</strong> {"Help students and new developers understand JSON structure and errors."}</li>
+                                    <li><strong>{"Code Review:"}</strong> {"Share readable JSON snippets in documentation or code reviews."}</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"📚 Step-by-Step Tutorial"}</h2>
+                            <div class="tutorial-step">
+                                <h3>{"Example: Formatting and Validating JSON"}</h3>
+                                <p><strong>{"Goal:"}</strong> {"Format and validate a JSON string with custom indentation."}</p>
+                                <ol>
+                                    <li>{"Paste or type your JSON string into the input field."}</li>
+                                    <li>{"Select your preferred indentation style (e.g., 4 spaces, tab, compact)."}</li>
+                                    <li>{"View the formatted JSON or error message in the output field."}</li>
+                                    <li>{"Click the output to copy the result for use elsewhere."}</li>
+                                </ol>
+                                <div class="example-box">
+                                    <p><strong>{"Input:"}</strong></p> 
+                                    <ul>
+                                        <li>{"{\"name\":\"Alice\",\"age\":30,\"skills\":[\"Rust\",\"Yew\"]}"}</li>
+                                    </ul>
+                                    <p><strong>{"Output (4 spaces):"}</strong></p>
+                                    <pre style="color: var(--color-font); white-space: pre; font-family: inherit; margin: 0; padding-left: 40px;">
+{r#"{
+    "name": "Alice",
+    "age": 30,
+    "skills": [
+        "Rust",
+        "Yew"
+    ]
+}"#}
+                                    </pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"🔧 Technical Background"}</h2>
+                            <h3>{"How JSON Formatting Works"}</h3>
+                            <p>{"The formatter parses the input string as JSON, then serializes it back with the chosen indentation. If the input is invalid, a detailed error message is shown with the line and column of the issue."}</p>
+                            <div class="example-box">
+                                <p><strong>{"Example for Error Highlighting:"}</strong></p>
+                                <ul>
+                                    <li>{"Input: {\"name\":\"Alice\",\"age\":,\"skills\":[\"Rust\",\"Yew\"]}"}</li>
+                                    <li>{"Error: Invalid JSON:\n{\"name\":\"Alice\",\"age\":,\"skills\":[\"Rust\",\"Yew\"]}\n-----------------^\nError: expected value at line 1 column 23"}</li>
+                                </ul>
+                            </div>
+                            <h3>{"Why Use a JSON Formatter?"}</h3>
                             <ul>
-                                <li>{ "Errors are highlighted with specific line and column details for quick debugging." }</li>
-                                <li>{ "Formatted JSON maintains key ordering and consistent indentation for clarity." }</li>
+                                <li>{"Makes JSON easier to read and debug."}</li>
+                                <li>{"Helps catch syntax errors before deploying or sharing data."}</li>
+                                <li>{"Improves collaboration by providing consistent formatting."}</li>
                             </ul>
-                            <p>
-                                { "Simplify your JSON workflow with this easy-to-use formatter and validator." }
-                            </p>
+                            <h3>{"Performance & Implementation"}</h3>
+                            <ul>
+                                <li><strong>{"Instant Feedback:"}</strong> {"Formatting and validation happen in your browser as you type."}</li>
+                                <li><strong>{"No Server Required:"}</strong> {"All processing is local for privacy and speed."}</li>
+                            </ul>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"❓ Frequently Asked Questions"}</h2>
+                            <div class="faq-item">
+                                <h3>{"Q: What happens if my JSON is invalid?"}</h3>
+                                <p>{"A: The tool will display a detailed error message with the line and column of the issue, and highlight the error in the input."}</p>
+                            </div>
+                            <div class="faq-item">
+                                <h3>{"Q: Can I use this tool offline?"}</h3>
+                                <p>{"A: Yes, all formatting and validation are performed locally in your browser."}</p>
+                            </div>
+                            <div class="faq-item">
+                                <h3>{"Q: Is my data safe?"}</h3>
+                                <p>{"A: Yes, your JSON data never leaves your device."}</p>
+                            </div>
+                            <div class="faq-item">
+                                <h3>{"Q: Can I format very large JSON files?"}</h3>
+                                <p>{"A: Yes, but performance may vary depending on your device and browser."}</p>
+                            </div>
+                            <div class="faq-item">
+                                <h3>{"Q: Why are there different indentation options?"}</h3>
+                                <p>{"A: Different projects and teams have different style preferences. Choose the one that fits your needs."}</p>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"🎯 Best Practices"}</h2>
+                            <ul>
+                                <li><strong>{"Validate Before Sharing:"}</strong> {"Always check your JSON for errors before using it in production or sharing with others."}</li>
+                                <li><strong>{"Error Handling:"}</strong> {"Handle invalid JSON gracefully in your applications."}</li>
+                                <li><strong>{"Performance:"}</strong> {"For very large files, use efficient parsing and formatting libraries."}</li>
+                                <li><strong>{"Documentation:"}</strong> {"Document your JSON structure and formatting conventions."}</li>
+                                <li><strong>{"Testing:"}</strong> {"Test with a variety of JSON structures, including edge cases and deeply nested data."}</li>
+                                <li><strong>{"Security Awareness:"}</strong> {"Never trust unvalidated JSON from untrusted sources."}</li>
+                            </ul>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"🔗 Related Tools"}</h2>
+                            <p>{"Enhance your workflow with these related tools:"}</p>
+                            <ul>
+                                <li><a href="/base64/">{"Base64 Encoder/Decoder"}</a> {" - For binary-safe text encoding and data transmission."}</li>
+                                <li><a href="/ascii/">{"ASCII Converter"}</a> {" - For converting text to ASCII codes and vice versa."}</li>
+                                <li><a href="/html/">{"HTML Entity Encoder"}</a> {" - For web-safe character encoding and HTML content."}</li>
+                                <li><a href="/url/">{"URL Encoder/Decoder"}</a> {" - For URL-safe string encoding in web applications."}</li>
+                                <li><a href="/base/">{"Number Base Converter"}</a> {" - For converting between different number bases."}</li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="tool-container ver2">
+                    <div class="tool-container">
                         <div>
                             <div style="display: flex; align-items: center; padding-left: 20px; padding-right: 20px; margin-bottom: 10px; margin-top: 5px; padding-top: 5px; padding-bottom: 5px;">
-                                <div class="tool-subtitle">{ "JSON" }</div>
+                                <div class="tool-subtitle" style="width: 60%; margin-bottom: 0px;">{ "Input" }</div>
                             </div>
                             <div class="tool-inner">
                                 <div>
                                     <textarea
                                         type="text"
-                                        style="overflow: auto; height: 800px;"
+                                        style="overflow-y: auto; overflow-x: hidden; height: 250px; white-space: pre-wrap; word-wrap: break-word;"
                                         wrap="off"
                                         value={self.input.clone()}
                                         placeholder={"Enter JSON here"}
@@ -189,7 +331,7 @@ impl Component for ToolJson {
                             </div>
                         </div>
                         <div>
-                            <div style="display: flex; align-items: center; padding-left: 20px; padding-right: 20px; margin-bottom: 10px; margin-top: 5px;">
+                            <div style="display: flex; align-items: center; padding-left: 20px; padding-right: 20px; margin-bottom: 10px; margin-top: 20px;">
                                 <div class="tool-subtitle" style="width: 60%; margin-bottom: 0px;">{ "Formatted JSON" }</div>
                                 <select
                                     id="input-mode-select"
@@ -211,7 +353,7 @@ impl Component for ToolJson {
                                         type="text"
                                         readonly=true
                                         wrap="off"
-                                        style={if self.compact { "cursor: pointer; overflow-y: auto; overflow-x: hidden; height: 800px; white-space: pre-wrap; word-wrap: break-word;" } else {"cursor: pointer; overflow: auto; height: 800px;"}}
+                                        style={if self.compact { "cursor: pointer; overflow-y: auto; overflow-x: hidden; height: 250px; white-space: pre-wrap; word-wrap: break-word;" } else {"cursor: pointer; overflow: auto; height: 250px;"}}
                                         value={self.view_output()}
                                         onclick={_ctx.link().callback(|e: MouseEvent| {
                                             let input: HtmlInputElement = e.target_unchecked_into();
