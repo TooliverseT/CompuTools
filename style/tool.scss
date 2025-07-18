@@ -43,6 +43,10 @@
     }
 }
 
+.tool-wrapper > * {
+    min-width: 0;
+}
+
 .tool-change {
     display: flex;
     color: var(--color-fourth);
@@ -593,14 +597,17 @@ select:hover {
     margin: 15px 0;
     border-left: 3px solid var(--color-fourth);
     font-family: $font-theme;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
     
     p {
         margin-bottom: 8px;
-        color: var(--color-font);
+        color: white;
         font-size: 0.95em;
         
         strong {
-            color: var(--color-font);
+            color: #FFE4B5;
             font-weight: 600;
         }
     }
@@ -609,7 +616,7 @@ select:hover {
         margin: 8px 0 8px 15px;
         
         li {
-            color: var(--color-font);
+            color: white;
             font-size: 0.9em;
             margin-bottom: 4px;
         }
@@ -619,6 +626,14 @@ select:hover {
         padding: 12px;
         font-size: 0.9em;
     }
+}
+
+.example-box p,
+.example-box ul,
+.example-box li {
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
 }
 
 .faq-item {
@@ -673,4 +688,11 @@ select:hover {
             text-decoration: none;
         }
     }
+}
+
+input[type="text"] {
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+    box-sizing: border-box;
 }

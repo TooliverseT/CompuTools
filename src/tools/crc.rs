@@ -1057,42 +1057,176 @@ impl Component for ToolCrc {
 
         html! {
             <>
-                <div class="tool-wrapper">
-                    <div>
                         <h1 class="tool-title">
                             { "CRC Converter" }
                         </h1>
+                <div class="tool-wrapper">
                         <div class="tool-intro">
-                            <p>
-                                {"This page provides a simple tool for calculating CRC (Cyclic Redundancy Check) values to verify data integrity and detect errors. CRC is widely used in networking, storage, and embedded systems."}
-                            </p>
-                            <p> {"With this tool, you can:"} </p>
-                            <ul>
-                                <li>{"Compute CRC values for input data using customizable settings."}</li>
-                                <li>{"Verify data integrity by comparing recalculated CRC values."}</li>
-                            </ul>
-                            <p>
-                                {"The tool supports adjustable parameters like polynomial, initial value, XOR out, and reflection options, ensuring compatibility with various CRC standards."}
-                            </p>
-                            <p>
-                                {"Hexadecimal input formats supported include:"}
-                            </p>
-                            <ul>
-                                <li>{"0x01 \\x02 x03 04 05"}</li>
-                                <li>{"0x01\\x02x030405"}</li>
-                            </ul>
-                            <p>
-                                {"Note:"}
-                            </p>
-                            <ul>
-                                <li>{"Provide input data in text or hexadecimal format."}</li>
-                                <li>{"Ensure parameter settings match the CRC algorithm used in your application."}</li>
-                            </ul>
+                        <div class="content-section">
+                            <h2>{"🔤 What is CRC?"}</h2>
+                            <p>{"CRC (Cyclic Redundancy Check) is a widely used error-detecting code designed to detect accidental changes to raw data. It is commonly used in digital networks, storage devices, and embedded systems to ensure data integrity."}</p>
+                            <p>{"A CRC algorithm processes input data and produces a short, fixed-length checksum (the CRC value) that can be used to verify the integrity of the data during transmission or storage."}</p>
+                        </div>
 
+                        <div class="content-section">
+                            <h2>{"⚙️ How This CRC Converter Works"}</h2>
+                            <p>{"This tool allows you to calculate CRC values for any input using a wide range of industry-standard CRC algorithms. You can choose the input format (ASCII or HEX), select the CRC algorithm, and instantly see the result."}</p>
+                            <h3>{"Supported Features:"}</h3>
+                            <ul>
+                                <li><strong>{"Multiple CRC Algorithms:"}</strong> {"Supports CRC-3, CRC-4, CRC-5, CRC-6, CRC-7, CRC-8, CRC-10, CRC-11, CRC-12, CRC-13, CRC-14, CRC-15, CRC-16, CRC-17, CRC-21, CRC-24, CRC-30, CRC-31, CRC-32, CRC-40, CRC-64 and more."}</li>
+                                <li><strong>{"Flexible Input Parsing:"}</strong> {"Accepts ASCII text or various HEX formats (e.g., 0x01, \x02, x03, 04, 05, 0x01\x02x030405)."}</li>
+                                <li><strong>{"Real-time Calculation:"}</strong> {"Instantly updates CRC value as you type or change settings."}</li>
+                                <li><strong>{"Copy with Notification:"}</strong> {"Click any output field to copy results with visual feedback."}</li>
+                                <li><strong>{"Algorithm Selection:"}</strong> {"Choose from dozens of CRC standards for compatibility with your application."}</li>
+                            </ul>
+                            <h3>{"Input Format Examples:"}</h3>
+                            <div class="example-box">
+                                <p><strong>{"ASCII input example:"}</strong></p>
+                                <ul>
+                                    <li>{"Hello World"}</li>
+                                    <li>{"CompuTools CRC"}</li>
+                            </ul>
+                                <p><strong>{"HEX input example:"}</strong></p>
+                                <ul>
+                                    <li>{"0x01 0x02 0x03 0x04 0x05"}</li>
+                                    <li>{"\x01\x02\x03\x04\x05"}</li>
+                                    <li>{"x01x02x03x04x05"}</li>
+                                    <li>{"0102030405"}</li>
+                            </ul>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"💡 Common Use Cases"}</h2>
+                            <div class="use-case">
+                                <h3>{"1. Networking & Communication"}</h3>
+                                <ul>
+                                    <li><strong>{"Packet Integrity:"}</strong> {"Verify the integrity of data packets in protocols like Ethernet, CAN, USB, and more."}</li>
+                                    <li><strong>{"Error Detection:"}</strong> {"Detect accidental data corruption during transmission."}</li>
+                                </ul>
+                            </div>
+                            <div class="use-case">
+                                <h3>{"2. Storage & Filesystems"}</h3>
+                                <ul>
+                                    <li><strong>{"Data Validation:"}</strong> {"Check the integrity of files and blocks in storage devices and filesystems."}</li>
+                                    <li><strong>{"Backup Verification:"}</strong> {"Ensure backups are not corrupted by comparing CRC values."}</li>
+                                </ul>
+                            </div>
+                            <div class="use-case">
+                                <h3>{"3. Embedded Systems & IoT"}</h3>
+                                <ul>
+                                    <li><strong>{"Firmware Updates:"}</strong> {"Validate firmware images before flashing to devices."}</li>
+                                    <li><strong>{"Sensor Data Integrity:"}</strong> {"Check sensor data for errors in real-time applications."}</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"📚 Step-by-Step Tutorial"}</h2>
+                            <div class="tutorial-step">
+                                <h3>{"Example 1: Calculating CRC for ASCII Input"}</h3>
+                                <p><strong>{"Goal:"}</strong> {"Calculate the CRC-32 value for the text 'Hello' using the ISO-HDLC algorithm."}</p>
+                                <ol>
+                                    <li>{"Set 'Input Method' to 'ASCII'."}</li>
+                                    <li>{"Enter 'Hello' in the input field."}</li>
+                                    <li>{"Select 'CRC-32/ISO-HDLC' as the algorithm."}</li>
+                                    <li>{"View the CRC result instantly."}</li>
+                                </ol>
+                                <div class="example-box">
+                                    <p><strong>{"Input:"}</strong> {"Hello"}</p>
+                                    <p><strong>{"Algorithm:"}</strong> {"CRC-32/ISO-HDLC"}</p>
+                                    <p><strong>{"Output:"}</strong> {"0x3610A686"}</p>
+                                </div>
+                            </div>
+                            <div class="tutorial-step">
+                                <h3>{"Example 2: Calculating CRC for HEX Input"}</h3>
+                                <p><strong>{"Goal:"}</strong> {"Calculate the CRC-16 value for the hex input '0x01 0x02 0x03 0x04' using the MODBUS algorithm."}</p>
+                                <ol>
+                                    <li>{"Set 'Input Method' to 'HEX'."}</li>
+                                    <li>{"Enter '0x01 0x02 0x03 0x04' in the input field."}</li>
+                                    <li>{"Select 'CRC-16/MODBUS' as the algorithm."}</li>
+                                    <li>{"View the CRC result instantly."}</li>
+                                </ol>
+                                <div class="example-box">
+                                    <p><strong>{"Input:"}</strong> {"0x01 0x02 0x03 0x04"}</p>
+                                    <p><strong>{"Algorithm:"}</strong> {"CRC-16/MODBUS"}</p>
+                                    <p><strong>{"Output:"}</strong> {"0x2BA1"}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"🔧 Technical Background"}</h2>
+                            <h3>{"How CRC Works"}</h3>
+                            <p>{"A CRC algorithm treats input data as a binary number and divides it by a fixed polynomial. The remainder of this division is the CRC value. Different algorithms use different polynomials, initial values, and post-processing steps."}</p>
+                            <div class="example-box">
+                                <p><strong>{"Example for CRC-8:"}</strong></p>
+                                <ul>
+                                    <li>{"Polynomial: x^8 + x^2 + x + 1 (0x07)"}</li>
+                                    <li>{"Input: 0x31 0x32 0x33 0x34 (ASCII for '1234')"}</li>
+                                    <li>{"CRC-8 Output: 0xF4"}</li>
+                                </ul>
+                            </div>
+                            <h3>{"Why Use CRC?"}</h3>
+                            <ul>
+                                <li>{"Detects accidental data corruption with high probability."}</li>
+                                <li>{"Efficient to compute in hardware and software."}</li>
+                                <li>{"Widely standardized and supported in protocols and storage."}</li>
+                            </ul>
+                            <h3>{"Performance & Implementation"}</h3>
+                            <ul>
+                                <li><strong>{"Fast Calculation:"}</strong> {"Optimized for real-time and large data sets."}</li>
+                                <li><strong>{"Cross-Platform:"}</strong> {"Works in browsers, embedded devices, and servers."}</li>
+                                <li><strong>{"Local Processing:"}</strong> {"All calculations happen in your browser for privacy and speed."}</li>
+                            </ul>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"❓ Frequently Asked Questions"}</h2>
+                            <div class="faq-item">
+                                <h3>{"Q: What is the difference between CRC and checksum?"}</h3>
+                                <p>{"A: A checksum is a simple sum of data bytes, while CRC uses polynomial division for more robust error detection."}</p>
+                            </div>
+                            <div class="faq-item">
+                                <h3>{"Q: Which CRC algorithm should I use?"}</h3>
+                                <p>{"A: It depends on your application. Common choices: CRC-32 for Ethernet, CRC-16/MODBUS for industrial, CRC-8 for small data blocks."}</p>
+                            </div>
+                            <div class="faq-item">
+                                <h3>{"Q: Can CRC detect all errors?"}</h3>
+                                <p>{"A: CRC is very effective for random errors, but cannot detect all possible errors (e.g., intentional tampering)."}</p>
+                            </div>
+                            <div class="faq-item">
+                                <h3>{"Q: Is CRC secure for cryptography?"}</h3>
+                                <p>{"A: No, CRC is not a cryptographic hash and should not be used for security purposes."}</p>
+                            </div>
+                            <div class="faq-item">
+                                <h3>{"Q: What if I enter invalid HEX or ASCII?"}</h3>
+                                <p>{"A: The tool will display an error message for invalid input. Always check your input format and algorithm selection."}</p>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"🎯 Best Practices"}</h2>
+                            <ul>
+                                <li><strong>{"Validate Input:"}</strong> {"Always check your input format and algorithm selection."}</li>
+                                <li><strong>{"Error Handling:"}</strong> {"Handle calculation errors gracefully in your applications."}</li>
+                                <li><strong>{"Performance:"}</strong> {"Use hardware-accelerated CRC if available for large data sets."}</li>
+                                <li><strong>{"Documentation:"}</strong> {"Document the CRC algorithm and parameters used in your system."}</li>
+                                <li><strong>{"Testing:"}</strong> {"Test with known vectors and edge cases (empty input, all zeros, etc.)."}</li>
+                                <li><strong>{"Compatibility:"}</strong> {"Ensure your CRC settings match those of your communication partners."}</li>
+                            </ul>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"🔗 Related Tools"}</h2>
+                            <p>{"Enhance your workflow with this related tool:"}</p>
+                            <ul>
+                                <li><a href="/file-hash/">{"File Hash Generator"}</a> {" - For calculating MD5, SHA-1, SHA-256, and SHA-512 hashes for files."}</li>
+                            </ul>
                         </div>
                     </div>
                     <div class="tool-container">
-                        <div style="display: flex; align-items: center; padding-left: 20px; padding-right: 20px; margin-bottom: 10px; margin-top: 5px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px; margin-top: 5px;">
                             <div style="width: 90%;">
                                 {"Input Method: "}
                             </div>
@@ -1110,7 +1244,7 @@ impl Component for ToolCrc {
                                 <option value="hex" selected={self.input_mode == InputMode::Hex}>{ "HEX" }</option>
                             </select>
                         </div>
-                        <div style="display: flex; align-items: center; padding-left: 20px; padding-right: 20px; margin-bottom: 10px; margin-top: 5px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px; margin-top: 5px;">
                             <div style="width: 90%;">
                                 {"CRC algorithm: "}
                             </div>
