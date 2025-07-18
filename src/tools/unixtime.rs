@@ -206,20 +206,19 @@ impl Component for ToolUnixtime {
 
         html! {
                 <>
+                <h1 class="tool-title">{ "Unix Timestamp Converter" }</h1>
                 <div class="tool-wrapper">
-                <div>
-                    <h1 class="tool-title">
-                        { "Unix Timestamp Converter" }
-                    </h1>
-                    <div class="tool-intro" style="margin-top: 0px;">
-                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                            <div class="unix-current">
-                                {self.current_unixtime}
-                            </div>
-                            <div class="date-current">
-                                {self.current_datetime.clone()}
-                            </div>
-                            <div class="date-timezone">
+                    <div class="tool-intro">
+                        <div class="content-section">
+                            <h2>{"⏳ What is Unix Time?"}</h2>
+                            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                <div class="unix-current">
+                                    {self.current_unixtime}
+                                </div>
+                                <div class="date-current">
+                                    {self.current_datetime.clone()}
+                                </div>
+                                <div class="date-timezone">
                                 <select onchange={onchange_timezone}>
                                     {self.timezones.iter().map(|(name, _)| {
                                         let tz_name = name.split_whitespace().next().unwrap_or("");
@@ -233,108 +232,151 @@ impl Component for ToolUnixtime {
                                         }
                                     }).collect::<Html>()}
                                 </select>
+                                </div>
+                            </div>
+                            <p>{"Unix Time (or Unix Timestamp) is the number of seconds that have elapsed since January 1, 1970 (UTC). It is widely used in computing for time representation and storage."}</p>
+                        </div>
+                        <div class="content-section">
+                            <h2>{"⚙️ How This Converter Works"}</h2>
+                            <ul>
+                                <li><strong>{"Unix Timestamp → Date & Time:"}</strong> {"Convert a Unix timestamp to a human-readable date and time."}</li>
+                                <li><strong>{"Date & Time → Unix Timestamp:"}</strong> {"Convert a date and time to a Unix timestamp."}</li>
+                                <li><strong>{"Timezone Support:"}</strong> {"Select your timezone for accurate conversions."}</li>
+                                <li><strong>{"Copy with Notification:"}</strong> {"Click any output field to copy results with visual feedback."}</li>
+                                <li><strong>{"Local Processing:"}</strong> {"All calculations happen in your browser for privacy and speed."}</li>
+                            </ul>
+                        </div>
+                        <div class="content-section">
+                            <h2>{"📚 Example"}</h2>
+                            <div class="example-box">
+                                <p><strong>{"Unix Timestamp input:"}</strong></p>
+                                <ul><li>{"1700000000"}</li></ul>
+                                <p><strong>{"Date & Time output (UTC):"}</strong></p>
+                                <pre style="color: var(--color-font); white-space: pre; font-family: inherit; margin: 0; padding-left: 40px;">
+{r#"Nov 14, 2023, 10:13:20 AM"#}
+                                </pre>
                             </div>
                         </div>
-                        <p>
-                            { "This tool allows you to convert Unix Timestamps to Date & Time formats and vice versa. Unix Timestamps represent the number of seconds since January 1, 1970 (UTC), while Date & Time offers a more readable format for daily use." }
-                        </p>
-                        <p>{ "With this tool, you can:" }</p>
-                        <ul>
-                            <li>{ "Convert a Unix Timestamp into a readable Date & Time format." }</li>
-                            <li>{ "Generate Unix Timestamps from Date & Time values." }</li>
-                        </ul>
-                        <p>
-                            { "The tool also supports different UTC offsets, making it useful for global applications and scheduling across regions." }
-                        </p>
-                        <p>{ "Note:" }</p>
-                        <ul>
-                            <li>{ "Results are displayed in UTC for clarity." }</li>
-                            <li>{ "Input values are validated to ensure they fall within the valid range of Unix Timestamps." }</li>
-                        </ul>
-                        <p>
-                            { "This converter is a fast and reliable tool for developers and anyone working with time-based data." }
-                        </p>
+                        <div class="content-section">
+                            <h2>{"💡 Common Use Cases"}</h2>
+                            <ul>
+                                <li><strong>{"Programming & Development:"}</strong> {"Convert timestamps for logging, scheduling, and debugging."}</li>
+                                <li><strong>{"Data Analysis:"}</strong> {"Interpret and process time-based data in databases and files."}</li>
+                                <li><strong>{"APIs & Webhooks:"}</strong> {"Work with APIs that use Unix timestamps for time fields."}</li>
+                                <li><strong>{"Scheduling & Reminders:"}</strong> {"Convert between human-readable dates and Unix time for reminders and events."}</li>
+                            </ul>
+                        </div>
+                        <div class="content-section">
+                            <h2>{"❓ Frequently Asked Questions"}</h2>
+                            <div class="faq-item">
+                                <h3>{"Q: What is the range of valid Unix timestamps?"}</h3>
+                                <p>{"A: Typically from 0 (Jan 1, 1970) to 2147483647 (Jan 19, 2038) for 32-bit systems, but modern systems support much larger ranges."}</p>
+                            </div>
+                            <div class="faq-item">
+                                <h3>{"Q: Are results always in UTC?"}</h3>
+                                <p>{"A: You can select your timezone for conversion. By default, results are shown in your local timezone."}</p>
+                            </div>
+                            <div class="faq-item">
+                                <h3>{"Q: Can I use this tool offline?"}</h3>
+                                <p>{"A: Yes, all calculations are performed locally in your browser."}</p>
+                            </div>
+                        </div>
+                        <div class="content-section">
+                            <h2>{"🎯 Best Practices"}</h2>
+                            <ul>
+                                <li><strong>{"Validate Input:"}</strong> {"Ensure timestamps and dates are within valid ranges."}</li>
+                                <li><strong>{"Timezone Awareness:"}</strong> {"Always check the timezone when converting times."}</li>
+                                <li><strong>{"Copy Carefully:"}</strong> {"Double-check copied values before using in code or databases."}</li>
+                                <li><strong>{"Test Edge Cases:"}</strong> {"Test with leap years, daylight saving changes, and far-future dates."}</li>
+                            </ul>
+                        </div>
+                        <div class="content-section">
+                            <h2>{"🔗 Related Tools"}</h2>
+                            <p>{"Explore more tools for developers:"}</p>
+                            // <ul>
+                            //     <li><a href="/base/">{"Base Converter"}</a> {" - For converting numbers between different bases."}</li>
+                            // </ul>
+                        </div>
+                    </div>
+                    <div class="tool-container">
+                        <div style="display: flex; align-items: center; padding-left: 20px; padding-right: 20px; margin-bottom: 10px; margin-top: 5px;">
+                            <div style="width: 90%;">
+                                if !convert {
+                                    {"Unix Timestamp to Date & Time"}
+                                } else {
+                                    {"Date & Time to Unix Timestamp"}
+                                }
+                            </div>
+                            <div onclick={on_convert} class="tool-change" style="width: 10%;">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                            </div>
+                        </div>
+                        if !convert {
+                            <div class="tool-inner">
+                                <div>
+                                    <div class="tool-subtitle">{ "Unix Timestamp" }</div>
+                                    <input
+                                        type="number"
+                                        name="unixtime"
+                                        inputmode="decimal"
+                                        placeholder={format!("{}", self.input_unixtime)}
+                                        autocomplete="off"
+                                        oninput={_ctx.link().callback(|e: InputEvent| {
+                                            let input: HtmlInputElement = e.target_unchecked_into();
+                                            Msg::UpdateUnixtime(input.value())
+                                        })} />
+                                </div>
+                            </div>
+                            // TODO: Date Time 표현식 선택할 수 있게
+                            <div class="tool-inner" style="margin-top: 10px;">
+                                <div>
+                                    <div class="tool-subtitle">{ "Date Time" }</div>
+                                    <input
+                                        type="text"
+                                        name="date"
+                                        readonly=true
+                                        style="cursor: pointer;"
+                                        value={format!("{}", self.output_datetime.clone())}
+                                        onclick={_ctx.link().callback(|e: MouseEvent| {
+                                            let input: HtmlInputElement = e.target_unchecked_into();
+                                            Msg::CopyToClipboard(input.value())
+                                        })} />
+                                </div>
+                            </div>
+                        } else {
+                            <div class="tool-inner">
+                                <div>
+                                    <div class="tool-subtitle">{ "Date Time" }</div>
+                                    <input
+                                        type="datetime-local"
+                                        name="year"
+                                        autocomplete="off"
+                                        value={self.input_datetime.clone()}
+                                        step="1"
+                                        oninput={_ctx.link().callback(|e: InputEvent| {
+                                            let input: HtmlInputElement = e.target_unchecked_into();
+                                            Msg::UpdateDatetime(input.value())
+                                        })} />
+                                </div>
+                            </div>
+                            <div class="tool-inner" style="margin-top: 10px;">
+                                <div>
+                                    <div class="tool-subtitle" style="margin-bottom: 5px;">{ "Unix Timestamp" }</div>
+                                    <input
+                                        type="number"
+                                        name="unixtime"
+                                        readonly=true
+                                        style="cursor: pointer;"
+                                        value={format!("{}", output_unixtime)}
+                                        onclick={_ctx.link().callback(|e: MouseEvent| {
+                                            let input: HtmlInputElement = e.target_unchecked_into();
+                                            Msg::CopyToClipboard(input.value())
+                                        })} />
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
-                <div class="tool-container">
-                    <div style="display: flex; align-items: center; padding-left: 20px; padding-right: 20px; margin-bottom: 10px; margin-top: 5px;">
-                        <div style="width: 90%;">
-                            if !convert {
-                                {"Unix Timestamp to Date & Time"}
-                            } else {
-                                {"Date & Time to Unix Timestamp"}
-                            }
-                        </div>
-                        <div onclick={on_convert} class="tool-change" style="width: 10%;">
-                            <i class="fa-solid fa-arrows-rotate"></i>
-                        </div>
-                    </div>
-                    if !convert {
-                        <div class="tool-inner">
-                            <div>
-                                <div class="tool-subtitle">{ "Unix Timestamp" }</div>
-                                <input
-                                    type="number"
-                                    name="unixtime"
-                                    inputmode="decimal"
-                                    placeholder={format!("{}", self.input_unixtime)}
-                                    autocomplete="off"
-                                    oninput={_ctx.link().callback(|e: InputEvent| {
-                                        let input: HtmlInputElement = e.target_unchecked_into();
-                                        Msg::UpdateUnixtime(input.value())
-                                    })} />
-                            </div>
-                        </div>
-                        // TODO: Date Time 표현식 선택할 수 있게
-                        <div class="tool-inner" style="margin-top: 10px;">
-                            <div>
-                                <div class="tool-subtitle">{ "Date Time" }</div>
-                                <input
-                                    type="text"
-                                    name="date"
-                                    readonly=true
-                                    style="cursor: pointer;"
-                                    value={format!("{}", self.output_datetime.clone())}
-                                    onclick={_ctx.link().callback(|e: MouseEvent| {
-                                        let input: HtmlInputElement = e.target_unchecked_into();
-                                        Msg::CopyToClipboard(input.value())
-                                    })} />
-                            </div>
-                        </div>
-                    } else {
-                        <div class="tool-inner">
-                            <div>
-                                <div class="tool-subtitle">{ "Date Time" }</div>
-                                <input
-                                    type="datetime-local"
-                                    name="year"
-                                    autocomplete="off"
-                                    value={self.input_datetime.clone()}
-                                    step="1"
-                                    oninput={_ctx.link().callback(|e: InputEvent| {
-                                        let input: HtmlInputElement = e.target_unchecked_into();
-                                        Msg::UpdateDatetime(input.value())
-                                    })} />
-                            </div>
-                        </div>
-                        <div class="tool-inner" style="margin-top: 10px;">
-                            <div>
-                                <div class="tool-subtitle" style="margin-bottom: 5px;">{ "Unix Timestamp" }</div>
-                                <input
-                                    type="number"
-                                    name="unixtime"
-                                    readonly=true
-                                    style="cursor: pointer;"
-                                    value={format!("{}", output_unixtime)}
-                                    onclick={_ctx.link().callback(|e: MouseEvent| {
-                                        let input: HtmlInputElement = e.target_unchecked_into();
-                                        Msg::CopyToClipboard(input.value())
-                                    })} />
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
                 </>
         }
     }

@@ -152,31 +152,79 @@ impl Component for ToolQuaternion {
 
         html! {
                 <>
+                    <h1 class="tool-title">{ "Quaternion Converter" }</h1>
                     <div class="tool-wrapper">
-                        <div>
-                            <h1 class="tool-title">
-                                { "Quaternion Converter" }
-                            </h1>
-                            <div class="tool-intro">
-                                <p>
-                                    { "This page provides a simple and intuitive tool for converting quaternions to Euler angles roll, pitch, yaw and vice versa. Quaternions, commonly used
-                                    in 3D graphics, robotics, and aerospace, offer a robust way to represent rotations without
-                                    the issues of gimbal lock. Euler angles, on the other hand, are often more intuitive for human interpretation." }
-                                </p>
-                                <p> {"With this tool, you can:"} </p>
+                        <div class="tool-intro">
+                            <div class="content-section">
+                                <h2>{"🧮 What is a Quaternion?"}</h2>
+                                <p>{"A quaternion is a four-dimensional complex number used to represent 3D rotations. Quaternions avoid gimbal lock and provide smooth interpolation, making them essential in 3D graphics, robotics, and aerospace."}</p>
+                                <p>{"A quaternion is typically written as Q = w + xi + yj + zk, where w, x, y, z are real numbers."}</p>
+                            </div>
+                            <div class="content-section">
+                                <h2>{"⚙️ How This Quaternion Converter Works"}</h2>
                                 <ul>
-                                    <li>{"Convert a quaternion into its corresponding roll, pitch, and yaw values."}</li>
-                                    <li>{"Transform Euler angles (roll, pitch, yaw) back into quaternion form."}</li>
+                                    <li><strong>{"Quaternion → Euler Angles:"}</strong> {"Convert a quaternion (w, x, y, z) to roll, pitch, and yaw (ZYX order)."}</li>
+                                    <li><strong>{"Euler Angles → Quaternion:"}</strong> {"Convert roll, pitch, yaw to a normalized quaternion."}</li>
+                                    <li><strong>{"Normalization:"}</strong> {"Input quaternions are automatically normalized for valid rotation."}</li>
+                                    <li><strong>{"Copy with Notification:"}</strong> {"Click any output field to copy results with visual feedback."}</li>
+                                    <li><strong>{"Local Processing:"}</strong> {"All calculations happen in your browser for privacy and speed."}</li>
                                 </ul>
-                                <p>
-                                    { "The Euler angles follow the ZYX rotation order, meaning the rotations are applied in the sequence of yaw (rotation around the Z-axis), pitch (rotation around the Y-axis), and roll (rotation around the X-axis). This is a standard convention in robotics and many other fields."}
-                                </p>
-                                <p>
-                                    { "Note:" }
-                                </p>
+                            </div>
+                            <div class="content-section">
+                                <h2>{"📚 Example"}</h2>
+                                <div class="example-box">
+                                    <p><strong>{"Quaternion input:"}</strong></p>
+                                    <ul><li>{"w = 0.7071, x = 0.0, y = 0.7071, z = 0.0"}</li></ul>
+                                    <p><strong>{"Euler output (radian):"}</strong></p>
+                                    <pre style="color: var(--color-font); white-space: pre; font-family: inherit; margin: 0; padding-left: 40px;">
+{r#"Roll: 0.0
+Pitch: 1.5708
+Yaw: 0.0"#}
+                                    </pre>
+                                </div>
+                            </div>
+                            <div class="content-section">
+                                <h2>{"💡 Common Use Cases"}</h2>
                                 <ul>
-                                    <li>{" The input quaternion values (x, y, z, w) are automatically normalized to ensure the quaternion represents a valid rotation"}</li>
-                                    <li>{"When converting Euler angles (roll, pitch, yaw) back into a quaternion, the input values for the Euler angles are constrained within the range of -π to π"}</li>
+                                    <li><strong>{"3D Graphics & Animation:"}</strong> {"Smoothly interpolate and compose 3D rotations."}</li>
+                                    <li><strong>{"Robotics & Aerospace:"}</strong> {"Represent and control orientation of robots, drones, and spacecraft."}</li>
+                                    <li><strong>{"Game Development:"}</strong> {"Prevent gimbal lock and enable smooth camera movement."}</li>
+                                    <li><strong>{"Data Conversion:"}</strong> {"Convert between quaternion and Euler formats for interoperability."}</li>
+                                </ul>
+                            </div>
+                            <div class="content-section">
+                                <h2>{"❓ Frequently Asked Questions"}</h2>
+                                <div class="faq-item">
+                                    <h3>{"Q: Why use quaternions instead of Euler angles?"}</h3>
+                                    <p>{"A: Quaternions avoid gimbal lock and allow smooth interpolation (slerp), which is difficult with Euler angles."}</p>
+                                </div>
+                                <div class="faq-item">
+                                    <h3>{"Q: What is gimbal lock?"}</h3>
+                                    <p>{"A: Gimbal lock is a loss of one degree of freedom in 3D rotation, which can occur with Euler angles but not with quaternions."}</p>
+                                </div>
+                                <div class="faq-item">
+                                    <h3>{"Q: Are the results normalized?"}</h3>
+                                    <p>{"A: Yes, all quaternion outputs are normalized to represent valid rotations."}</p>
+                                </div>
+                                <div class="faq-item">
+                                    <h3>{"Q: Can I use this tool offline?"}</h3>
+                                    <p>{"A: Yes, all calculations are performed locally in your browser."}</p>
+                                </div>
+                            </div>
+                            <div class="content-section">
+                                <h2>{"🎯 Best Practices"}</h2>
+                                <ul>
+                                    <li><strong>{"Normalize Inputs:"}</strong> {"Always use normalized quaternions for rotation calculations."}</li>
+                                    <li><strong>{"Check Ranges:"}</strong> {"Euler angles should be within -π to π for accurate conversion."}</li>
+                                    <li><strong>{"Test Edge Cases:"}</strong> {"Test with identity, 90°, and 180° rotations for correctness."}</li>
+                                    <li><strong>{"Document Conventions:"}</strong> {"Clearly state rotation order (e.g., ZYX) in your code and documentation."}</li>
+                                </ul>
+                            </div>
+                            <div class="content-section">
+                                <h2>{"🔗 Related Tools"}</h2>
+                                <p>{"Explore more mathematical tools:"}</p>
+                                <ul>
+                                    <li><a href="/base/">{"Base Converter"}</a> {" - For converting numbers between different bases."}</li>
                                 </ul>
                             </div>
                         </div>
