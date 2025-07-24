@@ -224,7 +224,7 @@ Yaw: 0.0"#}
                                 <h2>{"🔗 Related Tools"}</h2>
                                 <p>{"Explore more mathematical tools:"}</p>
                                 <ul>
-                                    <li><a href="/base/">{"Base Converter"}</a> {" - For converting numbers between different bases."}</li>
+                                    <li><a href="/base/">{"Number Base Converter"}</a> {" - For converting numbers between different bases."}</li>
                                 </ul>
                             </div>
                         </div>

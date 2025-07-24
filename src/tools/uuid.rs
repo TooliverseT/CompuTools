@@ -113,7 +113,7 @@ impl Component for ToolUuid {
                             <h2>{"🔗 Related Tools"}</h2>
                             <p>{"Explore more tools for developers:"}</p>
                             <ul>
-                                <li><a href="/base/">{"Base Converter"}</a> {" - For converting numbers between different bases."}</li>
+                                <li><a href="/base/">{"Number Base Converter"}</a> {" - For converting numbers between different bases."}</li>
                                 <li><a href="/json/">{"JSON Formatter"}</a> {" - For formatting and validating JSON data."}</li>
                             </ul>
                         </div>

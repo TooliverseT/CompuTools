@@ -138,7 +138,7 @@ impl Component for ToolUrl {
                             <p>{"Explore more tools for developers:"}</p>
                             <ul>
                                 <li><a href="/ascii/">{"ASCII Converter"}</a> {" - For converting text to ASCII codes and vice versa."}</li>
-                                <li><a href="/base64/">{"Base64 Converter"}</a> {" - For encoding and decoding data in Base64 format."}</li>
+                                <li><a href="/base64/">{"Base64 Encoder/Decoder"}</a> {" - For encoding and decoding data in Base64 format."}</li>
                                 <li><a href="/html/">{"HTML Entity Converter"}</a> {" - For encoding and decoding HTML entities."}</li>
                                 <li><a href="/json/">{"JSON Formatter"}</a> {" - For formatting and validating JSON data."}</li>
                             </ul>

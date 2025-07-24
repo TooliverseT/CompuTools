@@ -77,7 +77,7 @@ impl Component for Navbar {
                 },
                 SimpleThumbnail {
                     title: "base64".to_string(),
-                    display_name: "Base64 Converter".to_string(),
+                    display_name: "Base64 Encoder/Decoder".to_string(),
                     description: "Encode and decode Base64 data for secure transmission".to_string(),
                     category: "Text & Encoding".to_string(),
                     tags: vec!["base64", "encode", "decode", "transmission", "data"].iter().map(|s| s.to_string()).collect(),
