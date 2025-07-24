@@ -139,11 +139,11 @@ impl Component for ToolJson {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <>
-                <h1 class="tool-title">
-                    { "JSON Formatter" }
-                </h1>
+                        <h1 class="tool-title">
+                            { "JSON Formatter" }
+                        </h1>
                 <div class="tool-wrapper">
-                    <div class="tool-intro">
+                        <div class="tool-intro">
                         <div class="content-section">
                             <h2>{"🔤 What is JSON?"}</h2>
                             <p>{"JSON (JavaScript Object Notation) is a lightweight, text-based data format used for data interchange between systems. It is easy for humans to read and write, and easy for machines to parse and generate."}</p>

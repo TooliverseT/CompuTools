@@ -102,7 +102,7 @@
     cursor: pointer;
     
     i {
-        color: var(--color-fourth); // 모든 아이콘 색상을 통일
+        color: var(--color-fifth); // 모든 아이콘 색상을 통일
         font-size: 24px;
     }
     
@@ -141,11 +141,11 @@
 }
 
 .toggle-btn i {
-    color: var(--color-fourth);
+    color: var(--color-fifth);
 }
 
 [data-theme="dark"] .toggle-btn i {
-    color: var(--color-fourth);
+    color: var(--color-fifth);
 }
 
 .scroll-btn {

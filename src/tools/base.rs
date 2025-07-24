@@ -66,7 +66,7 @@ impl Component for ToolBase {
             <>
                 <h1 class="tool-title">{ "Base Converter" }</h1>
                 <div class="tool-wrapper">
-                    <div class="tool-intro">
+                        <div class="tool-intro">
                         <div class="content-section">
                             <h2>{"🔢 What is Base Conversion?"}</h2>
                             <p>{"Base conversion is the process of translating numbers from one numeral system (base) to another. Common bases include decimal (10), binary (2), octal (8), and hexadecimal (16). Each base uses a different set of digits and place values."}</p>
@@ -218,21 +218,21 @@ Hexadecimal: 2A"#}
                     </div>
                     <div class="tool-container">
                         <div class="base-container" style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
-                            { for common_bases.iter().map(|&base| {
-                                if let Some(value) = self.bases.get(&base) {
-                                    let base_name = match base {
-                                        2 => "Binary",
-                                        8 => "Octal",
-                                        10 => "Decimal",
-                                        16 => "Hexadecimal",
-                                        _ => unreachable!(),
-                                    };
-                                    self.render_input(ctx, base_name, value, base)
-                                } else {
-                                    html! {}
-                                }
-                            }) }
-                        </div>
+                                { for common_bases.iter().map(|&base| {
+                                    if let Some(value) = self.bases.get(&base) {
+                                        let base_name = match base {
+                                            2 => "Binary",
+                                            8 => "Octal",
+                                            10 => "Decimal",
+                                            16 => "Hexadecimal",
+                                            _ => unreachable!(),
+                                        };
+                                        self.render_input(ctx, base_name, value, base)
+                                    } else {
+                                        html! {}
+                                    }
+                                }) }
+                            </div>
                         <div style="margin-top: 20px;">
                             <label for="custom-base-select" style="margin-right: 8px;">{"Add Base:"}</label>
                             <select id="custom-base-select" onchange={on_add}>
@@ -251,7 +251,7 @@ Hexadecimal: 2A"#}
                                         <div style="display: grid; align-items: center; gap: 8px; grid-auto-flow: column;">
                                             { self.render_input(ctx, &label, value, base) }
                                             <button class="tool-btn" onclick={remove_cb} style="height: 32px;">{"Delete"}</button>
-                                        </div>
+                            </div>
                                     }
                                 } else {
                                     html! {}

@@ -75,11 +75,11 @@ impl Component for ToolHtml {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <>
-                <h1 class="tool-title">
-                    { "HTML Converter" }
-                </h1>
+                        <h1 class="tool-title">
+                            { "HTML Converter" }
+                        </h1>
                 <div class="tool-wrapper">
-                    <div class="tool-intro">
+                        <div class="tool-intro">
                         <div class="content-section">
                             <h2>{"🔤 What is an HTML Entity?"}</h2>
                             <p>{"An HTML entity is a special sequence of characters used to represent reserved or invisible characters in HTML. Entities are used to display characters that would otherwise be interpreted as HTML markup, such as <, >, &, or non-breaking spaces."}</p>

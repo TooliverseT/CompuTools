@@ -104,10 +104,6 @@
             font-size: 12px;
         }
     }
-
-    @include respond-to(small) {
-        max-height: 250px;
-    }
 }
 
 .tool-container {
@@ -603,11 +599,11 @@ select:hover {
     
     p {
         margin-bottom: 8px;
-        color: white;
+        color: var(--color-font);
         font-size: 0.95em;
         
         strong {
-            color: #FFE4B5;
+            color: var(--color-fourth);
             font-weight: 600;
         }
     }
@@ -616,7 +612,7 @@ select:hover {
         margin: 8px 0 8px 15px;
         
         li {
-            color: white;
+            color: var(--color-font);
             font-size: 0.9em;
             margin-bottom: 4px;
         }
