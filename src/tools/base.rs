@@ -109,7 +109,7 @@ impl Component for ToolBase {
                         // 다른 필드들 초기화
                         for (other_base, val) in self.bases.iter_mut() {
                             if *other_base != base {
-                                val.clear();
+                        val.clear();
                             }
                         }
                         for (other_base, err) in self.error_messages.iter_mut() {
@@ -190,7 +190,7 @@ impl Component for ToolBase {
                             <h3>{"🔥 Advanced Features:"}</h3>
                             <ul>
                                 <li><strong>{"Dual Mode Operation:"}</strong> {" Switch between integer and floating-point conversion modes."}</li>
-                                <li><strong>{"Flexible Input Formats:"}</strong> {" Supports 0x, 0b, 0o prefixes, escape sequences (\\x), and CSS-style (#) notation."}</li>
+                                <li><strong>{"Flexible Input Formats:"}</strong> {" Supports 0x, 0b, 0o prefixes and escape sequences (\\x) for convenient input."}</li>
                                 <li><strong>{"Complete Base Support:"}</strong> {" Convert between any base from 2 to 36, including uncommon bases."}</li>
                                 <li><strong>{"Floating-Point Precision:"}</strong> {" Configurable decimal precision (3-12 digits) with repeating decimal detection."}</li>
                                 <li><strong>{"Real-time Validation:"}</strong> {" Instant error detection with detailed feedback on invalid characters."}</li>
@@ -212,7 +212,6 @@ impl Component for ToolBase {
                                 <ul>
                                     <li>{"0x2A (programming style)"}</li>
                                     <li>{"x2A (short prefix)"}</li>
-                                    <li>{"#2A (CSS/web style)"}</li>
                                     <li>{"\\x2A (escape sequence)"}</li>
                                     <li>{"2A.A (floating-point in Float Mode)"}</li>
                                 </ul>
@@ -221,6 +220,7 @@ impl Component for ToolBase {
                                     <li>{"0o52 (modern prefix)"}</li>
                                     <li>{"o52 (short prefix)"}</li>
                                     <li>{"052 (traditional C-style)"}</li>
+                                    <li>{"\\052 (escape sequence)"}</li>
                                     <li>{"52.4 (floating-point in Float Mode)"}</li>
                                 </ul>
                             </div>
@@ -334,18 +334,22 @@ Verification: 2×7² + 0×7¹ + 2×7⁰ = 98+0+2 = 100 ✓"#}
                                 <ul>
                                     <li><strong>{"Memory Address Calculation:"}</strong> {" Convert between hex addresses and decimal offsets for debugging."}</li>
                                     <li><strong>{"Bitwise Operations:"}</strong> {" Understand AND, OR, XOR operations by visualizing binary representations."}</li>
-                                    <li><strong>{"Color Code Processing:"}</strong> {" Convert between #FF5733 (hex) and RGB decimal values."}</li>
+                                    <li><strong>{"File Permissions:"}</strong> {" Convert Unix file permissions between octal (755) and binary representations."}</li>
                                     <li><strong>{"Assembly Programming:"}</strong> {" Work with hex opcodes and binary instruction formats."}</li>
-                                    <li><strong>{"Network Programming:"}</strong> {" Convert IP addresses, subnet masks, and port numbers."}</li>
+                                    <li><strong>{"Network Programming:"}</strong> {" Convert IP addresses, port numbers, and protocol identifiers between different formats."}</li>
+                                <li><strong>{"Data Analysis:"}</strong> {" Process numerical data in different bases for statistical analysis and visualization."}</li>
+                                <li><strong>{"Embedded Systems:"}</strong> {" Convert between binary, octal, and hexadecimal for microcontroller programming."}</li>
+                                <li><strong>{"Game Development:"}</strong> {" Handle game states, coordinates, and resource management using different number systems."}</li>
+                                <li><strong>{"Database Operations:"}</strong> {" Convert primary keys, hash values, and encoded data between formats."}</li>
+                                <li><strong>{"Mathematics & Research:"}</strong> {" Explore number theory, algorithmic efficiency, and computational mathematics."}</li>
                                 </ul>
                                 <div class="example-box">
-                                    <p><strong>{"Real Example - RGB Color:"}</strong></p>
+                                    <p><strong>{"Real Example - File Permissions:"}</strong></p>
                                     <ul>
-                                        <li>{"CSS Color: #FF5733"}</li>
-                                        <li>{"Red: FF₁₆ = 255₁₀"}</li>
-                                        <li>{"Green: 57₁₆ = 87₁₀"}</li>
-                                        <li>{"Blue: 33₁₆ = 51₁₀"}</li>
-                                        <li>{"Result: rgb(255, 87, 51)"}</li>
+                                        <li>{"Unix Permissions: 755"}</li>
+                                        <li>{"Owner: 7₈ = 111₂ (rwx)"}</li>
+                                        <li>{"Group: 5₈ = 101₂ (r-x)"}</li>
+                                        <li>{"Others: 5₈ = 101₂ (r-x)"}</li>
                                     </ul>
                                 </div>
                             </div>
@@ -576,7 +580,7 @@ This is why: 0.1 + 0.2 ≠ 0.3 in programming"#}
                     if let Some(meta_tag) =
                         doc.query_selector("meta[name=\"description\"]").unwrap()
                     {
-                        meta_tag.set_attribute("content", "Number Base Converter with floating-point support, flexible input formats (0x, 0b, #), and dynamic base addition (2-36). Features step-by-step conversion tutorials, mathematical process visualization, real-time validation, and professional use cases for programming, cybersecurity, and education. Convert between decimal, binary, octal, hexadecimal instantly with precision control and repeating decimal detection.").unwrap();
+                        meta_tag.set_attribute("content", "Number Base Converter with floating-point support, flexible input formats (0x, 0b, 0o, \\x), and dynamic base addition (2-36). Features step-by-step conversion tutorials, mathematical process visualization, real-time validation, and professional use cases for programming, cybersecurity, and data analysis. Advanced error handling with educational content.").unwrap();
                     }
                 }
             }
@@ -927,11 +931,15 @@ impl ToolBase {
                 }
             },
             8 => {
-                // Octal: 0o52, o52, 052, 52
+                // Octal: 0o52, o52, 052, 52, \052
                 if input.starts_with("0o") || input.starts_with("0O") {
                     let remaining = &input[2..];
                     Ok(remaining.to_string())
                 } else if input.starts_with("o") || input.starts_with("O") {
+                    let remaining = &input[1..];
+                    Ok(remaining.to_string())
+                } else if input.starts_with("\\") && input.len() > 1 {
+                    // Octal escape sequence: \052
                     let remaining = &input[1..];
                     Ok(remaining.to_string())
                 } else if input.starts_with("0") && input.len() > 1 && 
@@ -946,14 +954,11 @@ impl ToolBase {
                 }
             },
             16 => {
-                // Hexadecimal: 0x2A, x2A, #2A, 2A, \x2A
+                // Hexadecimal: 0x2A, x2A, 2A, \x2A
                 if input.starts_with("0x") || input.starts_with("0X") {
                     let remaining = &input[2..];
                     Ok(remaining.to_string())
                 } else if input.starts_with("x") || input.starts_with("X") {
-                    let remaining = &input[1..];
-                    Ok(remaining.to_string())
-                } else if input.starts_with("#") {
                     let remaining = &input[1..];
                     Ok(remaining.to_string())
                 } else if input.starts_with("\\x") || input.starts_with("\\X") {
@@ -1074,7 +1079,7 @@ impl ToolBase {
         if self.supports_float {
             match base {
                 2 => "e.g. 0b101010.101, 101010.101".to_string(),
-                8 => "e.g. 0o52.4, 52.4".to_string(),
+                8 => "e.g. 0o52.4, \\052.4".to_string(),
                 10 => "e.g. 42.625, -42.625".to_string(),
                 16 => "e.g. 0x2A.A, 2A.A".to_string(),
                 _ => format!("Enter base {} number (float)", base),
@@ -1082,9 +1087,9 @@ impl ToolBase {
         } else {
             match base {
                 2 => "e.g. 0b101010, b101010, 101010".to_string(),
-                8 => "e.g. 0o52, o52, 052, 52".to_string(),
+                8 => "e.g. 0o52, o52, 052, \\052".to_string(),
                 10 => "e.g. 42, -42".to_string(),
-                16 => "e.g. 0x2A, x2A, #2A, 2A".to_string(),
+                16 => "e.g. 0x2A, x2A, 2A \\x2A".to_string(),
                 _ => format!("Enter base {} number", base),
             }
         }
@@ -1109,9 +1114,9 @@ impl ToolBase {
         } else {
             match base {
                 2 => "Valid: 0-1 | Formats: 0b, b, or plain".to_string(),
-                8 => "Valid: 0-7 | Formats: 0o, o, 0prefix, or plain".to_string(),
+                8 => "Valid: 0-7 | Formats: 0o, o, 0prefix, \\, or plain".to_string(),
                 10 => "Valid: 0-9 | Supports negative numbers".to_string(),
-                16 => "Valid: 0-9, A-F | Formats: 0x, x, #, \\x, or plain".to_string(),
+                16 => "Valid: 0-9, A-F | Formats: 0x, x, \\x, or plain".to_string(),
                 _ => {
                     if base <= 10 {
                         format!("Valid: 0-{}", base - 1)
