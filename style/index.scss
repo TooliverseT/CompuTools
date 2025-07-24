@@ -19,6 +19,8 @@ $dark-color-fifth: #D5B8A4;
 $dark-color-font: #F1F1F1;
 $dark-color-subfont: #C8C8C8;
 
+$color-error: #ff6b6b;
+
 $breakpoints: (
     small: 480px,
     medium: 768px,
@@ -40,6 +42,7 @@ html[data-theme="light"] {
     --color-fifth: #{$light-color-fifth};
     --color-font: #{$light-color-font};
     --color-subfont: #{$light-color-subfont};
+    --color-error: #{$color-error};
 }
   
 html[data-theme="dark"] {
@@ -50,6 +53,7 @@ html[data-theme="dark"] {
     --color-fifth: #{$dark-color-fifth};
     --color-font: #{$dark-color-font};
     --color-subfont: #{$dark-color-subfont};
+    --color-error: #{$color-error};
 }
 
 html {

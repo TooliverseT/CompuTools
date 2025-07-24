@@ -84,7 +84,7 @@ impl Component for Navbar {
                 },
                 SimpleThumbnail {
                     title: "base".to_string(),
-                    display_name: "Number Base".to_string(),
+                    display_name: "Number Base Converter".to_string(),
                     description: "Convert numbers between different bases (binary, hex, etc.)".to_string(),
                     category: "Mathematical".to_string(),
                     tags: vec!["base", "binary", "hex", "decimal", "convert"].iter().map(|s| s.to_string()).collect(),
