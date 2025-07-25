@@ -1503,12 +1503,12 @@ impl Component for ToolFileHash {
             if let Some(window) = window() {
                 let document = window.document();
                 if let Some(doc) = document {
-                    doc.set_title("File Hash Generator | CompuTools");
+                    doc.set_title("File Hash Calculator | CompuTools");
 
                     if let Some(meta_tag) =
                         doc.query_selector("meta[name=\"description\"]").unwrap()
                     {
-                        meta_tag.set_attribute("content", "Advanced File Hash Generator with drag & drop support, file validation, and hash verification. Compute MD5, SHA-1, SHA-256, SHA-512 hashes for any file up to 2GB. Features real-time progress tracking, chunked processing for large files, and comprehensive file integrity verification tools.").unwrap();
+                        meta_tag.set_attribute("content", "Professional File Hash Generator & Verifier with HMAC support. Compute MD5, SHA-1, SHA-256, SHA-512, CRC32 hashes for any file. Features drag & drop upload, hash verification with multiple input formats (hex, colon-separated, Base64, C-array), HMAC authentication, real-time progress tracking, smart Local Storage settings, and comprehensive file metadata display. Supports files up to 2MB with chunked processing for optimal performance. All processing happens locally in your browser for maximum security and privacy.").unwrap();
                     }
                 }
             }
