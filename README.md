@@ -12,7 +12,6 @@
 * 설명 접기 기능 추가
 * 설명 검증
 * 기능 업그레이드
-  * crc
   * file_hash
   * html
   * json

@@ -56,7 +56,7 @@ impl Component for Navbar {
                 },
                 SimpleThumbnail {
                     title: "crc".to_string(),
-                    display_name: "CRC Calculator".to_string(),
+                    display_name: "CRC Tool".to_string(),
                     description: "Generate CRC checksums for data integrity verification".to_string(),
                     category: "Security & Hash".to_string(),
                     tags: vec!["crc", "checksum", "integrity", "hash", "verify"].iter().map(|s| s.to_string()).collect(),

@@ -398,7 +398,7 @@ impl Component for ToolFileHash {
                             <h2>{"🔗 Related Tools"}</h2>
                             <p>{"Enhance your workflow with this related tool:"}</p>
                             <ul>
-                                <li><a href="/crc/">{"CRC Converter"}</a> {" - For calculating CRC checksums for data integrity verification."}</li>
+                                <li><a href="/crc/">{"CRC tool"}</a> {" - For calculating CRC checksums for data integrity verification."}</li>
                             </ul>
                         </div>
                     </div>

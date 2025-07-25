@@ -34,7 +34,7 @@ impl Component for About {
                             <ul>
                                 <li><strong>{ "Unix Timestamp Converter" }</strong>{ " - Convert between Unix timestamps and human-readable dates with timezone support" }</li>
                                 <li><strong>{ "Quaternion Converter" }</strong>{ " - Transform between quaternions and Euler angles for 3D rotations" }</li>
-                                <li><strong>{ "CRC Calculator" }</strong>{ " - Generate CRC checksums using various algorithms for data integrity verification" }</li>
+                                <li><strong>{ "CRC Tool" }</strong>{ " - Generate CRC checksums using various algorithms for data integrity verification" }</li>
                                 <li><strong>{ "ASCII Converter" }</strong>{ " - Convert text to ASCII codes and vice versa in both decimal and hexadecimal formats" }</li>
                                 <li><strong>{ "JSON Formatter" }</strong>{ " - Format, validate, and beautify JSON data with customizable indentation" }</li>
                                 <li><strong>{ "Base64 Encoder/Decoder" }</strong>{ " - Encode and decode Base64 data for secure transmission" }</li>

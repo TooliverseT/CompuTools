@@ -35,7 +35,7 @@ impl Component for Thumbnail {
         let content = match title.as_str() {
             "unix-timestamp" => "Unix Timestamp Converter",
             "quaternion" => "Quaternion Converter",
-            "crc" => "CRC Converter",
+            "crc" => "CRC Tool",
             "ascii" => "ASCII Converter",
             "json" => "JSON Formatter",
             "base64" => "Base64 Encoder/Decoder",

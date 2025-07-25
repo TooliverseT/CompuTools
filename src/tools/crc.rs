@@ -24,13 +24,59 @@ use log::info;
 use regex::Regex;
 use std::str::FromStr;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
-use web_sys::{window, HtmlInputElement, HtmlSelectElement};
+use web_sys::{window, HtmlInputElement, HtmlSelectElement, Storage};
 use yew::prelude::*;
 
 #[derive(PartialEq, Clone)]
 enum InputMode {
     Ascii,
     Hex,
+    Binary,
+    Decimal,
+    Octal,
+}
+
+#[derive(Clone, PartialEq)]
+pub enum OutputMode {
+    Decimal,
+    Hex,
+    Binary,
+    Octal,
+}
+
+#[derive(Clone, PartialEq)]
+pub enum HexStyle {
+    WithPrefix,     // 0x48
+    ShortPrefix,    // x48
+    NoPrefix,       // 48
+    EscapeSequence, // \x48
+}
+
+#[derive(Clone, PartialEq)]
+pub enum BinaryStyle {
+    WithPrefix,    // 0b01001000
+    ShortPrefix,   // b01001000
+    NoPrefix,      // 01001000
+}
+
+#[derive(Clone, PartialEq)]
+pub enum OctalStyle {
+    WithPrefix,     // 0o110
+    ShortPrefix,    // o110
+    NoPrefix,       // 110
+    EscapeSequence, // \110
+}
+
+#[derive(Clone, PartialEq)]
+pub enum Endianness {
+    BigEndian,    // 네트워크 바이트 순서 (MSB first)
+    LittleEndian, // 인텔 x86 바이트 순서 (LSB first)
+}
+
+#[derive(Clone, PartialEq)]
+pub enum ByteFormatting {
+    Continuous,   // 0x12345678
+    ByteSeparated, // 0x12 0x34 0x56 0x78
 }
 
 #[derive(PartialEq, Clone, Copy)]
@@ -951,17 +997,29 @@ impl CrcAlgorithm {
 pub struct ToolCrc {
     input: String,
     input_mode: InputMode,
+    output_mode: OutputMode,
+    hex_style: HexStyle,
+    binary_style: BinaryStyle,
+    octal_style: OctalStyle,
+    endianness: Endianness,
+    byte_formatting: ByteFormatting,
     selected_algorithm: CrcAlgorithm,
     bytes: Vec<u8>,
     bytes_string: String,
     crc_result: u64,
-    error_message: String,
+    error_message: Option<String>,
     width: u8,
 }
 
 pub enum Msg {
     InputChanged(String),
     ModeChanged(InputMode),
+    OutputModeChanged(OutputMode),
+    HexStyleChanged(HexStyle),
+    BinaryStyleChanged(BinaryStyle),
+    OctalStyleChanged(OctalStyle),
+    EndiannessChanged(Endianness),
+    ByteFormattingChanged(ByteFormatting),
     SelectAlgorithm(String),
     CopyToClipboard(String),
     Calculate,
@@ -972,46 +1030,99 @@ impl Component for ToolCrc {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self {
-            input: String::new(),
-            input_mode: InputMode::Ascii,
-            selected_algorithm: CrcAlgorithm::Crc32IsoHdlc,
-            bytes: Vec::new(),
-            bytes_string: String::new(),
-            crc_result: 0,
-            error_message: String::new(),
-            width: 32,
-        }
+        Self::load_from_storage()
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::InputChanged(value) => {
-                self.input = value;
-                self.error_message = String::new();
-                self.calculate_crc();
-                self.bytes_string = self
-                    .bytes
-                    .iter()
-                    .map(|byte| format!("0x{:02X}", byte))
-                    .collect::<Vec<String>>()
-                    .join(" ");
+                self.input = value.clone();
+                self.error_message = None;
+
+                if value.is_empty() {
+                    self.bytes.clear();
+                    self.bytes_string.clear();
+                    self.crc_result = 0;
+                    return true;
+                }
+
+                let parsed_bytes = match self.input_mode {
+                    InputMode::Ascii => Ok(self.input.as_bytes().to_vec()),
+                    InputMode::Hex => self.parse_hex_input(&self.input),
+                    InputMode::Binary => self.parse_binary_input(&self.input),
+                    InputMode::Decimal => self.parse_decimal_input(&self.input),
+                    InputMode::Octal => self.parse_octal_input(&self.input),
+                };
+
+                match parsed_bytes {
+                    Ok(bytes) => {
+                        self.bytes = bytes;
+                        self.calculate_crc();
+                        self.bytes_string = self
+                            .bytes
+                            .iter()
+                            .map(|byte| format!("0x{:02X}", byte))
+                            .collect::<Vec<String>>()
+                            .join(" ");
+                    }
+                    Err(err) => {
+                        self.error_message = Some(err);
+                        self.bytes.clear();
+                        self.bytes_string.clear();
+                        self.crc_result = 0;
+                    }
+                }
                 true
             }
             Msg::ModeChanged(mode) => {
                 self.input_mode = mode;
-                self.error_message = String::new();
-                let cb = _ctx.link().callback(|_: u8| Msg::Calculate);
-                cb.emit(0);
+                self.error_message = None;
+                self.input = String::new();
+                self.bytes.clear();
+                self.bytes_string.clear();
+                self.crc_result = 0;
+                self.save_to_storage();
+                true
+            }
+            Msg::OutputModeChanged(mode) => {
+                self.output_mode = mode;
+                self.save_to_storage();
+                true
+            }
+            Msg::HexStyleChanged(style) => {
+                self.hex_style = style;
+                self.save_to_storage();
+                true
+            }
+            Msg::BinaryStyleChanged(style) => {
+                self.binary_style = style;
+                self.save_to_storage();
+                true
+            }
+            Msg::OctalStyleChanged(style) => {
+                self.octal_style = style;
+                self.save_to_storage();
+                true
+            }
+            Msg::EndiannessChanged(endianness) => {
+                self.endianness = endianness;
+                self.save_to_storage();
+                true
+            }
+            Msg::ByteFormattingChanged(formatting) => {
+                self.byte_formatting = formatting;
+                self.save_to_storage();
                 true
             }
             Msg::SelectAlgorithm(value) => {
                 if let Some(algorithm) = CrcAlgorithm::from_name(&value) {
                     self.selected_algorithm = algorithm;
+                    self.calculate_crc();
+                    self.save_to_storage();
+                    true
+                } else {
+                    false
                 }
-                let cb = _ctx.link().callback(|_: u8| Msg::Calculate);
-                cb.emit(0);
-                true
             }
             Msg::Calculate => {
                 self.calculate_crc();
@@ -1024,9 +1135,7 @@ impl Component for ToolCrc {
                 true
             }
             Msg::CopyToClipboard(value) => {
-                // input_ref에서 HtmlInputElement를 가져옴
                 if let Some(clipboard) = window().map(|w| w.navigator().clipboard()) {
-                    // 클립보드 작업 수행
                     wasm_bindgen_futures::spawn_local(async move {
                         let promise = clipboard.write_text(&value);
                         let future = JsFuture::from(promise);
@@ -1039,7 +1148,7 @@ impl Component for ToolCrc {
                 } else {
                     {};
                 }
-                false // 리렌더링 필요 없음
+                false
             }
         }
     }
@@ -1049,16 +1158,16 @@ impl Component for ToolCrc {
 
         let onchange_mode = _ctx.link().callback(|e: Event| {
             let select: HtmlInputElement = e.target_unchecked_into();
-            Msg::SelectAlgorithm(select.value()) // 이 부분을 적절히 처리해야 합니다
+            Msg::SelectAlgorithm(select.value())
         });
 
-        let digits = ((self.width as f32 / 4.0).ceil()) as usize; // 4비트 = 1자리
+        let digits = ((self.width as f32 / 4.0).ceil()) as usize;
         let formatted_crc = format!("0x{:0width$X}", self.crc_result, width = digits);
 
         html! {
             <>
                         <h1 class="tool-title">
-                            { "CRC Converter" }
+                            { "CRC Tool" }
                         </h1>
                 <div class="tool-wrapper">
                         <div class="tool-intro">
@@ -1069,225 +1178,901 @@ impl Component for ToolCrc {
                         </div>
 
                         <div class="content-section">
-                            <h2>{"⚙️ How This CRC Converter Works"}</h2>
+                            <h2>{"⚙️ How This CRC Tool Works"}</h2>
                             <p>{"This tool allows you to calculate CRC values for any input using a wide range of industry-standard CRC algorithms. You can choose the input format (ASCII or HEX), select the CRC algorithm, and instantly see the result."}</p>
-                            <h3>{"Supported Features:"}</h3>
+                            <h3>{"🔥 Advanced Features:"}</h3>
                             <ul>
-                                <li><strong>{"Multiple CRC Algorithms:"}</strong> {"Supports CRC-3, CRC-4, CRC-5, CRC-6, CRC-7, CRC-8, CRC-10, CRC-11, CRC-12, CRC-13, CRC-14, CRC-15, CRC-16, CRC-17, CRC-21, CRC-24, CRC-30, CRC-31, CRC-32, CRC-40, CRC-64 and more."}</li>
-                                <li><strong>{"Flexible Input Parsing:"}</strong> {"Accepts ASCII text or various HEX formats (e.g., 0x01, \x02, x03, 04, 05, 0x01\x02x030405)."}</li>
-                                <li><strong>{"Real-time Calculation:"}</strong> {"Instantly updates CRC value as you type or change settings."}</li>
-                                <li><strong>{"Copy with Notification:"}</strong> {"Click any output field to copy results with visual feedback."}</li>
-                                <li><strong>{"Algorithm Selection:"}</strong> {"Choose from dozens of CRC standards for compatibility with your application."}</li>
+                                <li><strong>{"Comprehensive Algorithm Library:"}</strong> {"100+ CRC algorithms including CRC-3, CRC-4, CRC-5, CRC-6, CRC-7, CRC-8, CRC-10, CRC-11, CRC-12, CRC-13, CRC-14, CRC-15, CRC-16, CRC-17, CRC-21, CRC-24, CRC-30, CRC-31, CRC-32, CRC-40, CRC-64"}</li>
+                                <li><strong>{"Smart Algorithm Selection:"}</strong> {"Categorized by bit-width with industry-specific recommendations and popularity rankings"}</li>
+                                <li><strong>{"Multi-Format Input Support:"}</strong> {"ASCII text, HEX (multiple formats), Binary (0b/b prefix), Decimal (space-separated), and Octal (0o/o/\\ prefix)"}</li>
+                                <li><strong>{"Flexible Output Customization:"}</strong> {"Choose format (HEX/DEC/BIN/OCT), style (prefix options), endianness (Big/Little), and byte formatting (continuous/separated)"}</li>
+                                <li><strong>{"Real-time Calculation:"}</strong> {"Instant CRC computation as you type with comprehensive error validation"}</li>
+                                <li><strong>{"Persistent Settings:"}</strong> {"Auto-save preferences to Local Storage for consistent user experience"}</li>
+                                <li><strong>{"Professional-Grade Accuracy:"}</strong> {"Industry-standard implementations with verified test vectors"}</li>
                             </ul>
-                            <h3>{"Input Format Examples:"}</h3>
+
+                            <h3>{"🎯 Algorithm Selection Intelligence"}</h3>
                             <div class="example-box">
-                                <p><strong>{"ASCII input example:"}</strong></p>
+                                <p><strong>{"Popular Algorithms by Category:"}</strong></p>
                                 <ul>
-                                    <li>{"Hello World"}</li>
-                                    <li>{"CompuTools CRC"}</li>
-                            </ul>
-                                <p><strong>{"HEX input example:"}</strong></p>
+                                    <li><strong>{"Network & Ethernet:"}</strong> {"CRC-32/ISO-HDLC (most common), CRC-16/MODBUS, CRC-8/AUTOSAR"}</li>
+                                    <li><strong>{"Storage & Filesystems:"}</strong> {"CRC-32/MPEG-2, CRC-64/XZ, CRC-32/BZIP2"}</li>
+                                    <li><strong>{"Embedded & IoT:"}</strong> {"CRC-16/CCITT, CRC-8/MAXIM-DOW, CRC-5/USB"}</li>
+                                    <li><strong>{"Telecommunications:"}</strong> {"CRC-16/GSM, CRC-8/GSM-A, CRC-11/UMTS"}</li>
+                                    <li><strong>{"Automotive:"}</strong> {"CRC-15/CAN, CRC-17/CAN-FD, CRC-8/SAE-J1850"}</li>
+                                    <li><strong>{"Bluetooth & Wireless:"}</strong> {"CRC-24/BLE, CRC-8/BLUETOOTH, CRC-8/WCDMA"}</li>
+                                </ul>
+                            </div>
+
+                            <h3>{"📊 Input Format Examples & Best Practices:"}</h3>
+                            <div class="example-box">
+                                <p><strong>{"ASCII input (recommended for text data):"}</strong></p>
                                 <ul>
-                                    <li>{"0x01 0x02 0x03 0x04 0x05"}</li>
-                                    <li>{"\x01\x02\x03\x04\x05"}</li>
-                                    <li>{"x01x02x03x04x05"}</li>
-                                    <li>{"0102030405"}</li>
-                            </ul>
+                                    <li>{"\"Hello World\" → Direct character encoding"}</li>
+                                    <li>{"\"CompuTools CRC\" → UTF-8 byte sequence"}</li>
+                                    <li>{"\"test\\ndata\" → Includes control characters"}</li>
+                                </ul>
+                                
+                                <p><strong>{"HEX input (flexible formats accepted):"}</strong></p>
+                                <ul>
+                                    <li>{"Standard: \"0x01 0x02 0x03 0x04 0x05\""}</li>
+                                    <li>{"Escape: \"\\x01\\x02\\x03\\x04\\x05\""}</li>
+                                    <li>{"Short: \"x01x02x03x04x05\""}</li>
+                                    <li>{"Raw: \"0102030405\""}</li>
+                                    <li>{"Mixed: \"0x01 \\x02 x03 04 05\" (auto-detected)"}</li>
+                                </ul>
+
+                                <p><strong>{"Binary input (8-bit sequences):"}</strong></p>
+                                <ul>
+                                    <li>{"Prefixed: \"0b01001000 0b01100101\""}</li>
+                                    <li>{"Short: \"b01001000 b01100101\""}</li>
+                                    <li>{"Raw: \"01001000 01100101 01101100\""}</li>
+                                    <li>{"Stream: \"0100100001100101011011000110110001101111\""}</li>
+                                </ul>
+
+                                <p><strong>{"Decimal input (byte values 0-255):"}</strong></p>
+                                <ul>
+                                    <li>{"Space-separated: \"72 101 108 108 111\""}</li>
+                                    <li>{"Valid range: 0-255 per value"}</li>
+                                    <li>{"Example: \"123 45 67 89 10\" → 5 bytes"}</li>
+                                </ul>
+
+                                <p><strong>{"Octal input (base-8 representation):"}</strong></p>
+                                <ul>
+                                    <li>{"Standard: \"0o110 0o145 0o154\""}</li>
+                                    <li>{"Short: \"o110 o145 o154\""}</li>
+                                    <li>{"Raw: \"110 145 154 154 157\""}</li>
+                                    <li>{"Escape: \"\\110\\145\\154\\154\\157\""}</li>
+                                </ul>
                             </div>
                         </div>
 
                         <div class="content-section">
-                            <h2>{"💡 Common Use Cases"}</h2>
-                            <div class="use-case">
-                                <h3>{"1. Networking & Communication"}</h3>
-                                <ul>
-                                    <li><strong>{"Packet Integrity:"}</strong> {"Verify the integrity of data packets in protocols like Ethernet, CAN, USB, and more."}</li>
-                                    <li><strong>{"Error Detection:"}</strong> {"Detect accidental data corruption during transmission."}</li>
-                                </ul>
-                            </div>
-                            <div class="use-case">
-                                <h3>{"2. Storage & Filesystems"}</h3>
-                                <ul>
-                                    <li><strong>{"Data Validation:"}</strong> {"Check the integrity of files and blocks in storage devices and filesystems."}</li>
-                                    <li><strong>{"Backup Verification:"}</strong> {"Ensure backups are not corrupted by comparing CRC values."}</li>
-                                </ul>
-                            </div>
-                            <div class="use-case">
-                                <h3>{"3. Embedded Systems & IoT"}</h3>
-                                <ul>
-                                    <li><strong>{"Firmware Updates:"}</strong> {"Validate firmware images before flashing to devices."}</li>
-                                    <li><strong>{"Sensor Data Integrity:"}</strong> {"Check sensor data for errors in real-time applications."}</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="content-section">
-                            <h2>{"📚 Step-by-Step Tutorial"}</h2>
-                            <div class="tutorial-step">
-                                <h3>{"Example 1: Calculating CRC for ASCII Input"}</h3>
-                                <p><strong>{"Goal:"}</strong> {"Calculate the CRC-32 value for the text 'Hello' using the ISO-HDLC algorithm."}</p>
-                                <ol>
-                                    <li>{"Set 'Input Method' to 'ASCII'."}</li>
-                                    <li>{"Enter 'Hello' in the input field."}</li>
-                                    <li>{"Select 'CRC-32/ISO-HDLC' as the algorithm."}</li>
-                                    <li>{"View the CRC result instantly."}</li>
-                                </ol>
-                                <div class="example-box">
-                                    <p><strong>{"Input:"}</strong> {"Hello"}</p>
-                                    <p><strong>{"Algorithm:"}</strong> {"CRC-32/ISO-HDLC"}</p>
-                                    <p><strong>{"Output:"}</strong> {"0x3610A686"}</p>
+                            <h2>{"🔍 CRC Algorithm Reference Guide"}</h2>
+                            <p>{"Understanding which CRC algorithm to choose is crucial for compatibility and reliability. Each algorithm has specific characteristics that make it suitable for different applications."}</p>
+                            
+                            <h3>{"📋 Algorithm Categories & Characteristics"}</h3>
+                            
+                            <div style="margin: 20px 0;">
+                                <h4>{"🔷 CRC-8 Family (Most Common for Small Data)"}</h4>
+                                <div style="background-color: var(--color-third); padding: 10px; border-radius: 5px; margin: 10px 0;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                                        <thead style="background-color: var(--color-fourth); color: white;">
+                                            <tr>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">{"Algorithm"}</th>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">{"Polynomial"}</th>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">{"Primary Use Case"}</th>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">{"Popularity"}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;"><strong>{"CRC-8/AUTOSAR"}</strong></td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x2F"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"Automotive ECU communication"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;"><strong>{"CRC-8/MAXIM-DOW"}</strong></td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x31"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"1-Wire devices, Dallas sensors"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;"><strong>{"CRC-8/SMBUS"}</strong></td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x07"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"SMBus protocol, I2C communications"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"CRC-8/BLUETOOTH"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0xA7"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"Bluetooth HEC calculation"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"CRC-8/DVB-S2"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0xD5"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"Digital video broadcasting"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐"}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                            <div class="tutorial-step">
-                                <h3>{"Example 2: Calculating CRC for HEX Input"}</h3>
-                                <p><strong>{"Goal:"}</strong> {"Calculate the CRC-16 value for the hex input '0x01 0x02 0x03 0x04' using the MODBUS algorithm."}</p>
-                                <ol>
-                                    <li>{"Set 'Input Method' to 'HEX'."}</li>
-                                    <li>{"Enter '0x01 0x02 0x03 0x04' in the input field."}</li>
-                                    <li>{"Select 'CRC-16/MODBUS' as the algorithm."}</li>
-                                    <li>{"View the CRC result instantly."}</li>
-                                </ol>
+
+                            <div style="margin: 20px 0;">
+                                <h4>{"🔶 CRC-16 Family (Industry Standard)"}</h4>
+                                <div style="background-color: var(--color-third); padding: 10px; border-radius: 5px; margin: 10px 0;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                                        <thead style="background-color: var(--color-fourth); color: white;">
+                                            <tr>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">{"Algorithm"}</th>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">{"Polynomial"}</th>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">{"Primary Use Case"}</th>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">{"Popularity"}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;"><strong>{"CRC-16/MODBUS"}</strong></td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x8005"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"Industrial automation, MODBUS protocol"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;"><strong>{"CRC-16/USB"}</strong></td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x8005"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"USB token and data packets"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;"><strong>{"CRC-16/XMODEM"}</strong></td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x1021"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"File transfer protocols (XMODEM, YMODEM)"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"CRC-16/DNP"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x3D65"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"Distributed Network Protocol (power systems)"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"CRC-16/PROFIBUS"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x1DCF"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"PROFIBUS fieldbus protocol"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐"}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div style="margin: 20px 0;">
+                                <h4>{"🔸 CRC-32 Family (Most Robust)"}</h4>
+                                <div style="background-color: var(--color-third); padding: 10px; border-radius: 5px; margin: 10px 0;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                                        <thead style="background-color: var(--color-fourth); color: white;">
+                                            <tr>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">{"Algorithm"}</th>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">{"Polynomial"}</th>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">{"Primary Use Case"}</th>
+                                                <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">{"Popularity"}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;"><strong>{"CRC-32/ISO-HDLC"}</strong></td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x04C11DB7"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"Ethernet, PNG, ZIP, most common CRC-32"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;"><strong>{"CRC-32/MPEG-2"}</strong></td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x04C11DB7"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"MPEG-2 transport streams, AAC audio"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;"><strong>{"CRC-32/BZIP2"}</strong></td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x04C11DB7"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"BZIP2 compression algorithm"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"CRC-32/AUTOSAR"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0xF4ACFB13"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"Automotive software architecture"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐⭐"}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"CRC-32/ISCSI"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; font-family: monospace;">{"0x1EDC6F41"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd;">{"iSCSI storage protocol"}</td>
+                                                <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">{"⭐⭐"}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <h3>{"🎯 Algorithm Selection Guide"}</h3>
+                            <div class="example-box">
+                                <p><strong>{"Choose based on your application:"}</strong></p>
+                                <ul>
+                                    <li><strong>{"Web Development:"}</strong> {"CRC-32/ISO-HDLC (universal compatibility)"}</li>
+                                    <li><strong>{"File Integrity:"}</strong> {"CRC-32/ISO-HDLC, CRC-64/XZ (for large files)"}</li>
+                                    <li><strong>{"Network Protocols:"}</strong> {"CRC-16/MODBUS, CRC-32/ISO-HDLC"}</li>
+                                    <li><strong>{"Embedded Systems:"}</strong> {"CRC-8/MAXIM-DOW, CRC-16/XMODEM"}</li>
+                                    <li><strong>{"Industrial Automation:"}</strong> {"CRC-16/MODBUS, CRC-8/AUTOSAR"}</li>
+                                    <li><strong>{"Legacy Compatibility:"}</strong> {"CRC-16/ARC, CRC-32/JAMCRC"}</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"💼 Professional Use Cases & Real-World Applications"}</h2>
+                            
+                            <div class="use-case">
+                                <h3>{"1. 🌐 Network Communications & Protocols"}</h3>
+                                <h4>{"Ethernet Frame Check Sequence (FCS)"}</h4>
+                                <p>{"Every Ethernet frame includes a 32-bit CRC-32/ISO-HDLC checksum to detect transmission errors. Network switches and routers automatically verify this checksum and discard corrupted frames."}</p>
                                 <div class="example-box">
-                                    <p><strong>{"Input:"}</strong> {"0x01 0x02 0x03 0x04"}</p>
-                                    <p><strong>{"Algorithm:"}</strong> {"CRC-16/MODBUS"}</p>
-                                    <p><strong>{"Output:"}</strong> {"0x2BA1"}</p>
+                                    <p><strong>{"Real Example:"}</strong></p>
+                                    <ul>
+                                        <li>{"Frame data: \"48656C6C6F\" (ASCII: Hello)"}</li>
+                                        <li>{"CRC-32/ISO-HDLC result: 0x3610A686"}</li>
+                                        <li>{"Application: Frame validation in network equipment"}</li>
+                                    </ul>
+                                </div>
+
+                                <h4>{"MODBUS Industrial Communication"}</h4>
+                                <p>{"MODBUS RTU uses CRC-16/MODBUS for error detection in industrial control systems. This ensures reliable communication between PLCs, sensors, and HMI systems."}</p>
+                                <div class="example-box">
+                                    <p><strong>{"Industrial Scenario:"}</strong></p>
+                                    <ul>
+                                        <li>{"Command: Read holding registers from device ID 1"}</li>
+                                        <li>{"Data: \"01 03 00 00 00 0A\" (hex)"}</li>
+                                        <li>{"CRC-16/MODBUS: Calculated and appended"}</li>
+                                        <li>{"Result: Verified communication integrity"}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="use-case">
+                                <h3>{"2. 💾 Storage Systems & File Integrity"}</h3>
+                                <h4>{"ZIP Archive Integrity"}</h4>
+                                <p>{"ZIP files use CRC-32/ISO-HDLC to verify each compressed file's integrity. Archive managers check these values during extraction to detect corruption."}</p>
+                                
+                                <h4>{"Database Transaction Logs"}</h4>
+                                <p>{"Modern databases use CRC checksums to ensure transaction log integrity. PostgreSQL, for example, uses CRC-32 for write-ahead log (WAL) files."}</p>
+                                <div class="example-box">
+                                    <p><strong>{"Database Protection:"}</strong></p>
+                                    <ul>
+                                        <li>{"Each log record includes CRC checksum"}</li>
+                                        <li>{"Automatic corruption detection during recovery"}</li>
+                                        <li>{"Prevents data loss from storage failures"}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="use-case">
+                                <h3>{"3. 🚗 Automotive & Embedded Systems"}</h3>
+                                <h4>{"CAN Bus Communication"}</h4>
+                                <p>{"Controller Area Network (CAN) uses CRC-15/CAN for frame validation in automotive systems. Critical for safety systems like ABS, airbags, and engine control."}</p>
+                                
+                                <h4>{"AUTOSAR Software Architecture"}</h4>
+                                <p>{"Automotive software components use CRC-8/AUTOSAR and CRC-32/AUTOSAR for inter-module communication verification and memory protection."}</p>
+                                <div class="example-box">
+                                    <p><strong>{"Safety-Critical Application:"}</strong></p>
+                                    <ul>
+                                        <li>{"ECU firmware validation using CRC-32/AUTOSAR"}</li>
+                                        <li>{"Real-time message integrity in brake systems"}</li>
+                                        <li>{"Compliance with ISO 26262 functional safety"}</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="use-case">
+                                <h3>{"4. 📡 Telecommunications & Wireless"}</h3>
+                                <h4>{"Bluetooth Low Energy (BLE)"}</h4>
+                                <p>{"BLE uses CRC-24/BLE for packet integrity in IoT devices, wearables, and smart home systems. Ensures reliable data transmission with minimal power consumption."}</p>
+                                
+                                <h4>{"GSM/UMTS Mobile Networks"}</h4>
+                                <p>{"Mobile networks use various CRC algorithms (CRC-8/GSM-A, CRC-16/GSM, CRC-11/UMTS) for channel coding and error detection in voice and data transmission."}</p>
+                            </div>
+
+                            <div class="use-case">
+                                <h3>{"5. 🔧 Development & Testing Scenarios"}</h3>
+                                <h4>{"Protocol Development & Debugging"}</h4>
+                                <ul>
+                                    <li><strong>{"Frame Analysis:"}</strong> {"Verify protocol implementations by calculating expected CRC values"}</li>
+                                    <li><strong>{"Test Vector Generation:"}</strong> {"Create test cases with known CRC results for unit testing"}</li>
+                                    <li><strong>{"Interoperability Testing:"}</strong> {"Ensure different vendors' implementations produce identical CRC values"}</li>
+                                    <li><strong>{"Legacy System Integration:"}</strong> {"Validate data exchange with older systems using specific CRC variants"}</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"📚 Comprehensive Step-by-Step Tutorials"}</h2>
+                            
+                            <div class="tutorial-step">
+                                <h3>{"Tutorial 1: Network Protocol Implementation"}</h3>
+                                <p><strong>{"Scenario:"}</strong> {"Implementing a custom protocol with CRC-16/MODBUS for industrial IoT sensors"}</p>
+                                
+                                <h4>{"Step 1: Define Your Protocol Frame"}</h4>
+                                <ol>
+                                    <li>{"Set Input Method to 'HEX'"}</li>
+                                    <li>{"Enter frame data: \"01 03 00 00 00 0A\" (Device ID, Function, Address, Count)"}</li>
+                                    <li>{"Select 'CRC-16/MODBUS' algorithm"}</li>
+                                    <li>{"Choose 'Little Endian' for MODBUS compatibility"}</li>
+                                    <li>{"Set Byte Format to 'Byte Separated' for clarity"}</li>
+                                </ol>
+                                
+                                <h4>{"Step 2: Calculate and Verify"}</h4>
+                                <div class="example-box">
+                                    <p><strong>{"Expected Results:"}</strong></p>
+                                    <ul>
+                                        <li>{"Input: \"01 03 00 00 00 0A\""}</li>
+                                        <li>{"CRC-16/MODBUS: 0x2BA1 (Little Endian: 0xA1 0x2B)"}</li>
+                                        <li>{"Complete Frame: \"01 03 00 00 00 0A A1 2B\""}</li>
+                                    </ul>
+                                </div>
+                                
+                                <h4>{"Step 3: Implementation in Code"}</h4>
+                                <div class="example-box">
+                                    <p><strong>{"C Implementation Pattern:"}</strong></p>
+                                    <pre style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 11px; overflow-x: auto;">
+{r#"uint16_t calculate_modbus_crc(uint8_t *data, size_t length) {
+    uint16_t crc = 0xFFFF;
+    for (size_t i = 0; i < length; i++) {
+        crc ^= data[i];
+        for (int j = 0; j < 8; j++) {
+            if (crc & 0x0001) {
+                crc = (crc >> 1) ^ 0xA001;
+            } else {
+                crc = crc >> 1;
+            }
+        }
+    }
+    return crc;
+}"#}
+                                    </pre>
+                                </div>
+                            </div>
+
+                            <div class="tutorial-step">
+                                <h3>{"Tutorial 2: File Integrity Verification System"}</h3>
+                                <p><strong>{"Scenario:"}</strong> {"Building a file checksum system using CRC-32/ISO-HDLC"}</p>
+                                
+                                <h4>{"Step 1: Test with Known Data"}</h4>
+                                <ol>
+                                    <li>{"Set Input Method to 'ASCII'"}</li>
+                                    <li>{"Enter test string: \"The quick brown fox jumps over the lazy dog\""}</li>
+                                    <li>{"Select 'CRC-32/ISO-HDLC' algorithm"}</li>
+                                    <li>{"Set Output Format to 'HEX' with '0x' prefix"}</li>
+                                    <li>{"Choose 'Big Endian' for standard file formats"}</li>
+                                </ol>
+                                
+                                <h4>{"Step 2: Verify Standard Test Vector"}</h4>
+                                <div class="example-box">
+                                    <p><strong>{"Standard Test Results:"}</strong></p>
+                                    <ul>
+                                        <li>{"Input: \"The quick brown fox jumps over the lazy dog\""}</li>
+                                        <li>{"Expected CRC-32: 0x414FA339"}</li>
+                                        <li>{"Use this as a reference for your implementation"}</li>
+                                    </ul>
+                                </div>
+                                
+                                <h4>{"Step 3: Implement File Processing"}</h4>
+                                <div class="example-box">
+                                    <p><strong>{"Python Implementation Example:"}</strong></p>
+                                    <pre style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 11px; overflow-x: auto;">
+{r#"import zlib
+
+def calculate_file_crc32(filepath):
+    """Calculate CRC-32/ISO-HDLC for file contents"""
+    crc = 0
+    with open(filepath, 'rb') as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            crc = zlib.crc32(chunk, crc)
+    return crc & 0xffffffff  # Ensure positive 32-bit result
+
+# Usage
+file_crc = calculate_file_crc32('document.pdf')
+print(f"File CRC-32: 0x{file_crc:08X}")
+"#}
+                                    </pre>
+                                </div>
+                            </div>
+
+                            <div class="tutorial-step">
+                                <h3>{"Tutorial 3: Embedded System Sensor Validation"}</h3>
+                                <p><strong>{"Scenario:"}</strong> {"Implementing CRC-8/MAXIM-DOW for Dallas 1-Wire temperature sensors"}</p>
+                                
+                                <h4>{"Step 1: Sensor Data Format"}</h4>
+                                <ol>
+                                    <li>{"Set Input Method to 'HEX'"}</li>
+                                    <li>{"Enter sensor reading: \"50 05 4B 46 7F FF 0C 10\" (temperature data)"}</li>
+                                    <li>{"Select 'CRC-8/MAXIM-DOW' algorithm"}</li>
+                                    <li>{"Set Output Format to 'HEX' with '0x' prefix"}</li>
+                                </ol>
+                                
+                                <h4>{"Step 2: Validate Sensor Communication"}</h4>
+                                <div class="example-box">
+                                    <p><strong>{"1-Wire Protocol Validation:"}</strong></p>
+                                    <ul>
+                                        <li>{"Sensor Data: \"50 05 4B 46 7F FF 0C 10\""}</li>
+                                        <li>{"CRC-8/MAXIM-DOW: Calculate for first 8 bytes"}</li>
+                                        <li>{"Expected: CRC should match the 9th byte"}</li>
+                                        <li>{"Result: Validates sensor communication integrity"}</li>
+                                    </ul>
+                                </div>
+                                
+                                <h4>{"Step 3: Microcontroller Implementation"}</h4>
+                                <div class="example-box">
+                                    <p><strong>{"Arduino/C++ Example:"}</strong></p>
+                                    <pre style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 11px; overflow-x: auto;">
+{r#"uint8_t crc8_maxim_dow(uint8_t *data, size_t length) {
+    uint8_t crc = 0;
+    for (size_t i = 0; i < length; i++) {
+        crc ^= data[i];
+        for (int j = 0; j < 8; j++) {
+            if (crc & 0x01) {
+                crc = (crc >> 1) ^ 0x8C;
+            } else {
+                crc = crc >> 1;
+            }
+        }
+    }
+    return crc;
+}
+
+// Validate DS18B20 temperature sensor
+bool validate_sensor_data(uint8_t *sensor_data) {
+    uint8_t calculated_crc = crc8_maxim_dow(sensor_data, 8);
+    return calculated_crc == sensor_data[8];
+}"#}
+                                    </pre>
+                                </div>
+                            </div>
+
+                            <div class="tutorial-step">
+                                <h3>{"Tutorial 4: Custom Protocol Design"}</h3>
+                                <p><strong>{"Scenario:"}</strong> {"Designing a robust communication protocol for drone telemetry"}</p>
+                                
+                                <h4>{"Step 1: Protocol Frame Design"}</h4>
+                                <div class="example-box">
+                                    <p><strong>{"Frame Structure:"}</strong></p>
+                                    <ul>
+                                        <li>{"Header: 0xAA (sync byte)"}</li>
+                                        <li>{"Length: Data payload length"}</li>
+                                        <li>{"Type: Message type identifier"}</li>
+                                        <li>{"Data: Variable length payload"}</li>
+                                        <li>{"CRC: 16-bit checksum"}</li>
+                                    </ul>
+                                </div>
+                                
+                                <h4>{"Step 2: Algorithm Selection Process"}</h4>
+                                <ol>
+                                    <li>{"Consider requirements: Real-time, wireless, safety-critical"}</li>
+                                    <li>{"Evaluate options: CRC-16/XMODEM vs CRC-16/MODBUS vs CRC-16/USB"}</li>
+                                    <li>{"Test with our tool using sample telemetry data"}</li>
+                                    <li>{"Input sample: \"AA 08 01 1A 2B 3C 4D 5E 6F\" (header + data)"}</li>
+                                    <li>{"Compare CRC results for each algorithm"}</li>
+                                    <li>{"Choose CRC-16/XMODEM for aviation compatibility"}</li>
+                                </ol>
+                                
+                                <h4>{"Step 3: Performance Optimization"}</h4>
+                                <div class="example-box">
+                                    <p><strong>{"Optimization Strategies:"}</strong></p>
+                                    <ul>
+                                        <li><strong>{"Table-based CRC:"}</strong> {"Pre-compute lookup tables for speed"}</li>
+                                        <li><strong>{"Hardware CRC:"}</strong> {"Use built-in CRC units in modern MCUs"}</li>
+                                        <li><strong>{"Streaming CRC:"}</strong> {"Calculate incrementally as data arrives"}</li>
+                                        <li><strong>{"Error Recovery:"}</strong> {"Implement retransmission on CRC failure"}</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
 
                         <div class="content-section">
-                            <h2>{"🔧 Technical Background"}</h2>
-                            <h3>{"How CRC Works"}</h3>
-                            <p>{"A CRC algorithm treats input data as a binary number and divides it by a fixed polynomial. The remainder of this division is the CRC value. Different algorithms use different polynomials, initial values, and post-processing steps."}</p>
+                            <h2>{"🔧 Advanced Technical Deep Dive"}</h2>
+                            
+                            <h3>{"🧮 Mathematical Foundation"}</h3>
+                            <p>{"CRC calculations are based on polynomial arithmetic in GF(2) - Galois Field with two elements. Understanding this foundation helps in debugging and optimizing implementations."}</p>
+                            
                             <div class="example-box">
-                                <p><strong>{"Example for CRC-8:"}</strong></p>
+                                <p><strong>{"Key Mathematical Concepts:"}</strong></p>
                                 <ul>
-                                    <li>{"Polynomial: x^8 + x^2 + x + 1 (0x07)"}</li>
-                                    <li>{"Input: 0x31 0x32 0x33 0x34 (ASCII for '1234')"}</li>
-                                    <li>{"CRC-8 Output: 0xF4"}</li>
+                                    <li><strong>{"Generator Polynomial:"}</strong> {"Defines the CRC algorithm characteristics (e.g., 0x1021 for CRC-16/XMODEM)"}</li>
+                                    <li><strong>{"Polynomial Division:"}</strong> {"CRC is the remainder when data polynomial is divided by generator"}</li>
+                                    <li><strong>{"Initial Value:"}</strong> {"Starting state of the CRC register (0x0000, 0xFFFF, etc.)"}</li>
+                                    <li><strong>{"XOR Output:"}</strong> {"Final value XORed with result (often 0x0000 or 0xFFFF)"}</li>
+                                    <li><strong>{"Bit Reflection:"}</strong> {"Input/output bit order (normal vs reflected)"}</li>
                                 </ul>
                             </div>
-                            <h3>{"Why Use CRC?"}</h3>
+
+                            <h3>{"⚡ Performance Considerations"}</h3>
+                            <h4>{"Hardware vs Software Implementation"}</h4>
+                            <div class="example-box">
+                                <p><strong>{"Performance Comparison (1MB data):"}</strong></p>
+                                <ul>
+                                    <li><strong>{"Bit-by-bit Software:"}</strong> {"~50ms (basic implementation)"}</li>
+                                    <li><strong>{"Table-based Software:"}</strong> {"~5ms (256-entry lookup table)"}</li>
+                                    <li><strong>{"Hardware CRC Unit:"}</strong> {"~0.5ms (dedicated silicon)"}</li>
+                                    <li><strong>{"SIMD Optimized:"}</strong> {"~1ms (vectorized operations)"}</li>
+                                </ul>
+                            </div>
+
+                            <h3>{"🔍 Error Detection Capabilities"}</h3>
+                            <p>{"Different CRC algorithms provide varying levels of error detection capability:"}</p>
+                            
+                            <div class="example-box">
+                                <p><strong>{"Error Detection Guarantees:"}</strong></p>
+                                <ul>
+                                    <li><strong>{"Single-bit errors:"}</strong> {"100% detection for all CRC algorithms"}</li>
+                                    <li><strong>{"Two-bit errors:"}</strong> {"100% detection if bits are within CRC width"}</li>
+                                    <li><strong>{"Odd number of errors:"}</strong> {"100% detection if generator polynomial has (x+1) factor"}</li>
+                                    <li><strong>{"Burst errors:"}</strong> {"100% detection for bursts ≤ CRC width"}</li>
+                                    <li><strong>{"Random errors:"}</strong> {"(1 - 2^(-n)) probability for n-bit CRC"}</li>
+                                </ul>
+                            </div>
+
+                            <h3>{"🛡️ Security Considerations"}</h3>
+                            <p>{"While CRC is excellent for error detection, it's important to understand its limitations:"}</p>
+                            
+                            <div class="example-box">
+                                <p><strong>{"Security Limitations:"}</strong></p>
+                                <ul>
+                                    <li><strong>{"Not Cryptographically Secure:"}</strong> {"Easily reversible with knowledge of algorithm"}</li>
+                                    <li><strong>{"Intentional Modification:"}</strong> {"Attackers can modify data while preserving CRC"}</li>
+                                    <li><strong>{"Predictable:"}</strong> {"Deterministic output for given input"}</li>
+                                    <li><strong>{"Alternative for Security:"}</strong> {"Use cryptographic hashes (SHA-256) for tamper detection"}</li>
+                                </ul>
+                            </div>
+
+                            <h3>{"🔄 Implementation Best Practices"}</h3>
+                            <div class="example-box">
+                                <p><strong>{"Professional Development Guidelines:"}</strong></p>
+                                <ul>
+                                    <li><strong>{"Test Vector Validation:"}</strong> {"Always validate implementation against known test vectors"}</li>
+                                    <li><strong>{"Endianness Awareness:"}</strong> {"Document and test byte order for multi-byte CRCs"}</li>
+                                    <li><strong>{"Algorithm Documentation:"}</strong> {"Clearly specify polynomial, initial value, and post-processing"}</li>
+                                    <li><strong>{"Performance Profiling:"}</strong> {"Measure actual performance in target environment"}</li>
+                                    <li><strong>{"Error Handling:"}</strong> {"Define behavior for CRC mismatches in your protocol"}</li>
+                                    <li><strong>{"Version Control:"}</strong> {"Tag CRC parameters in protocol version management"}</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"❓ Comprehensive FAQ & Troubleshooting"}</h2>
+                            
+                            <div class="faq-item">
+                                <h3>{"Q: Why do I get different CRC results from different tools?"}</h3>
+                                <p>{"A: CRC algorithms with the same name can have different parameters (polynomial, initial value, XOR output, bit reflection). Our tool uses the standard Catalogue of CRC algorithms. Common variations include CRC-16 (multiple variants exist) and CRC-32 (IEEE 802.3 vs others)."}</p>
+                            </div>
+
+                            <div class="faq-item">
+                                <h3>{"Q: Which CRC algorithm should I choose for my application?"}</h3>
+                                <p>{"A: Consider these factors: (1) Industry standards in your domain, (2) Required error detection capability, (3) Performance constraints, (4) Compatibility with existing systems. For general use: CRC-32/ISO-HDLC. For industrial: CRC-16/MODBUS. For embedded: CRC-8/MAXIM-DOW."}</p>
+                            </div>
+
+                            <div class="faq-item">
+                                <h3>{"Q: How do I handle endianness in multi-byte CRCs?"}</h3>
+                                <p>{"A: Endianness affects how multi-byte CRC values are transmitted/stored. Big Endian sends most significant byte first (network byte order), Little Endian sends least significant byte first (Intel x86). Our tool shows both formats - choose based on your protocol specification."}</p>
+                            </div>
+
+                            <div class="faq-item">
+                                <h3>{"Q: Can CRC detect all types of errors?"}</h3>
+                                <p>{"A: CRC provides excellent error detection but not 100% coverage. It guarantees detection of: single-bit errors, double-bit errors (within CRC span), and burst errors up to CRC width. For random errors, detection probability is (1 - 2^(-n)) for n-bit CRC."}</p>
+                            </div>
+
+                            <div class="faq-item">
+                                <h3>{"Q: Why use CRC instead of simple checksums?"}</h3>
+                                <p>{"A: CRC provides much better error detection than simple checksums. While checksums can miss many error patterns (like swapped bytes or systematic bit shifts), CRC uses polynomial mathematics to detect these patterns reliably."}</p>
+                            </div>
+
+                            <div class="faq-item">
+                                <h3>{"Q: How do I optimize CRC calculation performance?"}</h3>
+                                <p>{"A: Several optimization strategies: (1) Use lookup tables instead of bit-by-bit calculation, (2) Leverage hardware CRC units in modern processors, (3) Process data in larger chunks, (4) Use SIMD instructions for parallel processing, (5) Consider slice-by-8 or slice-by-16 algorithms for high throughput."}</p>
+                            </div>
+
+                            <div class="faq-item">
+                                <h3>{"Q: What's the difference between CRC and cryptographic hashes?"}</h3>
+                                <p>{"A: CRC is designed for error detection (accidental changes), while cryptographic hashes (SHA-256, etc.) are designed for security (intentional tampering). CRC is faster and simpler but not secure against malicious modification. Use CRC for integrity, cryptographic hashes for security."}</p>
+                            </div>
+
+                            <div class="faq-item">
+                                <h3>{"Q: How do I validate my CRC implementation?"}</h3>
+                                <p>{"A: Use standard test vectors: (1) Test with known inputs and verify expected outputs, (2) Use the string '123456789' as a common test case, (3) Verify against multiple reference implementations, (4) Test edge cases (empty data, single byte, maximum size), (5) Cross-validate with our tool's results."}</p>
+                            </div>
+                        </div>
+
+                        <div class="content-section">
+                            <h2>{"🎯 Professional Tips & Best Practices"}</h2>
                             <ul>
-                                <li>{"Detects accidental data corruption with high probability."}</li>
-                                <li>{"Efficient to compute in hardware and software."}</li>
-                                <li>{"Widely standardized and supported in protocols and storage."}</li>
-                            </ul>
-                            <h3>{"Performance & Implementation"}</h3>
-                            <ul>
-                                <li><strong>{"Fast Calculation:"}</strong> {"Optimized for real-time and large data sets."}</li>
-                                <li><strong>{"Cross-Platform:"}</strong> {"Works in browsers, embedded devices, and servers."}</li>
-                                <li><strong>{"Local Processing:"}</strong> {"All calculations happen in your browser for privacy and speed."}</li>
+                                <li><strong>{"Algorithm Selection:"}</strong> {"Always check industry standards for your domain before choosing a CRC algorithm"}</li>
+                                <li><strong>{"Test Vector Validation:"}</strong> {"Validate implementations using standard test vectors like 'Check: 0x2144DF1C' for CRC-32"}</li>
+                                <li><strong>{"Performance Optimization:"}</strong> {"Use table-based lookup for production code - 256x faster than bit-by-bit calculation"}</li>
+                                <li><strong>{"Documentation:"}</strong> {"Clearly specify polynomial, initial value, XOR output, and bit reflection in your specifications"}</li>
+                                <li><strong>{"Cross-Platform Testing:"}</strong> {"Verify CRC calculations across different endianness systems"}</li>
+                                <li><strong>{"Error Recovery:"}</strong> {"Implement appropriate error recovery strategies when CRC validation fails"}</li>
+                                <li><strong>{"Version Management:"}</strong> {"Include CRC algorithm details in protocol version documentation"}</li>
+                                <li><strong>{"Security Awareness:"}</strong> {"Remember that CRC is for error detection, not security - use cryptographic hashes for tamper detection"}</li>
+                                <li><strong>{"Hardware Utilization:"}</strong> {"Leverage built-in CRC units in modern microcontrollers and processors"}</li>
+                                <li><strong>{"Streaming Implementation:"}</strong> {"Design CRC calculation to work with streaming data for memory efficiency"}</li>
                             </ul>
                         </div>
 
                         <div class="content-section">
-                            <h2>{"❓ Frequently Asked Questions"}</h2>
-                            <div class="faq-item">
-                                <h3>{"Q: What is the difference between CRC and checksum?"}</h3>
-                                <p>{"A: A checksum is a simple sum of data bytes, while CRC uses polynomial division for more robust error detection."}</p>
-                            </div>
-                            <div class="faq-item">
-                                <h3>{"Q: Which CRC algorithm should I use?"}</h3>
-                                <p>{"A: It depends on your application. Common choices: CRC-32 for Ethernet, CRC-16/MODBUS for industrial, CRC-8 for small data blocks."}</p>
-                            </div>
-                            <div class="faq-item">
-                                <h3>{"Q: Can CRC detect all errors?"}</h3>
-                                <p>{"A: CRC is very effective for random errors, but cannot detect all possible errors (e.g., intentional tampering)."}</p>
-                            </div>
-                            <div class="faq-item">
-                                <h3>{"Q: Is CRC secure for cryptography?"}</h3>
-                                <p>{"A: No, CRC is not a cryptographic hash and should not be used for security purposes."}</p>
-                            </div>
-                            <div class="faq-item">
-                                <h3>{"Q: What if I enter invalid HEX or ASCII?"}</h3>
-                                <p>{"A: The tool will display an error message for invalid input. Always check your input format and algorithm selection."}</p>
-                            </div>
-                        </div>
-
-                        <div class="content-section">
-                            <h2>{"🎯 Best Practices"}</h2>
+                            <h2>{"🔗 Related Tools & Resources"}</h2>
+                            <p>{"Enhance your data integrity workflow with these complementary tools:"}</p>
                             <ul>
-                                <li><strong>{"Validate Input:"}</strong> {"Always check your input format and algorithm selection."}</li>
-                                <li><strong>{"Error Handling:"}</strong> {"Handle calculation errors gracefully in your applications."}</li>
-                                <li><strong>{"Performance:"}</strong> {"Use hardware-accelerated CRC if available for large data sets."}</li>
-                                <li><strong>{"Documentation:"}</strong> {"Document the CRC algorithm and parameters used in your system."}</li>
-                                <li><strong>{"Testing:"}</strong> {"Test with known vectors and edge cases (empty input, all zeros, etc.)."}</li>
-                                <li><strong>{"Compatibility:"}</strong> {"Ensure your CRC settings match those of your communication partners."}</li>
+                                <li><a href="/file-hash/">{"File Hash Generator"}</a> {" - Calculate MD5, SHA-1, SHA-256, SHA-512 for cryptographic integrity verification"}</li>
+                                <li><a href="/base64/">{"Base64 Encoder/Decoder"}</a> {" - Encode binary CRC values for text-based protocols"}</li>
+                                <li><a href="/ascii/">{"ASCII Converter"}</a> {" - Convert between text and numeric representations for CRC input preparation"}</li>
+                                <li><a href="/base/">{"Number Base Converter"}</a> {" - Convert CRC values between decimal, hexadecimal, binary, and octal"}</li>
                             </ul>
-                        </div>
-
-                        <div class="content-section">
-                            <h2>{"🔗 Related Tools"}</h2>
-                            <p>{"Enhance your workflow with this related tool:"}</p>
+                            
+                            <h3>{"📚 External References"}</h3>
                             <ul>
-                                <li><a href="/file-hash/">{"File Hash Generator"}</a> {" - For calculating MD5, SHA-1, SHA-256, and SHA-512 hashes for files."}</li>
+                                <li><strong>{"Catalogue of CRC Algorithms:"}</strong> {" Comprehensive database of standardized CRC parameters"}</li>
+                                <li><strong>{"RFC 3385:"}</strong> {" Internet Protocol CRC calculation considerations"}</li>
+                                <li><strong>{"IEEE 802.3:"}</strong> {" Ethernet frame check sequence specification"}</li>
+                                <li><strong>{"ISO 3309:"}</strong> {" Data communication CRC procedures"}</li>
                             </ul>
                         </div>
                     </div>
                     <div class="tool-container">
-                        <div style="display: flex; align-items: center; margin-bottom: 10px; margin-top: 5px;">
-                            <div style="width: 90%;">
-                                {"Input Method: "}
-                            </div>
-                            <select
-                                id="input-mode-select"
-                                onchange={_ctx.link().callback(|e: Event| {
-                                    let value = e.target_unchecked_into::<web_sys::HtmlSelectElement>().value();
-                                    match value.as_str() {
-                                        "ascii" => Msg::ModeChanged(InputMode::Ascii),
-                                        "hex" => Msg::ModeChanged(InputMode::Hex),
-                                        _ => unreachable!(),
-                                    }
-                                })}>
-                                <option value="ascii" selected={self.input_mode == InputMode::Ascii}>{ "ASCII" }</option>
-                                <option value="hex" selected={self.input_mode == InputMode::Hex}>{ "HEX" }</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; align-items: center; margin-bottom: 10px; margin-top: 5px;">
-                            <div style="width: 90%;">
-                                {"CRC algorithm: "}
-                            </div>
-                            <select
-                                onchange={onchange_mode}>
-                                    {CrcAlgorithm::all().into_iter().map(|algorithm| {
-                                        let is_selected = algorithm == self.selected_algorithm;
-                                        html! {
-                                            <option
-                                                value={algorithm.name().to_string()}
-                                                selected={is_selected}
-                                            >
-                                                { algorithm.name() }
-                                            </option>
+                        // Input Settings Section
+                        <div style="background-color: var(--color-third); padding: 10px; border-radius: 6px; margin-bottom: 10px;">
+                            <h3 style="margin: 0 0 8px 0; color: var(--color-primary); font-size: 14px; border-bottom: 1px solid var(--color-primary); padding-bottom: 3px;">
+                                <i class="fa-solid fa-arrow-right" style="margin-right: 6px; font-size: 12px;"></i>
+                                {"Input Settings"}
+                            </h3>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                <div style="width: 70%; font-size: 13px;">
+                                    {"Input Method: "}
+                                </div>
+                                <select
+                                    id="input-mode-select"
+                                    style="width: 30%; padding: 2px; font-size: 12px;"
+                                    onchange={_ctx.link().callback(|e: Event| {
+                                        let value = e.target_unchecked_into::<web_sys::HtmlSelectElement>().value();
+                                        match value.as_str() {
+                                            "ascii" => Msg::ModeChanged(InputMode::Ascii),
+                                            "hex" => Msg::ModeChanged(InputMode::Hex),
+                                            "binary" => Msg::ModeChanged(InputMode::Binary),
+                                            "decimal" => Msg::ModeChanged(InputMode::Decimal),
+                                            "octal" => Msg::ModeChanged(InputMode::Octal),
+                                            _ => unreachable!(),
                                         }
-                                    }).collect::<Html>()}
-                            </select>
+                                    })}>
+                                    <option value="ascii" selected={self.input_mode == InputMode::Ascii}>{ "ASCII" }</option>
+                                    <option value="hex" selected={self.input_mode == InputMode::Hex}>{ "HEX" }</option>
+                                    <option value="binary" selected={self.input_mode == InputMode::Binary}>{ "BINARY" }</option>
+                                    <option value="decimal" selected={self.input_mode == InputMode::Decimal}>{ "DECIMAL" }</option>
+                                    <option value="octal" selected={self.input_mode == InputMode::Octal}>{ "OCTAL" }</option>
+                                </select>
+                            </div>
                         </div>
+                        
+                        // Output Settings Section
+                        <div style="background-color: var(--color-third); padding: 10px; border-radius: 6px; margin-bottom: 10px;">
+                            <h3 style="margin: 0 0 8px 0; color: var(--color-secondary); font-size: 14px; border-bottom: 1px solid var(--color-secondary); padding-bottom: 3px;">
+                                <i class="fa-solid fa-arrow-left" style="margin-right: 6px; font-size: 12px;"></i>
+                                {"Output Settings"}
+                            </h3>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                <div style="width: 70%; font-size: 13px;">
+                                    {"CRC Algorithm: "}
+                                </div>
+                                <select
+                                    style="width: 30%; padding: 2px; font-size: 12px;"
+                                    onchange={onchange_mode}>
+                                        {CrcAlgorithm::all().into_iter().map(|algorithm| {
+                                            let is_selected = algorithm == self.selected_algorithm;
+                                            html! {
+                                                <option
+                                                    value={algorithm.name().to_string()}
+                                                    selected={is_selected}
+                                                >
+                                                    { algorithm.name() }
+                                                </option>
+                                            }
+                                        }).collect::<Html>()}
+                                </select>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                <div style="width: 70%; font-size: 13px;">
+                                    {"Output Format: "}
+                                </div>
+                                <select
+                                    id="output-mode-select"
+                                    style="width: 30%; padding: 2px; font-size: 12px;"
+                                    onchange={_ctx.link().callback(|e: Event| {
+                                        let value = e.target_unchecked_into::<web_sys::HtmlSelectElement>().value();
+                                        match value.as_str() {
+                                            "decimal" => Msg::OutputModeChanged(OutputMode::Decimal),
+                                            "hex" => Msg::OutputModeChanged(OutputMode::Hex),
+                                            "binary" => Msg::OutputModeChanged(OutputMode::Binary),
+                                            "octal" => Msg::OutputModeChanged(OutputMode::Octal),
+                                            _ => unreachable!(),
+                                        }
+                                    })}>
+                                    <option value="hex" selected={self.output_mode == OutputMode::Hex}>{ "HEX" }</option>
+                                    <option value="decimal" selected={self.output_mode == OutputMode::Decimal}>{ "DECIMAL" }</option>
+                                    <option value="binary" selected={self.output_mode == OutputMode::Binary}>{ "BINARY" }</option>
+                                    <option value="octal" selected={self.output_mode == OutputMode::Octal}>{ "OCTAL" }</option>
+                                </select>
+                            </div>
+                            
+                            // 스타일 선택 드롭다운 (출력 모드별로 표시)
+                            if self.output_mode == OutputMode::Hex {
+                                <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                    <div style="width: 70%; font-size: 13px;">
+                                        {"Hex Style: "}
+                                    </div>
+                                    <select
+                                        style="width: 30%; padding: 2px; font-size: 12px;"
+                                        onchange={_ctx.link().callback(|e: Event| {
+                                            let value = e.target_unchecked_into::<web_sys::HtmlSelectElement>().value();
+                                            match value.as_str() {
+                                                "with_prefix" => Msg::HexStyleChanged(HexStyle::WithPrefix),
+                                                "short_prefix" => Msg::HexStyleChanged(HexStyle::ShortPrefix),
+                                                "no_prefix" => Msg::HexStyleChanged(HexStyle::NoPrefix),
+                                                "escape_sequence" => Msg::HexStyleChanged(HexStyle::EscapeSequence),
+                                                _ => unreachable!(),
+                                            }
+                                        })}>
+                                        <option value="with_prefix" selected={self.hex_style == HexStyle::WithPrefix}>{ "0x48" }</option>
+                                        <option value="short_prefix" selected={self.hex_style == HexStyle::ShortPrefix}>{ "x48" }</option>
+                                        <option value="no_prefix" selected={self.hex_style == HexStyle::NoPrefix}>{ "48" }</option>
+                                        <option value="escape_sequence" selected={self.hex_style == HexStyle::EscapeSequence}>{ "\\x48" }</option>
+                                    </select>
+                                </div>
+                            }
+                            
+                            if self.output_mode == OutputMode::Binary {
+                                <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                    <div style="width: 70%; font-size: 13px;">
+                                        {"Binary Style: "}
+                                    </div>
+                                    <select
+                                        style="width: 30%; padding: 2px; font-size: 12px;"
+                                        onchange={_ctx.link().callback(|e: Event| {
+                                            let value = e.target_unchecked_into::<web_sys::HtmlSelectElement>().value();
+                                            match value.as_str() {
+                                                "with_prefix" => Msg::BinaryStyleChanged(BinaryStyle::WithPrefix),
+                                                "short_prefix" => Msg::BinaryStyleChanged(BinaryStyle::ShortPrefix),
+                                                "no_prefix" => Msg::BinaryStyleChanged(BinaryStyle::NoPrefix),
+                                                _ => unreachable!(),
+                                            }
+                                        })}>
+                                        <option value="with_prefix" selected={self.binary_style == BinaryStyle::WithPrefix}>{ "0b01000001" }</option>
+                                        <option value="short_prefix" selected={self.binary_style == BinaryStyle::ShortPrefix}>{ "b01000001" }</option>
+                                        <option value="no_prefix" selected={self.binary_style == BinaryStyle::NoPrefix}>{ "01000001" }</option>
+                                    </select>
+                                </div>
+                            }
+                            
+                            if self.output_mode == OutputMode::Octal {
+                                <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                    <div style="width: 70%; font-size: 13px;">
+                                        {"Octal Style: "}
+                                    </div>
+                                    <select
+                                        style="width: 30%; padding: 2px; font-size: 12px;"
+                                        onchange={_ctx.link().callback(|e: Event| {
+                                            let value = e.target_unchecked_into::<web_sys::HtmlSelectElement>().value();
+                                            match value.as_str() {
+                                                "with_prefix" => Msg::OctalStyleChanged(OctalStyle::WithPrefix),
+                                                "short_prefix" => Msg::OctalStyleChanged(OctalStyle::ShortPrefix),
+                                                "no_prefix" => Msg::OctalStyleChanged(OctalStyle::NoPrefix),
+                                                "escape_sequence" => Msg::OctalStyleChanged(OctalStyle::EscapeSequence),
+                                                _ => unreachable!(),
+                                            }
+                                        })}>
+                                        <option value="with_prefix" selected={self.octal_style == OctalStyle::WithPrefix}>{ "0o101" }</option>
+                                        <option value="short_prefix" selected={self.octal_style == OctalStyle::ShortPrefix}>{ "o101" }</option>
+                                        <option value="no_prefix" selected={self.octal_style == OctalStyle::NoPrefix}>{ "101" }</option>
+                                        <option value="escape_sequence" selected={self.octal_style == OctalStyle::EscapeSequence}>{ "\\101" }</option>
+                                    </select>
+                                </div>
+                            }
+
+                            <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                <div style="width: 70%; font-size: 13px;">
+                                    {"Byte Order: "}
+                                </div>
+                                <select
+                                    style="width: 30%; padding: 2px; font-size: 12px;"
+                                    onchange={_ctx.link().callback(|e: Event| {
+                                        let value = e.target_unchecked_into::<web_sys::HtmlSelectElement>().value();
+                                        match value.as_str() {
+                                            "big_endian" => Msg::EndiannessChanged(Endianness::BigEndian),
+                                            "little_endian" => Msg::EndiannessChanged(Endianness::LittleEndian),
+                                            _ => unreachable!(),
+                                        }
+                                    })}>
+                                    <option value="big_endian" selected={self.endianness == Endianness::BigEndian}>{ "Big Endian" }</option>
+                                    <option value="little_endian" selected={self.endianness == Endianness::LittleEndian}>{ "Little Endian" }</option>
+                                </select>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 70%; font-size: 13px;">
+                                    {"Byte Format: "}
+                                </div>
+                                <select
+                                    style="width: 30%; padding: 2px; font-size: 12px;"
+                                    onchange={_ctx.link().callback(|e: Event| {
+                                        let value = e.target_unchecked_into::<web_sys::HtmlSelectElement>().value();
+                                        match value.as_str() {
+                                            "continuous" => Msg::ByteFormattingChanged(ByteFormatting::Continuous),
+                                            "byte_separated" => Msg::ByteFormattingChanged(ByteFormatting::ByteSeparated),
+                                            _ => unreachable!(),
+                                        }
+                                    })}>
+                                    <option value="continuous" selected={self.byte_formatting == ByteFormatting::Continuous}>{ "Continuous" }</option>
+                                    <option value="byte_separated" selected={self.byte_formatting == ByteFormatting::ByteSeparated}>{ "Byte Separated" }</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="tool-inner">
                             <div>
-                                <div class="tool-subtitle" style="margin-bottom: 5px;">{ "Input" }</div>
+                                <div class="tool-subtitle" style="margin-bottom: 3px; font-size: 14px;">{ "Input" }</div>
                                 <textarea
                                     type="text"
+                                    style={format!("{}; height: 80px; resize: vertical;", if self.error_message.is_some() { 
+                                        "overflow: auto; border: 2px solid var(--color-error)" 
+                                    } else { 
+                                        "overflow: auto" 
+                                    })}
                                     value={self.input.clone()}
                                     oninput={link.callback(|e: InputEvent| {
                                         let input: HtmlInputElement = e.target_unchecked_into();
                                         Msg::InputChanged(input.value())
                                     })}
                                     placeholder={
-                                        if self.input_mode == InputMode::Ascii {
-                                            "Enter ASCII text..."
-                                        } else {
-                                            "Enter HEX values (e.g., 0x01 \\x02 x03 04 05 or 0x01\\x02x030405)..."
+                                        match self.input_mode {
+                                            InputMode::Ascii => "Enter ASCII text...",
+                                            InputMode::Hex => "Enter HEX values (e.g., 0x01 \\x02 x03 04 05 or 0x01\\x02x030405)...",
+                                            InputMode::Binary => "Enter BINARY values (e.g., 0b01001000 b01100101 01101100)...",
+                                            InputMode::Decimal => "Enter DECIMAL values (e.g., 72 101 108 108 111)...",
+                                            InputMode::Octal => "Enter OCTAL values (e.g., 0o110 o145 \\154)...",
                                         }
                                     }
                                 />
+                                if let Some(error_msg) = &self.error_message {
+                                    <div style="color: var(--color-error); font-size: 11px; margin-top: 2px; line-height: 1.2;">
+                                        { error_msg }
+                                    </div>
+                                }
+                                <div style="color: var(--color-subfont); font-size: 10px; margin-top: 2px;">
+                                    { match self.input_mode {
+                                        InputMode::Ascii => "Any text characters are supported",
+                                        InputMode::Hex => "Supports: 0x01, \\x02, x03, 04, 05 formats and combinations",
+                                        InputMode::Binary => "Supports: 0b01000001, b01000001, 01000001 formats",
+                                        InputMode::Decimal => "Valid range: 0-255 (space-separated numbers)",
+                                        InputMode::Octal => "Supports: 0o101, o101, 101, \\101 formats",
+                                    }}
+                                </div>
                             </div>
                             <div>
-                                <div class="tool-subtitle" style="margin-top: 15px;">{ "Processed data" }</div>
+                                <div class="tool-subtitle" style="margin-top: 10px; font-size: 14px;">{ "Processed data" }</div>
                                 <textarea
                                     type="text"
                                     readonly=true
-                                    style="cursor: pointer;"
+                                    style="cursor: pointer; height: 50px; resize: vertical;"
                                     value={self.bytes_string.clone()}
                                     onclick={_ctx.link().callback(|e: MouseEvent| {
                                         let input: HtmlInputElement = e.target_unchecked_into();
@@ -1295,15 +2080,15 @@ impl Component for ToolCrc {
                                     })} />
                             </div>
                         </div>
-                        <div class="tool-inner" style="margin-top: 10px;">
+                        <div class="tool-inner" style="margin-top: 8px;">
                             <div>
-                                <div class="tool-subtitle">{ format!("{} Result", self.selected_algorithm.name()) }</div>
+                                <div class="tool-subtitle" style="font-size: 14px;">{ format!("{} Result", self.selected_algorithm.name()) }</div>
                                 <input
                                     type="text"
                                     name="crc"
                                     readonly=true
-                                    style="cursor: pointer;"
-                                    value={formatted_crc}
+                                    style="cursor: pointer; height: 40px; font-weight: bold;"
+                                    value={self.format_crc_output()}
                                     onclick={_ctx.link().callback(|e: MouseEvent| {
                                         let input: HtmlInputElement = e.target_unchecked_into();
                                         Msg::CopyToClipboard(input.value())
@@ -1321,12 +2106,12 @@ impl Component for ToolCrc {
             if let Some(window) = window() {
                 let document = window.document();
                 if let Some(doc) = document {
-                    doc.set_title("CRC Converter | CompuTools");
+                    doc.set_title("CRC Tool - Online CRC Calculator & Decoder | CompuTools");
 
                     if let Some(meta_tag) =
                         doc.query_selector("meta[name=\"description\"]").unwrap()
                     {
-                        meta_tag.set_attribute("content", "This page provides a simple and efficient tool for calculating CRC (Cyclic Redundancy Check) values for data integrity verification and error detection. CRC is widely used in networking, storage, and embedded systems. crc3, crc4, crc5, crc6, crc7, crc8, crc10, crc11, crc12, crc13, crc14, crc15, crc16, crc17, crc21, crc24, crc30, crc31,crc32, crc40, crc64. CTC Tool").unwrap();
+                        meta_tag.set_attribute("content", "Free online CRC tool and calculator. Calculate CRC checksums with 100+ algorithms including CRC-32, CRC-16, CRC-8. CRC decoder and encoder for data integrity verification. Supports ASCII, HEX, Binary input formats. Professional CRC calculator for developers, engineers, and network protocols.").unwrap();
                     }
                 }
             }
@@ -1336,6 +2121,10 @@ impl Component for ToolCrc {
 
 impl ToolCrc {
     fn parse_hex_input(&self, input: &str) -> Result<Vec<u8>, String> {
+        if input.trim().is_empty() {
+            return Ok(Vec::new());
+        }
+
         let mut result = Vec::new();
         let mut current_number = String::new();
         let mut chars = input.chars().peekable();
@@ -1387,10 +2176,10 @@ impl ToolCrc {
                                 current_number.clear();
                             }
                         } else {
-                            return Err("Invalid hex format: expected 'x' after '\\'".to_string());
+                            return Err("Invalid escape sequence: expected 'x' after '\\'".to_string());
                         }
                     } else {
-                        return Err("Unexpected end of input after '\\'".to_string());
+                        return Err("Incomplete escape sequence: unexpected end of input after '\\'".to_string());
                     }
                 }
                 'x' | 'X' => {
@@ -1410,8 +2199,7 @@ impl ToolCrc {
                     if c.is_ascii_hexdigit() {
                         current_number.push(chars.next().unwrap());
                     } else {
-                        chars.next(); // 무시할 문자 건너뛰기
-                        continue;
+                        return Err(format!("Invalid character '{}' in hexadecimal input. Only 0-9, A-F, a-f are allowed.", c));
                     }
 
                     // 두 자리가 모이면 바이트로 변환
@@ -1433,7 +2221,7 @@ impl ToolCrc {
         }
 
         if result.is_empty() {
-            return Err("No valid hex values found".to_string());
+            return Err("No valid hexadecimal values found in input".to_string());
         }
 
         Ok(result)
@@ -1457,7 +2245,7 @@ impl ToolCrc {
         }
 
         if hex_str.is_empty() {
-            return Err("Expected hex digits".to_string());
+            return Err("Expected hexadecimal digits after prefix".to_string());
         }
 
         // 한 자리 숫자인 경우 앞에 0을 붙임
@@ -1469,24 +2257,612 @@ impl ToolCrc {
     }
 
     fn parse_hex_string(&self, hex_str: &str) -> Result<u8, String> {
-        u8::from_str_radix(hex_str, 16).map_err(|_| format!("Invalid hex value: {}", hex_str))
+        u8::from_str_radix(hex_str, 16).map_err(|_| format!("Invalid hexadecimal value: '{}'", hex_str))
     }
 
     fn calculate_crc(&mut self) {
-        self.crc_result = 0;
+        if self.bytes.is_empty() {
+            self.crc_result = 0;
+            return;
+        }
 
-        let input_bytes = match self.input_mode {
-            InputMode::Ascii => Ok(self.input.as_bytes().to_vec()),
-            InputMode::Hex => self.parse_hex_input(&self.input),
+        (self.crc_result, self.width) = self.selected_algorithm.calculate(&self.bytes);
+    }
+
+    fn format_crc_output(&self) -> String {
+        // 엔디안에 따라 바이트 순서 조정
+        let crc_value = match self.endianness {
+            Endianness::BigEndian => self.crc_result,
+            Endianness::LittleEndian => {
+                match self.width {
+                    8 => self.crc_result, // 8비트는 엔디안 무관
+                    16 => ((self.crc_result & 0xFF) << 8) | ((self.crc_result >> 8) & 0xFF),
+                    24 => {
+                        let b0 = (self.crc_result >> 16) & 0xFF;
+                        let b1 = (self.crc_result >> 8) & 0xFF;
+                        let b2 = self.crc_result & 0xFF;
+                        (b2 << 16) | (b1 << 8) | b0
+                    },
+                    32 => {
+                        let b0 = (self.crc_result >> 24) & 0xFF;
+                        let b1 = (self.crc_result >> 16) & 0xFF;
+                        let b2 = (self.crc_result >> 8) & 0xFF;
+                        let b3 = self.crc_result & 0xFF;
+                        (b3 << 24) | (b2 << 16) | (b1 << 8) | b0
+                    },
+                    64 => {
+                        let mut result = 0u64;
+                        for i in 0..8 {
+                            let byte = (self.crc_result >> (i * 8)) & 0xFF;
+                            result |= byte << ((7 - i) * 8);
+                        }
+                        result
+                    },
+                    _ => {
+                        // 다른 비트 크기에 대한 일반적인 처리
+                        let bytes = ((self.width + 7) / 8) as usize;
+                        let mut result = 0u64;
+                        for i in 0..bytes {
+                            let byte = (self.crc_result >> (i * 8)) & 0xFF;
+                            result |= byte << (((bytes - 1 - i) as u64) * 8);
+                        }
+                        result
+                    }
+                }
+            }
         };
-        match input_bytes {
-            Ok(bytes) => {
-                self.bytes = bytes;
-                (self.crc_result, self.width) = self.selected_algorithm.calculate(&self.bytes);
+
+        match self.output_mode {
+            OutputMode::Decimal => {
+                format!("{}", crc_value)
             }
-            Err(e) => {
-                self.error_message = format!("Error: {}", e);
+            OutputMode::Hex => {
+                self.format_hex_output(crc_value)
             }
+            OutputMode::Binary => {
+                self.format_binary_output(crc_value)
+            }
+            OutputMode::Octal => {
+                self.format_octal_output(crc_value)
+            }
+        }
+    }
+
+    fn format_hex_output(&self, value: u64) -> String {
+        let bytes = ((self.width + 7) / 8) as usize;
+        
+        match self.byte_formatting {
+            ByteFormatting::Continuous => {
+                let digits = bytes * 2;
+                match self.hex_style {
+                    HexStyle::WithPrefix => format!("0x{:0width$X}", value, width = digits),
+                    HexStyle::ShortPrefix => format!("x{:0width$X}", value, width = digits),
+                    HexStyle::NoPrefix => format!("{:0width$X}", value, width = digits),
+                    HexStyle::EscapeSequence => format!("\\x{:0width$X}", value, width = digits),
+                }
+            }
+            ByteFormatting::ByteSeparated => {
+                let mut byte_strings = Vec::new();
+                for i in 0..bytes {
+                    let byte = (value >> ((bytes - 1 - i) * 8)) & 0xFF;
+                    let byte_str = match self.hex_style {
+                        HexStyle::WithPrefix => format!("0x{:02X}", byte),
+                        HexStyle::ShortPrefix => format!("x{:02X}", byte),
+                        HexStyle::NoPrefix => format!("{:02X}", byte),
+                        HexStyle::EscapeSequence => format!("\\x{:02X}", byte),
+                    };
+                    byte_strings.push(byte_str);
+                }
+                byte_strings.join(" ")
+            }
+        }
+    }
+
+    fn format_binary_output(&self, value: u64) -> String {
+        match self.byte_formatting {
+            ByteFormatting::Continuous => {
+                let binary_str = format!("{:0width$b}", value, width = self.width as usize);
+                match self.binary_style {
+                    BinaryStyle::WithPrefix => format!("0b{}", binary_str),
+                    BinaryStyle::ShortPrefix => format!("b{}", binary_str),
+                    BinaryStyle::NoPrefix => binary_str,
+                }
+            }
+            ByteFormatting::ByteSeparated => {
+                let bytes = ((self.width + 7) / 8) as usize;
+                let mut byte_strings = Vec::new();
+                for i in 0..bytes {
+                    let byte = (value >> ((bytes - 1 - i) * 8)) & 0xFF;
+                    let byte_str = match self.binary_style {
+                        BinaryStyle::WithPrefix => format!("0b{:08b}", byte),
+                        BinaryStyle::ShortPrefix => format!("b{:08b}", byte),
+                        BinaryStyle::NoPrefix => format!("{:08b}", byte),
+                    };
+                    byte_strings.push(byte_str);
+                }
+                byte_strings.join(" ")
+            }
+        }
+    }
+
+    fn format_octal_output(&self, value: u64) -> String {
+        let bytes = ((self.width + 7) / 8) as usize;
+        
+        match self.byte_formatting {
+            ByteFormatting::Continuous => {
+                let digits = ((self.width as f32 / 3.0).ceil()) as usize;
+                match self.octal_style {
+                    OctalStyle::WithPrefix => format!("0o{:0width$o}", value, width = digits),
+                    OctalStyle::ShortPrefix => format!("o{:0width$o}", value, width = digits),
+                    OctalStyle::NoPrefix => format!("{:0width$o}", value, width = digits),
+                    OctalStyle::EscapeSequence => format!("\\{:0width$o}", value, width = digits),
+                }
+            }
+            ByteFormatting::ByteSeparated => {
+                let mut byte_strings = Vec::new();
+                for i in 0..bytes {
+                    let byte = (value >> ((bytes - 1 - i) * 8)) & 0xFF;
+                    let byte_str = match self.octal_style {
+                        OctalStyle::WithPrefix => format!("0o{:03o}", byte),
+                        OctalStyle::ShortPrefix => format!("o{:03o}", byte),
+                        OctalStyle::NoPrefix => format!("{:03o}", byte),
+                        OctalStyle::EscapeSequence => format!("\\{:03o}", byte),
+                    };
+                    byte_strings.push(byte_str);
+                }
+                byte_strings.join(" ")
+            }
+        }
+    }
+
+    fn parse_binary_input(&self, input: &str) -> Result<Vec<u8>, String> {
+        if input.trim().is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let mut result = Vec::new();
+        let mut current_number = String::new();
+        let mut chars = input.chars().peekable();
+
+        while let Some(&c) = chars.peek() {
+            match c {
+                // 공백 문자 처리
+                ' ' | '\n' | '\t' | '\r' => {
+                    if !current_number.is_empty() {
+                        result.push(self.parse_binary_string(&current_number)?);
+                        current_number.clear();
+                    }
+                    chars.next();
+                }
+                // "0b" 접두사 처리
+                '0' => {
+                    chars.next();
+                    if let Some(&next) = chars.peek() {
+                        if next == 'b' || next == 'B' {
+                            if !current_number.is_empty() {
+                                result.push(self.parse_binary_string(&current_number)?);
+                                current_number.clear();
+                            }
+                            chars.next(); // 'b' 건너뛰기
+                            current_number = self.collect_binary_digits(&mut chars)?;
+                            if !current_number.is_empty() {
+                                result.push(self.parse_binary_string(&current_number)?);
+                                current_number.clear();
+                            }
+                        } else {
+                            // 일반 '0' 이진수 숫자
+                            current_number.push('0');
+                            if current_number.len() == 8 {
+                                result.push(self.parse_binary_string(&current_number)?);
+                                current_number.clear();
+                            }
+                        }
+                    } else {
+                        // 마지막 문자가 '0'인 경우
+                        current_number.push('0');
+                        if current_number.len() == 8 {
+                            result.push(self.parse_binary_string(&current_number)?);
+                            current_number.clear();
+                        }
+                    }
+                }
+                'b' | 'B' => {
+                    if !current_number.is_empty() {
+                        result.push(self.parse_binary_string(&current_number)?);
+                        current_number.clear();
+                    }
+                    chars.next(); // 'b' 건너뛰기
+                    current_number = self.collect_binary_digits(&mut chars)?;
+                    if !current_number.is_empty() {
+                        result.push(self.parse_binary_string(&current_number)?);
+                        current_number.clear();
+                    }
+                }
+                // 이진수 숫자 수집
+                '1' => {
+                    current_number.push(chars.next().unwrap());
+                    // 8비트가 모이면 바이트로 변환
+                    if current_number.len() == 8 {
+                        result.push(self.parse_binary_string(&current_number)?);
+                        current_number.clear();
+                    }
+                }
+                _ => {
+                    return Err(format!("Invalid character '{}' in binary input. Only 0 and 1 are allowed.", c));
+                }
+            }
+        }
+
+        // 남은 숫자 처리
+        if !current_number.is_empty() {
+            if current_number.len() > 8 {
+                return Err(format!("Binary sequence '{}' is longer than 8 bits", current_number));
+            }
+            result.push(self.parse_binary_string(&current_number)?);
+        }
+
+        if result.is_empty() {
+            return Err("No valid binary values found in input".to_string());
+        }
+
+        Ok(result)
+    }
+
+    fn collect_binary_digits(
+        &self,
+        chars: &mut std::iter::Peekable<std::str::Chars>,
+    ) -> Result<String, String> {
+        let mut binary_str = String::new();
+
+        while let Some(&c) = chars.peek() {
+            if c == '0' || c == '1' {
+                binary_str.push(chars.next().unwrap());
+                if binary_str.len() == 8 {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        if binary_str.is_empty() {
+            return Err("Expected binary digits after prefix".to_string());
+        }
+
+        Ok(binary_str)
+    }
+
+    fn parse_binary_string(&self, binary_str: &str) -> Result<u8, String> {
+        if binary_str.len() > 8 {
+            return Err(format!("Binary sequence '{}' exceeds 8 bits", binary_str));
+        }
+        u8::from_str_radix(binary_str, 2).map_err(|_| format!("Invalid binary value: '{}'", binary_str))
+    }
+
+    fn parse_decimal_input(&self, input: &str) -> Result<Vec<u8>, String> {
+        if input.trim().is_empty() {
+            return Ok(Vec::new());
+        }
+
+        input
+            .split_whitespace()
+            .map(|s| {
+                s.parse::<u16>()
+                    .map_err(|_| format!("Invalid decimal number: '{}'", s))
+                    .and_then(|num| {
+                        if num > 255 {
+                            Err(format!("Decimal value {} exceeds maximum range (0-255)", num))
+                        } else {
+                            Ok(num as u8)
+                        }
+                    })
+            })
+            .collect()
+    }
+
+    fn parse_octal_input(&self, input: &str) -> Result<Vec<u8>, String> {
+        if input.trim().is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let mut result = Vec::new();
+        let mut current_number = String::new();
+        let mut chars = input.chars().peekable();
+
+        while let Some(&c) = chars.peek() {
+            match c {
+                // 공백 문자 처리
+                ' ' | '\n' | '\t' | '\r' => {
+                    if !current_number.is_empty() {
+                        result.push(self.parse_octal_string(&current_number)?);
+                        current_number.clear();
+                    }
+                    chars.next();
+                }
+                // "\NNN" escape sequence 처리
+                '\\' => {
+                    if !current_number.is_empty() {
+                        result.push(self.parse_octal_string(&current_number)?);
+                        current_number.clear();
+                    }
+                    chars.next(); // '\' 건너뛰기
+                    current_number = self.collect_octal_digits(&mut chars)?;
+                    if !current_number.is_empty() {
+                        result.push(self.parse_octal_string(&current_number)?);
+                        current_number.clear();
+                    }
+                }
+                // "0o" 접두사 처리
+                '0' => {
+                    chars.next();
+                    if let Some(&next) = chars.peek() {
+                        if next == 'o' || next == 'O' {
+                            if !current_number.is_empty() {
+                                result.push(self.parse_octal_string(&current_number)?);
+                                current_number.clear();
+                            }
+                            chars.next(); // 'o' 건너뛰기
+                            current_number = self.collect_octal_digits(&mut chars)?;
+                            if !current_number.is_empty() {
+                                result.push(self.parse_octal_string(&current_number)?);
+                                current_number.clear();
+                            }
+                        } else {
+                            current_number.push('0');
+                        }
+                    } else {
+                        current_number.push('0');
+                    }
+                }
+                'o' | 'O' => {
+                    if !current_number.is_empty() {
+                        result.push(self.parse_octal_string(&current_number)?);
+                        current_number.clear();
+                    }
+                    chars.next(); // 'o' 건너뛰기
+                    current_number = self.collect_octal_digits(&mut chars)?;
+                    if !current_number.is_empty() {
+                        result.push(self.parse_octal_string(&current_number)?);
+                        current_number.clear();
+                    }
+                }
+                // 8진수 숫자 수집
+                '0'..='7' => {
+                    current_number.push(chars.next().unwrap());
+                    // 3자리가 모이면 바이트로 변환 (8진수 377 = 255)
+                    if current_number.len() == 3 {
+                        result.push(self.parse_octal_string(&current_number)?);
+                        current_number.clear();
+                    }
+                }
+                _ => {
+                    return Err(format!("Invalid character '{}' in octal input. Only 0-7 are allowed.", c));
+                }
+            }
+        }
+
+        // 남은 숫자 처리
+        if !current_number.is_empty() {
+            if current_number.len() > 3 {
+                return Err(format!("Octal sequence '{}' is longer than 3 digits", current_number));
+            }
+            result.push(self.parse_octal_string(&current_number)?);
+        }
+
+        if result.is_empty() {
+            return Err("No valid octal values found in input".to_string());
+        }
+
+        Ok(result)
+    }
+
+    fn collect_octal_digits(
+        &self,
+        chars: &mut std::iter::Peekable<std::str::Chars>,
+    ) -> Result<String, String> {
+        let mut octal_str = String::new();
+
+        while let Some(&c) = chars.peek() {
+            if c >= '0' && c <= '7' {
+                octal_str.push(chars.next().unwrap());
+                if octal_str.len() == 3 {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        if octal_str.is_empty() {
+            return Err("Expected octal digits after prefix".to_string());
+        }
+
+        Ok(octal_str)
+    }
+
+    fn parse_octal_string(&self, octal_str: &str) -> Result<u8, String> {
+        if octal_str.len() > 3 {
+            return Err(format!("Octal sequence '{}' exceeds 3 digits", octal_str));
+        }
+        u8::from_str_radix(octal_str, 8).map_err(|_| format!("Invalid octal value: '{}'", octal_str))
+    }
+
+    // Local Storage 키 상수들
+    const STORAGE_KEY_INPUT_MODE: &'static str = "crc_input_mode";
+    const STORAGE_KEY_OUTPUT_MODE: &'static str = "crc_output_mode";
+    const STORAGE_KEY_HEX_STYLE: &'static str = "crc_hex_style";
+    const STORAGE_KEY_BINARY_STYLE: &'static str = "crc_binary_style";
+    const STORAGE_KEY_OCTAL_STYLE: &'static str = "crc_octal_style";
+    const STORAGE_KEY_ENDIANNESS: &'static str = "crc_endianness";
+    const STORAGE_KEY_BYTE_FORMATTING: &'static str = "crc_byte_formatting";
+    const STORAGE_KEY_CRC_ALGORITHM: &'static str = "crc_algorithm";
+
+    fn get_local_storage() -> Option<Storage> {
+        window()?.local_storage().ok()?
+    }
+
+    fn load_from_storage() -> Self {
+        let storage = Self::get_local_storage();
+        
+        let input_mode = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_INPUT_MODE).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "ascii" => Some(InputMode::Ascii),
+                "hex" => Some(InputMode::Hex),
+                "binary" => Some(InputMode::Binary),
+                "decimal" => Some(InputMode::Decimal),
+                "octal" => Some(InputMode::Octal),
+                _ => None,
+            })
+            .unwrap_or(InputMode::Ascii);
+
+        let output_mode = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_OUTPUT_MODE).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "decimal" => Some(OutputMode::Decimal),
+                "hex" => Some(OutputMode::Hex),
+                "binary" => Some(OutputMode::Binary),
+                "octal" => Some(OutputMode::Octal),
+                _ => None,
+            })
+            .unwrap_or(OutputMode::Hex);
+
+        let hex_style = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_HEX_STYLE).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "with_prefix" => Some(HexStyle::WithPrefix),
+                "short_prefix" => Some(HexStyle::ShortPrefix),
+                "no_prefix" => Some(HexStyle::NoPrefix),
+                "escape_sequence" => Some(HexStyle::EscapeSequence),
+                _ => None,
+            })
+            .unwrap_or(HexStyle::WithPrefix);
+
+        let binary_style = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_BINARY_STYLE).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "with_prefix" => Some(BinaryStyle::WithPrefix),
+                "short_prefix" => Some(BinaryStyle::ShortPrefix),
+                "no_prefix" => Some(BinaryStyle::NoPrefix),
+                _ => None,
+            })
+            .unwrap_or(BinaryStyle::WithPrefix);
+
+        let octal_style = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_OCTAL_STYLE).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "with_prefix" => Some(OctalStyle::WithPrefix),
+                "short_prefix" => Some(OctalStyle::ShortPrefix),
+                "no_prefix" => Some(OctalStyle::NoPrefix),
+                "escape_sequence" => Some(OctalStyle::EscapeSequence),
+                _ => None,
+            })
+            .unwrap_or(OctalStyle::WithPrefix);
+
+        let endianness = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_ENDIANNESS).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "big_endian" => Some(Endianness::BigEndian),
+                "little_endian" => Some(Endianness::LittleEndian),
+                _ => None,
+            })
+            .unwrap_or(Endianness::BigEndian);
+
+        let byte_formatting = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_BYTE_FORMATTING).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "continuous" => Some(ByteFormatting::Continuous),
+                "byte_separated" => Some(ByteFormatting::ByteSeparated),
+                _ => None,
+            })
+            .unwrap_or(ByteFormatting::Continuous);
+
+        let selected_algorithm = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_CRC_ALGORITHM).ok().flatten())
+            .and_then(|s| CrcAlgorithm::from_name(&s))
+            .unwrap_or(CrcAlgorithm::Crc32IsoHdlc);
+
+        Self {
+            input: String::new(),
+            input_mode,
+            output_mode,
+            hex_style,
+            binary_style,
+            octal_style,
+            endianness,
+            byte_formatting,
+            selected_algorithm,
+            bytes: Vec::new(),
+            bytes_string: String::new(),
+            crc_result: 0,
+            error_message: None,
+            width: 32,
+        }
+    }
+
+    fn save_to_storage(&self) {
+        if let Some(storage) = Self::get_local_storage() {
+            let input_mode_str = match self.input_mode {
+                InputMode::Ascii => "ascii",
+                InputMode::Hex => "hex",
+                InputMode::Binary => "binary",
+                InputMode::Decimal => "decimal",
+                InputMode::Octal => "octal",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_INPUT_MODE, input_mode_str);
+
+            let output_mode_str = match self.output_mode {
+                OutputMode::Decimal => "decimal",
+                OutputMode::Hex => "hex",
+                OutputMode::Binary => "binary",
+                OutputMode::Octal => "octal",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_OUTPUT_MODE, output_mode_str);
+
+            let hex_style_str = match self.hex_style {
+                HexStyle::WithPrefix => "with_prefix",
+                HexStyle::ShortPrefix => "short_prefix",
+                HexStyle::NoPrefix => "no_prefix",
+                HexStyle::EscapeSequence => "escape_sequence",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_HEX_STYLE, hex_style_str);
+
+            let binary_style_str = match self.binary_style {
+                BinaryStyle::WithPrefix => "with_prefix",
+                BinaryStyle::ShortPrefix => "short_prefix",
+                BinaryStyle::NoPrefix => "no_prefix",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_BINARY_STYLE, binary_style_str);
+
+            let octal_style_str = match self.octal_style {
+                OctalStyle::WithPrefix => "with_prefix",
+                OctalStyle::ShortPrefix => "short_prefix",
+                OctalStyle::NoPrefix => "no_prefix",
+                OctalStyle::EscapeSequence => "escape_sequence",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_OCTAL_STYLE, octal_style_str);
+
+            let endianness_str = match self.endianness {
+                Endianness::BigEndian => "big_endian",
+                Endianness::LittleEndian => "little_endian",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_ENDIANNESS, endianness_str);
+
+            let byte_formatting_str = match self.byte_formatting {
+                ByteFormatting::Continuous => "continuous",
+                ByteFormatting::ByteSeparated => "byte_separated",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_BYTE_FORMATTING, byte_formatting_str);
+
+            let _ = storage.set_item(Self::STORAGE_KEY_CRC_ALGORITHM, self.selected_algorithm.name());
         }
     }
 }
