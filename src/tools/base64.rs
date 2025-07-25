@@ -5,7 +5,7 @@ use gloo_timers;
 use js_sys;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{window, HtmlInputElement, Event, FileList, Blob, BlobPropertyBag, Url, Document, Element, HtmlElement, MouseEvent, DragEvent};
+use web_sys::{window, HtmlInputElement, Event, FileList, Blob, BlobPropertyBag, Url, Document, Element, HtmlElement, MouseEvent, DragEvent, Storage};
 use yew::prelude::*;
 use crate::components::tool_category::ToolCategoryManager;
 
@@ -562,34 +562,7 @@ impl Component for ToolBase64 {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self {
-            input_string: String::new(),
-            output_base64: String::new(),
-            input_base64: String::new(),
-            output_string: String::new(),
-            convert: false,
-            error_message: None,
-            base64_mode: Base64Mode::Standard,
-            output_format: OutputFormat::Continuous,
-            // 파일 업로드 관련
-            uploaded_file: None,
-            file_content: None,
-            file_info: None,
-            is_loading: false,
-            // 프로그레스 관련
-            processing_progress: 0.0,
-            is_processing: false,
-            processing_chunks: None,
-            // 포맷팅 관련
-            formatting_state: None,
-            is_formatting: false,
-            // 디코딩된 이미지 관련
-            decoded_image_data: None, // Data URL for image preview
-            decoded_image_mime: None, // MIME type of decoded image
-            decoded_binary_data: None, // Raw binary data
-            // 드래그 앤 드롭 관련
-            is_drag_over: false, // 드래그 오버 상태
-        }
+        Self::load_from_storage()
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -693,6 +666,7 @@ impl Component for ToolBase64 {
                 self.decoded_image_mime = None;
                 self.decoded_binary_data = None;
                 
+                self.save_to_storage();
                 true
             }
             Msg::ModeChanged(mode) => {
@@ -706,6 +680,7 @@ impl Component for ToolBase64 {
                 
                 // 청크 처리 또는 포맷팅 중이면 처리하지 않음
                 if self.is_processing || self.is_formatting {
+                    self.save_to_storage();
                     return true;
                 }
                 
@@ -781,6 +756,7 @@ impl Component for ToolBase64 {
                         }
                     }
                 }
+                self.save_to_storage();
                 true
             }
             Msg::FormatChanged(format) => {
@@ -788,6 +764,7 @@ impl Component for ToolBase64 {
                 
                 // 청크 처리 또는 포맷팅 중이면 처리하지 않음
                 if self.is_processing || self.is_formatting {
+                    self.save_to_storage();
                     return true;
                 }
                 
@@ -806,6 +783,7 @@ impl Component for ToolBase64 {
                         }
                     }
                 }
+                self.save_to_storage();
                 true
             }
             Msg::FileSelected(files) => {
@@ -1943,4 +1921,106 @@ impl Component for ToolBase64 {
             }
         }
     }
+}
+
+impl ToolBase64 {
+    // Local Storage 키 상수들
+    const STORAGE_KEY_BASE64_MODE: &'static str = "base64_mode";
+    const STORAGE_KEY_OUTPUT_FORMAT: &'static str = "base64_output_format";
+    const STORAGE_KEY_CONVERT: &'static str = "base64_convert";
+
+    fn get_local_storage() -> Option<Storage> {
+        window()?.local_storage().ok()?
+    }
+
+    fn load_from_storage() -> Self {
+        let storage = Self::get_local_storage();
+        
+        let base64_mode = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_BASE64_MODE).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "standard" => Some(Base64Mode::Standard),
+                "urlsafe" => Some(Base64Mode::UrlSafe),
+                "nopadding" => Some(Base64Mode::NoPadding),
+                _ => None,
+            })
+            .unwrap_or(Base64Mode::Standard);
+
+        let output_format = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_OUTPUT_FORMAT).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "continuous" => Some(OutputFormat::Continuous),
+                "linebreaks76" => Some(OutputFormat::LineBreaks76),
+                "linebreaks64" => Some(OutputFormat::LineBreaks64),
+                "chunks4" => Some(OutputFormat::Chunks4),
+                "chunks8" => Some(OutputFormat::Chunks8),
+                "dataurlimg" => Some(OutputFormat::DataUrlImg),
+                "dataurlcss" => Some(OutputFormat::DataUrlCss),
+                _ => None,
+            })
+            .unwrap_or(OutputFormat::Continuous);
+
+        let convert = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_CONVERT).ok().flatten())
+            .and_then(|s| s.parse::<bool>().ok())
+            .unwrap_or(false);
+
+        Self {
+            input_string: String::new(),
+            output_base64: String::new(),
+            input_base64: String::new(),
+            output_string: String::new(),
+            convert,
+            error_message: None,
+            base64_mode,
+            output_format,
+            // 파일 업로드 관련
+            uploaded_file: None,
+            file_content: None,
+            file_info: None,
+            is_loading: false,
+            // 프로그레스 관련
+            processing_progress: 0.0,
+            is_processing: false,
+            processing_chunks: None,
+            // 포맷팅 관련
+            formatting_state: None,
+            is_formatting: false,
+            // 디코딩된 이미지 관련
+            decoded_image_data: None, // Data URL for image preview
+            decoded_image_mime: None, // MIME type of decoded image
+            decoded_binary_data: None, // Raw binary data
+            // 드래그 앤 드롭 관련
+            is_drag_over: false, // 드래그 오버 상태
+        }
+    }
+
+    fn save_to_storage(&self) {
+        if let Some(storage) = Self::get_local_storage() {
+            let base64_mode_str = match self.base64_mode {
+                Base64Mode::Standard => "standard",
+                Base64Mode::UrlSafe => "urlsafe",
+                Base64Mode::NoPadding => "nopadding",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_BASE64_MODE, base64_mode_str);
+
+            let output_format_str = match self.output_format {
+                OutputFormat::Continuous => "continuous",
+                OutputFormat::LineBreaks76 => "linebreaks76",
+                OutputFormat::LineBreaks64 => "linebreaks64",
+                OutputFormat::Chunks4 => "chunks4",
+                OutputFormat::Chunks8 => "chunks8",
+                OutputFormat::DataUrlImg => "dataurlimg",
+                OutputFormat::DataUrlCss => "dataurlcss",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_OUTPUT_FORMAT, output_format_str);
+
+            let _ = storage.set_item(Self::STORAGE_KEY_CONVERT, &self.convert.to_string());
+        }
+    }
+
+    // ... existing methods ...
 }

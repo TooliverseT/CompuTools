@@ -1,5 +1,5 @@
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{window, HtmlInputElement};
+use web_sys::{window, HtmlInputElement, Storage};
 use yew::prelude::*;
 use crate::components::tool_category::ToolCategoryManager;
 
@@ -65,19 +65,7 @@ impl Component for ToolAscii {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self {
-            input_ascii: String::new(),
-            output_text: String::new(),
-            input_text: String::new(),
-            output_ascii: String::new(),
-            convert: false,
-            mode: AsciiMode::Hex,
-            hex_style: HexStyle::WithPrefix,
-            binary_style: BinaryStyle::WithPrefix,
-            octal_style: OctalStyle::WithPrefix,
-            show_ascii_table: false,
-            error_message: None,
-        }
+        Self::load_from_storage()
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -149,6 +137,7 @@ impl Component for ToolAscii {
                     self.output_ascii = self.convert_text_to_ascii(&input_bytes);
                 }
 
+                self.save_to_storage();
                 true
             }
             Msg::HexStyleChanged(style) => {
@@ -158,6 +147,7 @@ impl Component for ToolAscii {
                     let input_bytes = self.input_text.as_bytes().to_vec();
                     self.output_ascii = self.convert_text_to_ascii(&input_bytes);
                 }
+                self.save_to_storage();
                 true
             }
             Msg::BinaryStyleChanged(style) => {
@@ -167,6 +157,7 @@ impl Component for ToolAscii {
                     let input_bytes = self.input_text.as_bytes().to_vec();
                     self.output_ascii = self.convert_text_to_ascii(&input_bytes);
                 }
+                self.save_to_storage();
                 true
             }
             Msg::OctalStyleChanged(style) => {
@@ -176,11 +167,13 @@ impl Component for ToolAscii {
                     let input_bytes = self.input_text.as_bytes().to_vec();
                     self.output_ascii = self.convert_text_to_ascii(&input_bytes);
                 }
+                self.save_to_storage();
                 true
             }
             Msg::Convert => {
                 self.convert = !self.convert;
                 self.error_message = None;
+                self.save_to_storage();
                 true
             }
             Msg::CopyToClipboard(value) => {
@@ -613,7 +606,11 @@ impl Component for ToolAscii {
                             </div>
                             <div style="display: flex; align-items: center; margin-bottom: 10px; margin-top: 5px;">
                                 <div style="width: 70%;">
-                                    {"Output Format: "}
+                                    if !convert {
+                                        {"Output Format: "}
+                                    } else {
+                                        {"Input Format: "}
+                                    }
                                 </div>
                                 <select
                                     id="input-mode-select"
@@ -635,8 +632,8 @@ impl Component for ToolAscii {
                                 </select>
                             </div>
                             
-                            // 스타일 선택 드롭다운 (모드별로 표시)
-                            if self.mode == AsciiMode::Hex {
+                            // 스타일 선택 드롭다운 (Text to ASCII 모드일 때만 표시)
+                            if !convert && self.mode == AsciiMode::Hex {
                                 <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                     <div style="width: 70%;">
                                         {"Hex Style: "}
@@ -661,7 +658,7 @@ impl Component for ToolAscii {
                                 </div>
                             }
                             
-                            if self.mode == AsciiMode::Binary {
+                            if !convert && self.mode == AsciiMode::Binary {
                                 <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                     <div style="width: 70%;">
                                         {"Binary Style: "}
@@ -684,7 +681,7 @@ impl Component for ToolAscii {
                                 </div>
                             }
                             
-                            if self.mode == AsciiMode::Octal {
+                            if !convert && self.mode == AsciiMode::Octal {
                                 <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                     <div style="width: 70%;">
                                         {"Octal Style: "}
@@ -822,6 +819,125 @@ impl Component for ToolAscii {
 }
 
 impl ToolAscii {
+    // Local Storage 키 상수들
+    const STORAGE_KEY_MODE: &'static str = "ascii_mode";
+    const STORAGE_KEY_HEX_STYLE: &'static str = "ascii_hex_style";
+    const STORAGE_KEY_BINARY_STYLE: &'static str = "ascii_binary_style";
+    const STORAGE_KEY_OCTAL_STYLE: &'static str = "ascii_octal_style";
+    const STORAGE_KEY_CONVERT: &'static str = "ascii_convert";
+
+    fn get_local_storage() -> Option<Storage> {
+        window()?.local_storage().ok()?
+    }
+
+    fn load_from_storage() -> Self {
+        let storage = Self::get_local_storage();
+        
+        let mode = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_MODE).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "decimal" => Some(AsciiMode::Decimal),
+                "hex" => Some(AsciiMode::Hex),
+                "binary" => Some(AsciiMode::Binary),
+                "octal" => Some(AsciiMode::Octal),
+                _ => None,
+            })
+            .unwrap_or(AsciiMode::Hex);
+
+        let hex_style = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_HEX_STYLE).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "with_prefix" => Some(HexStyle::WithPrefix),
+                "short_prefix" => Some(HexStyle::ShortPrefix),
+                "no_prefix" => Some(HexStyle::NoPrefix),
+                "escape_sequence" => Some(HexStyle::EscapeSequence),
+                _ => None,
+            })
+            .unwrap_or(HexStyle::WithPrefix);
+
+        let binary_style = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_BINARY_STYLE).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "with_prefix" => Some(BinaryStyle::WithPrefix),
+                "short_prefix" => Some(BinaryStyle::ShortPrefix),
+                "no_prefix" => Some(BinaryStyle::NoPrefix),
+                _ => None,
+            })
+            .unwrap_or(BinaryStyle::WithPrefix);
+
+        let octal_style = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_OCTAL_STYLE).ok().flatten())
+            .and_then(|s| match s.as_str() {
+                "with_prefix" => Some(OctalStyle::WithPrefix),
+                "short_prefix" => Some(OctalStyle::ShortPrefix),
+                "no_prefix" => Some(OctalStyle::NoPrefix),
+                "escape_sequence" => Some(OctalStyle::EscapeSequence),
+                _ => None,
+            })
+            .unwrap_or(OctalStyle::WithPrefix);
+
+        let convert = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_CONVERT).ok().flatten())
+            .and_then(|s| s.parse::<bool>().ok())
+            .unwrap_or(false);
+
+        Self {
+            input_ascii: String::new(),
+            output_text: String::new(),
+            input_text: String::new(),
+            output_ascii: String::new(),
+            convert,
+            mode,
+            hex_style,
+            binary_style,
+            octal_style,
+            show_ascii_table: false,
+            error_message: None,
+        }
+    }
+
+    fn save_to_storage(&self) {
+        if let Some(storage) = Self::get_local_storage() {
+            let mode_str = match self.mode {
+                AsciiMode::Decimal => "decimal",
+                AsciiMode::Hex => "hex",
+                AsciiMode::Binary => "binary",
+                AsciiMode::Octal => "octal",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_MODE, mode_str);
+
+            let hex_style_str = match self.hex_style {
+                HexStyle::WithPrefix => "with_prefix",
+                HexStyle::ShortPrefix => "short_prefix",
+                HexStyle::NoPrefix => "no_prefix",
+                HexStyle::EscapeSequence => "escape_sequence",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_HEX_STYLE, hex_style_str);
+
+            let binary_style_str = match self.binary_style {
+                BinaryStyle::WithPrefix => "with_prefix",
+                BinaryStyle::ShortPrefix => "short_prefix",
+                BinaryStyle::NoPrefix => "no_prefix",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_BINARY_STYLE, binary_style_str);
+
+            let octal_style_str = match self.octal_style {
+                OctalStyle::WithPrefix => "with_prefix",
+                OctalStyle::ShortPrefix => "short_prefix",
+                OctalStyle::NoPrefix => "no_prefix",
+                OctalStyle::EscapeSequence => "escape_sequence",
+            };
+            let _ = storage.set_item(Self::STORAGE_KEY_OCTAL_STYLE, octal_style_str);
+
+            let _ = storage.set_item(Self::STORAGE_KEY_CONVERT, &self.convert.to_string());
+        }
+    }
+
     fn convert_text_to_ascii(&self, input_bytes: &[u8]) -> String {
         match self.mode {
             AsciiMode::Decimal => {

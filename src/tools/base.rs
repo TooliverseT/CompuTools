@@ -2,7 +2,7 @@ use gloo_timers::callback::Timeout;
 use log::info;
 use std::collections::{HashMap, BTreeMap};
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{window, HtmlInputElement};
+use web_sys::{window, HtmlInputElement, Storage};
 use yew::prelude::*;
 use crate::components::tool_category::ToolCategoryManager;
 
@@ -27,13 +27,7 @@ impl Component for ToolBase {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        let mut bases = BTreeMap::new();
-        let mut error_messages = BTreeMap::new();
-        for base in 2..=36 {
-            bases.insert(base, String::new());
-            error_messages.insert(base, None);
-        }
-        Self { bases, custom_bases: vec![], error_messages, decimal_precision: 6, supports_float: false }
+        Self::load_from_storage()
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -127,19 +121,24 @@ impl Component for ToolBase {
             Msg::AddCustomBase(base) => {
                 if !self.custom_bases.contains(&base) {
                     self.custom_bases.push(base);
+                    self.custom_bases.sort(); // 정렬해서 일관성 유지
+                    self.save_to_storage();
                 }
                 true
             }
             Msg::RemoveCustomBase(base) => {
                 self.custom_bases.retain(|&b| b != base);
+                self.save_to_storage();
                 true
             }
             Msg::SetPrecision(precision) => {
                 self.decimal_precision = precision;
+                self.save_to_storage();
                 true
             }
             Msg::ToggleFloatMode => {
                 self.supports_float = !self.supports_float;
+                self.save_to_storage();
                 true
             }
         }
@@ -606,6 +605,82 @@ This is why: 0.1 + 0.2 ≠ 0.3 in programming"#}
 }
 
 impl ToolBase {
+    // Local Storage 키 상수들
+    const STORAGE_KEY_SUPPORTS_FLOAT: &'static str = "base_supports_float";
+    const STORAGE_KEY_DECIMAL_PRECISION: &'static str = "base_decimal_precision";
+    const STORAGE_KEY_CUSTOM_BASES: &'static str = "base_custom_bases";
+
+    fn get_local_storage() -> Option<Storage> {
+        window()?.local_storage().ok()?
+    }
+
+    fn load_from_storage() -> Self {
+        let storage = Self::get_local_storage();
+        
+        let supports_float = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_SUPPORTS_FLOAT).ok().flatten())
+            .and_then(|s| s.parse::<bool>().ok())
+            .unwrap_or(false);
+
+        let decimal_precision = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_DECIMAL_PRECISION).ok().flatten())
+            .and_then(|s| s.parse::<u32>().ok())
+            .filter(|&p| p >= 3 && p <= 12) // 유효한 범위 체크
+            .unwrap_or(6);
+
+        let custom_bases = storage
+            .as_ref()
+            .and_then(|s| s.get_item(Self::STORAGE_KEY_CUSTOM_BASES).ok().flatten())
+            .and_then(|s| {
+                // JSON 형태로 저장된 배열을 파싱
+                s.split(',')
+                    .filter_map(|base_str| base_str.trim().parse::<u32>().ok())
+                    .filter(|&base| base >= 2 && base <= 36) // 유효한 범위 체크
+                    .collect::<Vec<u32>>()
+                    .into()
+            })
+            .unwrap_or_else(Vec::new);
+
+        let mut bases = BTreeMap::new();
+        let mut error_messages = BTreeMap::new();
+        for base in 2..=36 {
+            bases.insert(base, String::new());
+            error_messages.insert(base, None);
+        }
+
+        Self { 
+            bases, 
+            custom_bases, 
+            error_messages, 
+            decimal_precision, 
+            supports_float 
+        }
+    }
+
+    fn save_to_storage(&self) {
+        if let Some(storage) = Self::get_local_storage() {
+            let _ = storage.set_item(
+                Self::STORAGE_KEY_SUPPORTS_FLOAT, 
+                &self.supports_float.to_string()
+            );
+
+            let _ = storage.set_item(
+                Self::STORAGE_KEY_DECIMAL_PRECISION, 
+                &self.decimal_precision.to_string()
+            );
+
+            // custom_bases를 쉼표로 구분된 문자열로 저장
+            let custom_bases_str = self.custom_bases
+                .iter()
+                .map(|base| base.to_string())
+                .collect::<Vec<String>>()
+                .join(",");
+            let _ = storage.set_item(Self::STORAGE_KEY_CUSTOM_BASES, &custom_bases_str);
+        }
+    }
+
     fn validate_input(&self, input: &str, base: u32) -> Result<(), String> {
         if input.trim().is_empty() {
             return Ok(());
