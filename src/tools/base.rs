@@ -1,7 +1,10 @@
-use yew::prelude::*;
+use gloo_timers::callback::Timeout;
 use log::info;
-use std::collections::BTreeMap;
-use web_sys::window;
+use std::collections::{HashMap, BTreeMap};
+use wasm_bindgen_futures::JsFuture;
+use web_sys::{window, HtmlInputElement};
+use yew::prelude::*;
+use crate::components::tool_category::ToolCategoryManager;
 
 pub struct ToolBase {
     bases: BTreeMap<u32, String>,
@@ -475,9 +478,23 @@ This is why: 0.1 + 0.2 ≠ 0.3 in programming"#}
 
                         <div class="content-section">
                             <h2>{"🔗 Related Tools"}</h2>
-                            <p>{"Enhance your workflow with this mathematical tool:"}</p>
                             <ul>
-                                <li><a href="/quaternion/">{"Quaternion Calculator"}</a> {" - For advanced mathematical operations with quaternions."}</li>
+                                {
+                                    ToolCategoryManager::get_related_tools("base")
+                                        .iter()
+                                        .map(|tool| {
+                                            html! {
+                                                <li>
+                                                    <a href={format!("/{}/", tool.route_name)}>
+                                                        { &tool.display_name }
+                                                    </a>
+                                                    { " - " }
+                                                    { &tool.description }
+                                                </li>
+                                            }
+                                        })
+                                        .collect::<Html>()
+                                }
                             </ul>
                         </div>
                     </div>

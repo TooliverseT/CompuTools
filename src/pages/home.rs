@@ -2,6 +2,7 @@ use yew::prelude::*;
 
 use super::router::Route;
 use crate::components::thumbnail::{self, Thumbnail};
+use crate::components::tool_category::{ToolCategoryManager, ToolInfo, ToolCategory as ManagedToolCategory};
 use web_sys::HtmlInputElement;
 use yew_router::prelude::*;
 
@@ -13,19 +14,10 @@ pub struct ToolCategory {
     pub icon: String,
 }
 
-#[derive(Clone, PartialEq)]
-pub struct SimpleThumbnail {
-    pub title: String,
-    pub display_name: String,
-    pub description: String,
-    pub category: String,
-    pub tags: Vec<String>,
-}
-
 pub struct Home {
-    list: Vec<SimpleThumbnail>,
+    list: Vec<ToolInfo>,
     categories: Vec<ToolCategory>,
-    last_list: Vec<SimpleThumbnail>,
+    last_list: Vec<ToolInfo>,
     thumbnail: Vec<Html>,
     recent_items: Vec<Html>,
     input: String,
@@ -35,8 +27,8 @@ pub struct Home {
 }
 
 pub enum Msg {
-    Init(Vec<SimpleThumbnail>),
-    Update(Vec<SimpleThumbnail>),
+    Init(Vec<ToolInfo>),
+    Update(Vec<ToolInfo>),
     Input(String),
     Search,
     ToggleSort,
@@ -66,7 +58,7 @@ impl Component for Home {
             Msg::Init(tools) => {
                 self.list = tools;
                 self.categories = self.create_categories();
-                let cb = _ctx.link().callback(|msg: Vec<SimpleThumbnail>| Msg::Update(msg));
+                let cb = _ctx.link().callback(|msg: Vec<ToolInfo>| Msg::Update(msg));
                 cb.emit(self.list.clone());
                 true
             }
@@ -77,7 +69,7 @@ impl Component for Home {
                 // 카테고리 필터링
                 if self.current_category != "All" {
                     list = list.into_iter()
-                        .filter(|tool| tool.category == self.current_category)
+                        .filter(|tool| tool.category.display_name() == self.current_category)
                         .collect();
                 }
                 
@@ -91,13 +83,13 @@ impl Component for Home {
                 let html_list: Vec<Html> = list
                     .iter()
                     .map(|tool| {
-                        let title = tool.title.clone();
+                        let route_name = tool.route_name.clone();
                         let display_name = tool.display_name.clone();
                         let description = tool.description.clone();
-                        let category = tool.category.clone();
+                        let category = tool.category.display_name().to_string();
 
                         html! {
-                            <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { title: title.clone() }}>
+                            <Link<Route> classes={classes!("home-thumbnail")} to={Route::Page { title: route_name.clone() }}>
                                 <div class="thumbnail-header">
                                     <div class="thumbnail-title">{ display_name }</div>
                                     <div class="thumbnail-category">{ category }</div>
@@ -113,13 +105,13 @@ impl Component for Home {
                 let filtered_html_list: Vec<Html> = recent_items
                     .iter()
                     .filter_map(|item_title| {
-                        self.list.iter().find(|tool| &tool.title == item_title).map(|tool| {
-                            let title = tool.title.clone();
+                        self.list.iter().find(|tool| &tool.route_name == item_title).map(|tool| {
+                            let route_name = tool.route_name.clone();
                             let display_name = tool.display_name.clone();
                             let description = tool.description.clone();
 
                             html! {
-                                <Link<Route> classes={classes!("home-thumbnail", "recent")} to={Route::Page { title: title.clone() }}>
+                                <Link<Route> classes={classes!("home-thumbnail", "recent")} to={Route::Page { title: route_name.clone() }}>
                                     <div class="thumbnail-header">
                                         <div class="thumbnail-title">{ display_name }</div>
                                         <div class="recent-badge">{ "Recent" }</div>
@@ -140,22 +132,11 @@ impl Component for Home {
             Msg::Search => {
                 if !self.input.is_empty() {
                     self.search = true;
-                    let input = self.input.to_lowercase();
-                    let list: Vec<SimpleThumbnail> = self
-                        .list
-                        .clone()
-                        .into_iter()
-                        .filter(|tool| {
-                            let title = tool.display_name.to_lowercase();
-                            let description = tool.description.to_lowercase();
-                            let tags = tool.tags.join(" ").to_lowercase();
-                            title.contains(&input) || description.contains(&input) || tags.contains(&input)
-                        })
-                        .collect();
-                    let cb = _ctx.link().callback(|msg: Vec<SimpleThumbnail>| Msg::Update(msg));
-                    cb.emit(list.clone());
+                    let search_results = ToolCategoryManager::search_tools(&self.input);
+                    let cb = _ctx.link().callback(|msg: Vec<ToolInfo>| Msg::Update(msg));
+                    cb.emit(search_results);
                 } else {
-                    let cb = _ctx.link().callback(|msg: Vec<SimpleThumbnail>| Msg::Update(msg));
+                    let cb = _ctx.link().callback(|msg: Vec<ToolInfo>| Msg::Update(msg));
                     cb.emit(self.list.clone());
                 }
                 true
@@ -163,13 +144,13 @@ impl Component for Home {
             Msg::ToggleSort => {
                 let new_sort = if self.asc == "asc" { "desc" } else { "asc" };
                 self.asc = new_sort.to_string();
-                let cb = _ctx.link().callback(|msg: Vec<SimpleThumbnail>| Msg::Update(msg));
+                let cb = _ctx.link().callback(|msg: Vec<ToolInfo>| Msg::Update(msg));
                 cb.emit(self.last_list.clone());
                 true
             }
             Msg::SelectCategory(category) => {
                 self.current_category = category;
-                let cb = _ctx.link().callback(|msg: Vec<SimpleThumbnail>| Msg::Update(msg));
+                let cb = _ctx.link().callback(|msg: Vec<ToolInfo>| Msg::Update(msg));
                 cb.emit(self.list.clone());
                 true
             }
@@ -262,85 +243,7 @@ impl Component for Home {
             }
 
             let link = _ctx.link().clone();
-            let list: Vec<SimpleThumbnail> = vec![
-                SimpleThumbnail {
-                    title: "unix-timestamp".to_string(),
-                    display_name: "Unix Timestamp".to_string(),
-                    description: "Convert between Unix timestamps and human-readable dates".to_string(),
-                    category: "Time & Date".to_string(),
-                    tags: vec!["time", "date", "unix", "timestamp", "convert"].iter().map(|s| s.to_string()).collect(),
-                },
-                SimpleThumbnail {
-                    title: "quaternion".to_string(),
-                    display_name: "Quaternion".to_string(),
-                    description: "Convert between quaternions and Euler angles for 3D rotations".to_string(),
-                    category: "Mathematical".to_string(),
-                    tags: vec!["quaternion", "euler", "3d", "rotation", "math"].iter().map(|s| s.to_string()).collect(),
-                },
-                SimpleThumbnail {
-                    title: "crc".to_string(),
-                    display_name: "CRC Tool".to_string(),
-                    description: "Generate CRC checksums for data integrity verification".to_string(),
-                    category: "Security & Hash".to_string(),
-                    tags: vec!["crc", "checksum", "integrity", "hash", "verify"].iter().map(|s| s.to_string()).collect(),
-                },
-                SimpleThumbnail {
-                    title: "ascii".to_string(),
-                    display_name: "ASCII Converter".to_string(),
-                    description: "Convert text to ASCII codes and vice versa".to_string(),
-                    category: "Text & Encoding".to_string(),
-                    tags: vec!["ascii", "text", "code", "convert", "character"].iter().map(|s| s.to_string()).collect(),
-                },
-                SimpleThumbnail {
-                    title: "json".to_string(),
-                    display_name: "JSON Formatter".to_string(),
-                    description: "Format, validate, and beautify JSON data".to_string(),
-                    category: "Text & Encoding".to_string(),
-                    tags: vec!["json", "format", "validate", "beautify", "parse"].iter().map(|s| s.to_string()).collect(),
-                },
-                SimpleThumbnail {
-                    title: "base64".to_string(),
-                    display_name: "Base64 Encoder/Decoder".to_string(),
-                    description: "Encode and decode Base64 data for secure transmission".to_string(),
-                    category: "Text & Encoding".to_string(),
-                    tags: vec!["base64", "encode", "decode", "transmission", "data"].iter().map(|s| s.to_string()).collect(),
-                },
-                SimpleThumbnail {
-                    title: "base".to_string(),
-                    display_name: "Number Base Converter".to_string(),
-                    description: "Convert numbers between different bases (binary, hex, etc.)".to_string(),
-                    category: "Mathematical".to_string(),
-                    tags: vec!["base", "binary", "hex", "decimal", "convert"].iter().map(|s| s.to_string()).collect(),
-                },
-                SimpleThumbnail {
-                    title: "file-hash".to_string(),
-                    display_name: "File Hash".to_string(),
-                    description: "Calculate MD5, SHA-1, SHA-256, SHA-512 hashes for files".to_string(),
-                    category: "Security & Hash".to_string(),
-                    tags: vec!["file", "hash", "md5", "sha", "integrity"].iter().map(|s| s.to_string()).collect(),
-                },
-                SimpleThumbnail {
-                    title: "html".to_string(),
-                    display_name: "HTML Converter".to_string(),
-                    description: "Encode and decode HTML entities for web content".to_string(),
-                    category: "Text & Encoding".to_string(),
-                    tags: vec!["html", "encode", "decode", "entities", "web"].iter().map(|s| s.to_string()).collect(),
-                },
-                SimpleThumbnail {
-                    title: "url".to_string(),
-                    display_name: "URL Converter".to_string(),
-                    description: "Encode and decode URLs for proper web transmission".to_string(),
-                    category: "Text & Encoding".to_string(),
-                    tags: vec!["url", "encode", "decode", "web", "transmission"].iter().map(|s| s.to_string()).collect(),
-                },
-                SimpleThumbnail {
-                    title: "uuid".to_string(),
-                    display_name: "UUID Generator".to_string(),
-                    description: "Generate version 4 UUIDs for unique identification".to_string(),
-                    category: "Generators".to_string(),
-                    tags: vec!["uuid", "generate", "unique", "identifier", "random"].iter().map(|s| s.to_string()).collect(),
-                },
-            ];
+            let list = ToolCategoryManager::get_all_tools();
             link.send_message(Msg::Init(list));
         }
     }
@@ -348,44 +251,27 @@ impl Component for Home {
 
 impl Home {
     fn create_categories(&self) -> Vec<ToolCategory> {
-        vec![
+        let mut categories = vec![
             ToolCategory {
                 name: "All".to_string(),
                 description: "All available tools".to_string(),
                 tools: vec![],
-                icon: "fa-th-large".to_string(),
-            },
-            ToolCategory {
-                name: "Text & Encoding".to_string(),
-                description: "Text conversion and encoding tools".to_string(),
+                icon: "fa-solid fa-th-large".to_string(),
+            }
+        ];
+
+        // ToolCategoryManager에서 카테고리를 가져와서 추가
+        let managed_categories = ToolCategoryManager::get_all_categories();
+        for managed_category in managed_categories {
+            categories.push(ToolCategory {
+                name: managed_category.display_name().to_string(),
+                description: managed_category.description().to_string(),
                 tools: vec![],
-                icon: "fa-file-text".to_string(),
-            },
-            ToolCategory {
-                name: "Security & Hash".to_string(),
-                description: "Security and hashing utilities".to_string(),
-                tools: vec![],
-                icon: "fa-shield-alt".to_string(),
-            },
-            ToolCategory {
-                name: "Mathematical".to_string(),
-                description: "Mathematical calculation tools".to_string(),
-                tools: vec![],
-                icon: "fa-calculator".to_string(),
-            },
-            ToolCategory {
-                name: "Time & Date".to_string(),
-                description: "Time and date conversion tools".to_string(),
-                tools: vec![],
-                icon: "fa-clock".to_string(),
-            },
-            ToolCategory {
-                name: "Generators".to_string(),
-                description: "Data generation utilities".to_string(),
-                tools: vec![],
-                icon: "fa-magic".to_string(),
-            },
-        ]
+                icon: managed_category.icon().to_string(),
+            });
+        }
+
+        categories
     }
 
     fn render_category_buttons(&self, ctx: &Context<Self>) -> Vec<Html> {

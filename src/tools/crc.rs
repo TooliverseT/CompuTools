@@ -26,6 +26,7 @@ use std::str::FromStr;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use web_sys::{window, HtmlInputElement, HtmlSelectElement, Storage};
 use yew::prelude::*;
+use crate::components::tool_category::ToolCategoryManager;
 
 #[derive(PartialEq, Clone)]
 enum InputMode {
@@ -1057,13 +1058,13 @@ impl Component for ToolCrc {
                 match parsed_bytes {
                     Ok(bytes) => {
                         self.bytes = bytes;
-                        self.calculate_crc();
-                        self.bytes_string = self
-                            .bytes
-                            .iter()
-                            .map(|byte| format!("0x{:02X}", byte))
-                            .collect::<Vec<String>>()
-                            .join(" ");
+                self.calculate_crc();
+                self.bytes_string = self
+                    .bytes
+                    .iter()
+                    .map(|byte| format!("0x{:02X}", byte))
+                    .collect::<Vec<String>>()
+                    .join(" ");
                     }
                     Err(err) => {
                         self.error_message = Some(err);
@@ -1119,7 +1120,7 @@ impl Component for ToolCrc {
                     self.selected_algorithm = algorithm;
                     self.calculate_crc();
                     self.save_to_storage();
-                    true
+                true
                 } else {
                     false
                 }
@@ -1201,7 +1202,7 @@ impl Component for ToolCrc {
                                     <li><strong>{"Telecommunications:"}</strong> {"CRC-16/GSM, CRC-8/GSM-A, CRC-11/UMTS"}</li>
                                     <li><strong>{"Automotive:"}</strong> {"CRC-15/CAN, CRC-17/CAN-FD, CRC-8/SAE-J1850"}</li>
                                     <li><strong>{"Bluetooth & Wireless:"}</strong> {"CRC-24/BLE, CRC-8/BLUETOOTH, CRC-8/WCDMA"}</li>
-                                </ul>
+                            </ul>
                             </div>
 
                             <h3>{"📊 Input Format Examples & Best Practices:"}</h3>
@@ -1211,8 +1212,8 @@ impl Component for ToolCrc {
                                     <li>{"\"Hello World\" → Direct character encoding"}</li>
                                     <li>{"\"CompuTools CRC\" → UTF-8 byte sequence"}</li>
                                     <li>{"\"test\\ndata\" → Includes control characters"}</li>
-                                </ul>
-                                
+                            </ul>
+
                                 <p><strong>{"HEX input (flexible formats accepted):"}</strong></p>
                                 <ul>
                                     <li>{"Standard: \"0x01 0x02 0x03 0x04 0x05\""}</li>
@@ -1809,21 +1810,24 @@ bool validate_sensor_data(uint8_t *sensor_data) {
                         </div>
 
                         <div class="content-section">
-                            <h2>{"🔗 Related Tools & Resources"}</h2>
-                            <p>{"Enhance your data integrity workflow with these complementary tools:"}</p>
+                            <h2>{"🔗 Related Tools"}</h2>
                             <ul>
-                                <li><a href="/file-hash/">{"File Hash Generator"}</a> {" - Calculate MD5, SHA-1, SHA-256, SHA-512 for cryptographic integrity verification"}</li>
-                                <li><a href="/base64/">{"Base64 Encoder/Decoder"}</a> {" - Encode binary CRC values for text-based protocols"}</li>
-                                <li><a href="/ascii/">{"ASCII Converter"}</a> {" - Convert between text and numeric representations for CRC input preparation"}</li>
-                                <li><a href="/base/">{"Number Base Converter"}</a> {" - Convert CRC values between decimal, hexadecimal, binary, and octal"}</li>
-                            </ul>
-                            
-                            <h3>{"📚 External References"}</h3>
-                            <ul>
-                                <li><strong>{"Catalogue of CRC Algorithms:"}</strong> {" Comprehensive database of standardized CRC parameters"}</li>
-                                <li><strong>{"RFC 3385:"}</strong> {" Internet Protocol CRC calculation considerations"}</li>
-                                <li><strong>{"IEEE 802.3:"}</strong> {" Ethernet frame check sequence specification"}</li>
-                                <li><strong>{"ISO 3309:"}</strong> {" Data communication CRC procedures"}</li>
+                                {
+                                    ToolCategoryManager::get_related_tools("crc")
+                                        .iter()
+                                        .map(|tool| {
+                                            html! {
+                                                <li>
+                                                    <a href={format!("/{}/", tool.route_name)}>
+                                                        { &tool.display_name }
+                                                    </a>
+                                                    { " - " }
+                                                    { &tool.description }
+                                                </li>
+                                            }
+                                        })
+                                        .collect::<Html>()
+                                }
                             </ul>
                         </div>
                     </div>
@@ -1837,29 +1841,29 @@ bool validate_sensor_data(uint8_t *sensor_data) {
                             
                             <div style="display: flex; align-items: center; margin-bottom: 6px;">
                                 <div style="width: 70%; font-size: 13px;">
-                                    {"Input Method: "}
-                                </div>
-                                <select
-                                    id="input-mode-select"
+                                {"Input Method: "}
+                            </div>
+                            <select
+                                id="input-mode-select"
                                     style="width: 30%; padding: 2px; font-size: 12px;"
-                                    onchange={_ctx.link().callback(|e: Event| {
-                                        let value = e.target_unchecked_into::<web_sys::HtmlSelectElement>().value();
-                                        match value.as_str() {
-                                            "ascii" => Msg::ModeChanged(InputMode::Ascii),
-                                            "hex" => Msg::ModeChanged(InputMode::Hex),
+                                onchange={_ctx.link().callback(|e: Event| {
+                                    let value = e.target_unchecked_into::<web_sys::HtmlSelectElement>().value();
+                                    match value.as_str() {
+                                        "ascii" => Msg::ModeChanged(InputMode::Ascii),
+                                        "hex" => Msg::ModeChanged(InputMode::Hex),
                                             "binary" => Msg::ModeChanged(InputMode::Binary),
                                             "decimal" => Msg::ModeChanged(InputMode::Decimal),
                                             "octal" => Msg::ModeChanged(InputMode::Octal),
-                                            _ => unreachable!(),
-                                        }
-                                    })}>
-                                    <option value="ascii" selected={self.input_mode == InputMode::Ascii}>{ "ASCII" }</option>
-                                    <option value="hex" selected={self.input_mode == InputMode::Hex}>{ "HEX" }</option>
+                                        _ => unreachable!(),
+                                    }
+                                })}>
+                                <option value="ascii" selected={self.input_mode == InputMode::Ascii}>{ "ASCII" }</option>
+                                <option value="hex" selected={self.input_mode == InputMode::Hex}>{ "HEX" }</option>
                                     <option value="binary" selected={self.input_mode == InputMode::Binary}>{ "BINARY" }</option>
                                     <option value="decimal" selected={self.input_mode == InputMode::Decimal}>{ "DECIMAL" }</option>
                                     <option value="octal" selected={self.input_mode == InputMode::Octal}>{ "OCTAL" }</option>
-                                </select>
-                            </div>
+                            </select>
+                        </div>
                         </div>
                         
                         // Output Settings Section
@@ -1872,23 +1876,23 @@ bool validate_sensor_data(uint8_t *sensor_data) {
                             <div style="display: flex; align-items: center; margin-bottom: 6px;">
                                 <div style="width: 70%; font-size: 13px;">
                                     {"CRC Algorithm: "}
-                                </div>
-                                <select
-                                    style="width: 30%; padding: 2px; font-size: 12px;"
-                                    onchange={onchange_mode}>
-                                        {CrcAlgorithm::all().into_iter().map(|algorithm| {
-                                            let is_selected = algorithm == self.selected_algorithm;
-                                            html! {
-                                                <option
-                                                    value={algorithm.name().to_string()}
-                                                    selected={is_selected}
-                                                >
-                                                    { algorithm.name() }
-                                                </option>
-                                            }
-                                        }).collect::<Html>()}
-                                </select>
                             </div>
+                            <select
+                                    style="width: 30%; padding: 2px; font-size: 12px;"
+                                onchange={onchange_mode}>
+                                    {CrcAlgorithm::all().into_iter().map(|algorithm| {
+                                        let is_selected = algorithm == self.selected_algorithm;
+                                        html! {
+                                            <option
+                                                value={algorithm.name().to_string()}
+                                                selected={is_selected}
+                                            >
+                                                { algorithm.name() }
+                                            </option>
+                                        }
+                                    }).collect::<Html>()}
+                            </select>
+                        </div>
                             
                             <div style="display: flex; align-items: center; margin-bottom: 6px;">
                                 <div style="width: 70%; font-size: 13px;">
@@ -2262,12 +2266,12 @@ impl ToolCrc {
 
     fn calculate_crc(&mut self) {
         if self.bytes.is_empty() {
-            self.crc_result = 0;
+        self.crc_result = 0;
             return;
         }
 
-        (self.crc_result, self.width) = self.selected_algorithm.calculate(&self.bytes);
-    }
+                (self.crc_result, self.width) = self.selected_algorithm.calculate(&self.bytes);
+            }
 
     fn format_crc_output(&self) -> String {
         // 엔디안에 따라 바이트 순서 조정

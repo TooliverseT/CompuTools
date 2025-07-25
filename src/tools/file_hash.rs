@@ -14,6 +14,7 @@ use web_sys::Blob;
 use web_sys::{window, HtmlInputElement};
 use web_sys::{File, FileReader as WebFileReader, ProgressEvent};
 use yew::prelude::*;
+use crate::components::tool_category::ToolCategoryManager;
 
 // 청크 처리를 위한 상수 - 성능 향상을 위해 청크 크기 증가
 const CHUNK_SIZE: usize = 16 * 1024 * 1024;
@@ -396,9 +397,23 @@ impl Component for ToolFileHash {
 
                         <div class="content-section">
                             <h2>{"🔗 Related Tools"}</h2>
-                            <p>{"Enhance your workflow with this related tool:"}</p>
                             <ul>
-                                <li><a href="/crc/">{"CRC tool"}</a> {" - For calculating CRC checksums for data integrity verification."}</li>
+                                {
+                                    ToolCategoryManager::get_related_tools("file-hash")
+                                        .iter()
+                                        .map(|tool| {
+                                            html! {
+                                                <li>
+                                                    <a href={format!("/{}/", tool.route_name)}>
+                                                        { &tool.display_name }
+                                                    </a>
+                                                    { " - " }
+                                                    { &tool.description }
+                                                </li>
+                                            }
+                                        })
+                                        .collect::<Html>()
+                                }
                             </ul>
                         </div>
                     </div>

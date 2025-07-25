@@ -3,6 +3,7 @@ use std::f64::consts::PI;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use web_sys::{window, HtmlInputElement, HtmlSelectElement};
 use yew::prelude::*;
+use crate::components::tool_category::ToolCategoryManager;
 
 #[derive(Clone, PartialEq)]
 struct Quaternion {
@@ -222,9 +223,23 @@ Yaw: 0.0"#}
                             </div>
                             <div class="content-section">
                                 <h2>{"🔗 Related Tools"}</h2>
-                                <p>{"Explore more mathematical tools:"}</p>
                                 <ul>
-                                    <li><a href="/base/">{"Number Base Converter"}</a> {" - For converting numbers between different bases."}</li>
+                                    {
+                                        ToolCategoryManager::get_related_tools("quaternion")
+                                            .iter()
+                                            .map(|tool| {
+                                                html! {
+                                                    <li>
+                                                        <a href={format!("/{}/", tool.route_name)}>
+                                                            { &tool.display_name }
+                                                        </a>
+                                                        { " - " }
+                                                        { &tool.description }
+                                                    </li>
+                                                }
+                                            })
+                                            .collect::<Html>()
+                                    }
                                 </ul>
                             </div>
                         </div>

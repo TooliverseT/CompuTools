@@ -1,6 +1,7 @@
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{window, HtmlInputElement};
 use yew::prelude::*;
+use crate::components::tool_category::ToolCategoryManager;
 
 #[derive(Clone, PartialEq)]
 pub enum AsciiMode {
@@ -577,13 +578,23 @@ impl Component for ToolAscii {
 
                             <div class="content-section">
                                 <h2>{"🔗 Related Tools"}</h2>
-                                <p>{"Enhance your text processing workflow with these complementary tools:"}</p>
                                 <ul>
-                                    <li><a href="/base64/">{"Base64 Encoder/Decoder"}</a> {" - For binary-safe text encoding and data transmission"}</li>
-                                    <li><a href="/html/">{"HTML Entity Encoder"}</a> {" - For web-safe character encoding and HTML content"}</li>
-                                    <li><a href="/url/">{"URL Encoder/Decoder"}</a> {" - For URL-safe string encoding in web applications"}</li>
-                                    <li><a href="/json/">{"JSON Formatter"}</a> {" - For structured data formatting and validation"}</li>
-                                    <li><a href="/base/">{"Number Base Converter"}</a> {" - For converting between different number bases"}</li>
+                                    {
+                                        ToolCategoryManager::get_related_tools("ascii")
+                                            .iter()
+                                            .map(|tool| {
+                                                html! {
+                                                    <li>
+                                                        <a href={format!("/{}/", tool.route_name)}>
+                                                            { &tool.display_name }
+                                                        </a>
+                                                        { " - " }
+                                                        { &tool.description }
+                                                    </li>
+                                                }
+                                            })
+                                            .collect::<Html>()
+                                    }
                                 </ul>
                             </div>
                         </div>

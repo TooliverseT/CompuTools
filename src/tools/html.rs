@@ -1,8 +1,11 @@
 use yew::prelude::*;
 use html_escape::{encode_text, decode_html_entities, encode_unquoted_attribute};
-use web_sys::{window, HtmlInputElement};
+use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
+use web_sys::{window, HtmlInputElement};
+use yew::prelude::*;
 use log::info;
+use crate::components::tool_category::ToolCategoryManager;
 use regex::Regex;
 
 pub struct ToolHtml {
@@ -229,13 +232,23 @@ impl Component for ToolHtml {
 
                         <div class="content-section">
                             <h2>{"🔗 Related Tools"}</h2>
-                            <p>{"Enhance your workflow with these related tools:"}</p>
                             <ul>
-                                <li><a href="/base64/">{"Base64 Encoder/Decoder"}</a> {" - For binary-safe text encoding and data transmission."}</li>
-                                <li><a href="/ascii/">{"ASCII Converter"}</a> {" - For converting text to ASCII codes and vice versa."}</li>
-                                <li><a href="/url/">{"URL Encoder/Decoder"}</a> {" - For URL-safe string encoding in web applications."}</li>
-                                <li><a href="/json/">{"JSON Formatter"}</a> {" - For structured data formatting and validation."}</li>
-                                <li><a href="/base/">{"Number Base Converter"}</a> {" - For converting between different number bases."}</li>
+                                {
+                                    ToolCategoryManager::get_related_tools("html")
+                                        .iter()
+                                        .map(|tool| {
+                                            html! {
+                                                <li>
+                                                    <a href={format!("/{}/", tool.route_name)}>
+                                                        { &tool.display_name }
+                                                    </a>
+                                                    { " - " }
+                                                    { &tool.description }
+                                                </li>
+                                            }
+                                        })
+                                        .collect::<Html>()
+                                }
                             </ul>
                         </div>
                     </div>

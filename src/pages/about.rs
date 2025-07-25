@@ -1,5 +1,8 @@
 use yew::prelude::*;
+use yew_router::prelude::*;
 use web_sys::window;
+use crate::components::tool_category::ToolCategoryManager;
+use crate::pages::router::Route;
 
 pub struct About {}
 
@@ -12,6 +15,10 @@ impl Component for About {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
+        // 모든 툴을 가져와서 이름 순으로 정렬
+        let mut all_tools = ToolCategoryManager::get_all_tools();
+        all_tools.sort_by(|a, b| a.display_name.to_lowercase().cmp(&b.display_name.to_lowercase()));
+
         html! {
             <>
                 <div class="tool-wrapper ver2">
@@ -30,19 +37,21 @@ impl Component for About {
                                 { "Our platform provides a comprehensive collection of essential tools for developers, engineers, students, and professionals working with data conversion and computational tasks. Each tool is designed with precision, performance, and user experience in mind." }
                             </p>
                             
-                            <h3>{ "Our Tools Include:" }</h3>
+                            <h3>{ format!("Our {} Tools Include:", all_tools.len()) }</h3>
                             <ul>
-                                <li><strong>{ "Unix Timestamp Converter" }</strong>{ " - Convert between Unix timestamps and human-readable dates with timezone support" }</li>
-                                <li><strong>{ "Quaternion Converter" }</strong>{ " - Transform between quaternions and Euler angles for 3D rotations" }</li>
-                                <li><strong>{ "CRC Tool" }</strong>{ " - Generate CRC checksums using various algorithms for data integrity verification" }</li>
-                                <li><strong>{ "ASCII Converter" }</strong>{ " - Convert text to ASCII codes and vice versa in both decimal and hexadecimal formats" }</li>
-                                <li><strong>{ "JSON Formatter" }</strong>{ " - Format, validate, and beautify JSON data with customizable indentation" }</li>
-                                <li><strong>{ "Base64 Encoder/Decoder" }</strong>{ " - Encode and decode Base64 data for secure transmission" }</li>
-                                <li><strong>{ "Number Base Converter" }</strong>{ " - Convert numbers between various bases (binary, octal, decimal, hexadecimal, and more)" }</li>
-                                <li><strong>{ "File Hash Generator" }</strong>{ " - Calculate MD5, SHA-1, SHA-256, and SHA-512 hashes for file integrity" }</li>
-                                <li><strong>{ "HTML Encoder/Decoder" }</strong>{ " - Convert HTML entities for safe web content display" }</li>
-                                <li><strong>{ "URL Encoder/Decoder" }</strong>{ " - Encode and decode URLs for proper web transmission" }</li>
-                                <li><strong>{ "UUID Generator" }</strong>{ " - Generate version 4 UUIDs for unique identification" }</li>
+                                {
+                                    all_tools.iter().map(|tool| {
+                                        html! {
+                                            <li>
+                                                <Link<Route> to={Route::Page { title: tool.route_name.clone() }}>
+                                                    <strong>{ &tool.display_name }</strong>
+                                                </Link<Route>>
+                                                { " - " }
+                                                { &tool.description }
+                                            </li>
+                                        }
+                                    }).collect::<Html>()
+                                }
                             </ul>
                             
                             <h2>{ "Why Choose CompuTools?" }</h2>

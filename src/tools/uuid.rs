@@ -1,7 +1,9 @@
+use js_sys;
 use uuid::Uuid;
-use yew::prelude::*;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use web_sys::{window, HtmlInputElement, HtmlSelectElement};
+use yew::prelude::*;
+use crate::components::tool_category::ToolCategoryManager;
 
 pub struct ToolUuid {
     uuid: String,
@@ -111,10 +113,23 @@ impl Component for ToolUuid {
                         </div>
                         <div class="content-section">
                             <h2>{"🔗 Related Tools"}</h2>
-                            <p>{"Explore more tools for developers:"}</p>
                             <ul>
-                                <li><a href="/base/">{"Number Base Converter"}</a> {" - For converting numbers between different bases."}</li>
-                                <li><a href="/json/">{"JSON Formatter"}</a> {" - For formatting and validating JSON data."}</li>
+                                {
+                                    ToolCategoryManager::get_related_tools("uuid")
+                                        .iter()
+                                        .map(|tool| {
+                                            html! {
+                                                <li>
+                                                    <a href={format!("/{}/", tool.route_name)}>
+                                                        { &tool.display_name }
+                                                    </a>
+                                                    { " - " }
+                                                    { &tool.description }
+                                                </li>
+                                            }
+                                        })
+                                        .collect::<Html>()
+                                }
                             </ul>
                         </div>
                     </div>

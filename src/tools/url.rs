@@ -4,6 +4,7 @@ use urlencoding::{encode, decode};
 use web_sys::{window, HtmlInputElement};
 use wasm_bindgen_futures::JsFuture;
 use log::info;
+use crate::components::tool_category::ToolCategoryManager;
 
 pub struct ToolUrl {
     input_text: String,
@@ -135,12 +136,23 @@ impl Component for ToolUrl {
                         </div>
                         <div class="content-section">
                             <h2>{"🔗 Related Tools"}</h2>
-                            <p>{"Explore more tools for developers:"}</p>
                             <ul>
-                                <li><a href="/ascii/">{"ASCII Converter"}</a> {" - For converting text to ASCII codes and vice versa."}</li>
-                                <li><a href="/base64/">{"Base64 Encoder/Decoder"}</a> {" - For encoding and decoding data in Base64 format."}</li>
-                                <li><a href="/html/">{"HTML Entity Converter"}</a> {" - For encoding and decoding HTML entities."}</li>
-                                <li><a href="/json/">{"JSON Formatter"}</a> {" - For formatting and validating JSON data."}</li>
+                                {
+                                    ToolCategoryManager::get_related_tools("url")
+                                        .iter()
+                                        .map(|tool| {
+                                            html! {
+                                                <li>
+                                                    <a href={format!("/{}/", tool.route_name)}>
+                                                        { &tool.display_name }
+                                                    </a>
+                                                    { " - " }
+                                                    { &tool.description }
+                                                </li>
+                                            }
+                                        })
+                                        .collect::<Html>()
+                                }
                             </ul>
                         </div>
                     </div>

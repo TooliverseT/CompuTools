@@ -1,5 +1,6 @@
 use chrono::{
     DateTime, Datelike, FixedOffset, Local, NaiveDateTime, Offset, TimeZone, Timelike, Utc,
+    Weekday,
 };
 use chrono_tz::TZ_VARIANTS;
 use gloo_timers::callback::Interval;
@@ -10,6 +11,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::{spawn_local, JsFuture};
 use web_sys::{window, HtmlInputElement, HtmlSelectElement};
 use yew::prelude::*;
+use crate::components::tool_category::ToolCategoryManager;
 
 #[wasm_bindgen]
 extern "C" {
@@ -292,10 +294,24 @@ impl Component for ToolUnixtime {
                         </div>
                         <div class="content-section">
                             <h2>{"🔗 Related Tools"}</h2>
-                            <p>{"Explore more tools for developers:"}</p>
-                            // <ul>
-                            //     <li><a href="/base/">{"Base Converter"}</a> {" - For converting numbers between different bases."}</li>
-                            // </ul>
+                            <ul>
+                                {
+                                    ToolCategoryManager::get_related_tools("unix-timestamp")
+                                        .iter()
+                                        .map(|tool| {
+                                            html! {
+                                                <li>
+                                                    <a href={format!("/{}/", tool.route_name)}>
+                                                        { &tool.display_name }
+                                                    </a>
+                                                    { " - " }
+                                                    { &tool.description }
+                                                </li>
+                                            }
+                                        })
+                                        .collect::<Html>()
+                                }
+                            </ul>
                         </div>
                     </div>
                     <div class="tool-container">

@@ -4,6 +4,7 @@ use std::io::Cursor;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{window, HtmlInputElement};
 use yew::prelude::*;
+use crate::components::tool_category::ToolCategoryManager;
 
 pub struct ToolJson {
     input: String,
@@ -299,13 +300,23 @@ impl Component for ToolJson {
 
                         <div class="content-section">
                             <h2>{"🔗 Related Tools"}</h2>
-                            <p>{"Enhance your workflow with these related tools:"}</p>
                             <ul>
-                                <li><a href="/base64/">{"Base64 Encoder/Decoder"}</a> {" - For binary-safe text encoding and data transmission."}</li>
-                                <li><a href="/ascii/">{"ASCII Converter"}</a> {" - For converting text to ASCII codes and vice versa."}</li>
-                                <li><a href="/html/">{"HTML Entity Encoder"}</a> {" - For web-safe character encoding and HTML content."}</li>
-                                <li><a href="/url/">{"URL Encoder/Decoder"}</a> {" - For URL-safe string encoding in web applications."}</li>
-                                <li><a href="/base/">{"Number Base Converter"}</a> {" - For converting between different number bases."}</li>
+                                {
+                                    ToolCategoryManager::get_related_tools("json")
+                                        .iter()
+                                        .map(|tool| {
+                                            html! {
+                                                <li>
+                                                    <a href={format!("/{}/", tool.route_name)}>
+                                                        { &tool.display_name }
+                                                    </a>
+                                                    { " - " }
+                                                    { &tool.description }
+                                                </li>
+                                            }
+                                        })
+                                        .collect::<Html>()
+                                }
                             </ul>
                         </div>
                     </div>
