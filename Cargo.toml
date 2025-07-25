@@ -34,3 +34,5 @@ indexmap = "2.8.0"
 html-escape = "0.2.13"
 urlencoding = "2.1.0"
 uuid = { version = "1", features = ["v4", "js"] }
+hex = "0.4"
+hmac = "0.12"

@@ -1687,12 +1687,13 @@ impl Component for ToolBase64 {
                                     >
                                         if let Some(file_info) = &self.file_info {
                                             // 파일이 업로드된 상태
-                                            <div style="display: flex; align-items: center; justify-content: space-between;">
-                                                <div style="display: flex; align-items: center; flex: 1;">
+                                            <div>
+                                                // 첫 번째 행: 파일 정보
+                                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                                     <span style="font-size: 20px; margin-right: 8px;">
                                                         { Self::get_file_icon(&file_info.mime_type) }
                                                     </span>
-                                                    <div style="text-align: left;">
+                                                    <div style="text-align: left; overflow-y: auto;">
                                                         <div style="font-weight: bold; color: var(--color-font);">
                                                             { &file_info.name }
                                                         </div>
@@ -1701,12 +1702,15 @@ impl Component for ToolBase64 {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <button 
-                                                    type="button"
-                                                    style="background: var(--color-error); color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;"
-                                                    onclick={_ctx.link().callback(|_| Msg::ClearFile)}>
-                                                    { "Remove" }
-                                                </button>
+                                                // 두 번째 행: Remove 버튼
+                                                <div style="display: flex; justify-content: center;">
+                                                    <button 
+                                                        type="button"
+                                                        style="background: var(--color-error); color: white; border: none; border-radius: 4px; padding: 8px 16px; cursor: pointer;"
+                                                        onclick={_ctx.link().callback(|_| Msg::ClearFile)}>
+                                                        { "Remove" }
+                                                    </button>
+                                                </div>
                                             </div>
                                             if self.is_loading {
                                                 <div style="margin-top: 10px; color: var(--color-subfont);">
