@@ -37,7 +37,7 @@ impl Component for Thumbnail {
             "quaternion" => "Quaternion Converter",
             "crc" => "CRC Tool",
             "ascii" => "ASCII Converter",
-            "json" => "JSON Formatter",
+            "json" => "JSON Formatter & Converter",
             "base64" => "Base64 Encoder/Decoder",
             "base" => "Number Base Converter",
             "file-hash" => "File Hash Generator",

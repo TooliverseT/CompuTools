@@ -100,7 +100,7 @@ impl ToolCategoryManager {
             },
             ToolInfo {
                 route_name: "json".to_string(),
-                display_name: "JSON Formatter".to_string(),
+                display_name: "JSON Formatter & Converter".to_string(),
                 description: "Format, validate, minify and beautify JSON data with error detection".to_string(),
                 category: ToolCategory::TextEncoding,
                 tags: vec!["json", "format", "validate", "beautify", "parse", "minify", "pretty"].iter().map(|s| s.to_string()).collect(),
