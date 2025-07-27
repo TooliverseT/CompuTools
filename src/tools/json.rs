@@ -6,7 +6,6 @@ use wasm_bindgen_futures::JsFuture;
 use web_sys::{window, HtmlInputElement, Storage};
 use yew::prelude::*;
 use crate::components::tool_category::ToolCategoryManager;
-use jsonschema::{JSONSchema, Draft};
 
 #[derive(Clone, PartialEq)]
 pub enum JsonViewMode {
@@ -14,7 +13,6 @@ pub enum JsonViewMode {
     TreeView,
     Yaml,
     Table,
-    SchemaValidation,
 }
 
 #[derive(Clone, PartialEq)]
@@ -54,7 +52,6 @@ pub struct ToolJson {
     expanded_nodes: HashSet<String>,
     view_mode: JsonViewMode,
     table_state: TableState,
-    schema_input: String,
 }
 
 pub enum Msg {
@@ -68,7 +65,6 @@ pub enum Msg {
     ChangePage(usize),
     ChangeRowsPerPage(usize),
     UpdateSearchQuery(String),
-    UpdateSchemaInput(String),
 }
 
 impl Component for ToolJson {
@@ -160,7 +156,6 @@ impl Component for ToolJson {
                     "tree" => JsonViewMode::TreeView,
                     "yaml" => JsonViewMode::Yaml,
                     "table" => JsonViewMode::Table,
-                    "schema" => JsonViewMode::SchemaValidation,
                     _ => JsonViewMode::Formatted, // Default to formatted
                 };
                 self.show_tree_view = self.view_mode == JsonViewMode::TreeView;
@@ -206,12 +201,6 @@ impl Component for ToolJson {
             Msg::UpdateSearchQuery(query) => {
                 self.table_state.search_query = query;
                 self.table_state.current_page = 0; // 검색어 변경 시 첫 페이지로 이동
-                true
-            }
-            Msg::UpdateSchemaInput(schema_input) => {
-                self.schema_input = schema_input;
-                self.validate_json_against_schema();
-                self.save_to_storage();
                 true
             }
         }
@@ -743,7 +732,6 @@ impl Component for ToolJson {
                                     <option value="yaml" selected={self.view_mode == JsonViewMode::Yaml}>{ "YAML View" }</option>
                                     <option value="tree" selected={self.view_mode == JsonViewMode::TreeView}>{ "Tree View" }</option>
                                     <option value="table" selected={self.view_mode == JsonViewMode::Table}>{ "Table View" }</option>
-                                    <option value="schema" selected={self.view_mode == JsonViewMode::SchemaValidation}>{ "Schema Validation" }</option>
                                 </select>
                             </div>
                         </div>
@@ -843,8 +831,6 @@ impl Component for ToolJson {
                                         { "YAML Output" }
                                     } else if self.view_mode == JsonViewMode::Table {
                                         { "JSON Table View" }
-                                    } else if self.view_mode == JsonViewMode::SchemaValidation {
-                                        { "Schema Validation" }
                                     } else {
                                         { "Formatted JSON" }
                                     }
@@ -867,10 +853,6 @@ impl Component for ToolJson {
                                         <div style="min-height: 350px; max-height: 600px; overflow-y: auto; border: 1px solid var(--color-border); border-radius: 5px; padding: 10px; background-color: var(--color-bg);">
                                             { self.render_tree_view(_ctx) }
                                 </div>
-                                    } else if self.view_mode == JsonViewMode::SchemaValidation {
-                                        <div style="min-height: 350px; max-height: 600px; overflow-y: auto; border: 1px solid var(--color-border); border-radius: 5px; padding: 10px; background-color: var(--color-bg);">
-                                            { self.render_schema_validation(_ctx) }
-                                        </div>
                                     } else {
                                         <div style="min-height: 350px; max-height: 600px; overflow-y: auto; border: 1px solid var(--color-border); border-radius: 5px; padding: 10px; background-color: var(--color-bg);">
                                             { self.render_table_view(_ctx) }
@@ -929,7 +911,6 @@ impl ToolJson {
             "tree" => JsonViewMode::TreeView,
             "yaml" => JsonViewMode::Yaml,
             "table" => JsonViewMode::Table,
-            "schema" => JsonViewMode::SchemaValidation,
             _ => JsonViewMode::Formatted,
         };
 
@@ -951,7 +932,6 @@ impl ToolJson {
                 rows_per_page: 5,
                 search_query: String::new(),
             },
-            schema_input: String::new(),
         }
     }
 
@@ -964,7 +944,6 @@ impl ToolJson {
                 JsonViewMode::TreeView => "tree",
                 JsonViewMode::Yaml => "yaml",
                 JsonViewMode::Table => "table",
-                JsonViewMode::SchemaValidation => "schema",
             };
             let _ = storage.set_item(Self::STORAGE_KEY_VIEW_MODE, view_mode_str);
         }
@@ -1435,107 +1414,6 @@ impl ToolJson {
                 
                 <div style="font-size: 12px; color: var(--color-subfont);">
                     { format!("Page {} of {}", current_page + 1, total_pages) }
-                </div>
-            </div>
-        }
-    }
-
-    fn validate_json_against_schema(&mut self) {
-        if self.schema_input.trim().is_empty() || self.input.trim().is_empty() {
-            self.output = "Please provide both JSON Schema and JSON data for validation.".to_string();
-            self.error = None;
-            return;
-        }
-
-        // Parse schema
-        let schema_value = match serde_json::from_str::<serde_json::Value>(&self.schema_input) {
-            Ok(value) => value,
-            Err(err) => {
-                self.output.clear();
-                self.error = Some(format!("Invalid JSON Schema: {}", err));
-                return;
-            }
-        };
-
-        // Parse input JSON
-        let json_value = match serde_json::from_str::<serde_json::Value>(&self.input) {
-            Ok(value) => value,
-            Err(err) => {
-                self.output.clear();
-                self.error = Some(format!("Invalid JSON data: {}", err));
-                return;
-            }
-        };
-
-        // Create JSONSchema instance
-        let schema = match JSONSchema::options()
-            .with_draft(Draft::Draft202012)
-            .compile(&schema_value) {
-            Ok(schema) => schema,
-            Err(err) => {
-                self.output.clear();
-                self.error = Some(format!("Invalid JSON Schema: {}", err));
-                return;
-            }
-        };
-
-        // Validate JSON against schema
-        let validation_result = schema.validate(&json_value);
-        
-        if validation_result.is_ok() {
-            self.output = "✅ JSON data is valid according to the schema!".to_string();
-            self.error = None;
-        } else {
-            let mut error_messages = Vec::new();
-            for error in validation_result.unwrap_err() {
-                error_messages.push(format!("- {}: {}", error.instance_path, error));
-            }
-            self.output = format!("❌ JSON data is invalid according to the schema:\n\n{}", 
-                error_messages.join("\n"));
-            self.error = None;
-        }
-    }
-
-    fn render_schema_validation(&self, _ctx: &Context<Self>) -> Html {
-        html! {
-            <div>
-                <div class="tool-inner">
-                    <div>
-                        <div class="tool-subtitle" style="margin-bottom: 5px;">{ "JSON Schema" }</div>
-                        <textarea
-                            type="text"
-                            style="overflow-y: auto; overflow-x: hidden; height: 200px; white-space: pre-wrap; word-wrap: break-word;"
-                            wrap="off"
-                            value={self.schema_input.clone()}
-                            placeholder={"Enter JSON Schema here"}
-                            oninput={_ctx.link().callback(|e: InputEvent| {
-                                let input: HtmlInputElement = e.target_unchecked_into();
-                                Msg::UpdateSchemaInput(input.value())
-                            })}
-                        />
-                    </div>
-                </div>
-                <div>
-                    <div style="display: flex; align-items: center; padding-left: 20px; padding-right: 20px; margin-bottom: 10px; margin-top: 20px;">
-                        <div class="tool-subtitle" style="width: 40%; margin-bottom: 0px;">
-                            { "Validation Result" }
-                        </div>
-                    </div>
-                    <div class="tool-inner">
-                        <div>
-                            <textarea
-                                type="text"
-                                readonly=true
-                                wrap="off"
-                                style="cursor: pointer; overflow: auto; height: 200px; white-space: pre-wrap; word-wrap: break-word;"
-                                value={self.view_output()}
-                                onclick={_ctx.link().callback(|e: MouseEvent| {
-                                    let input: HtmlInputElement = e.target_unchecked_into();
-                                    Msg::CopyToClipboard(input.value())
-                                })}
-                            />
-                        </div>
-                    </div>
                 </div>
             </div>
         }
