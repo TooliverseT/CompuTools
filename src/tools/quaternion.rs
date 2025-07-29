@@ -20,6 +20,27 @@ struct EulerAngles {
     yaw: f64,
 }
 
+#[derive(Clone, PartialEq)]
+pub enum ValidationError {
+    InvalidNumber(String),
+    OutOfRange(String, f64, f64),
+    ZeroQuaternion,
+    InvalidQuaternionNorm,
+    EmptyInput,
+}
+
+impl ValidationError {
+    fn to_string(&self) -> String {
+        match self {
+            ValidationError::InvalidNumber(field) => format!("Invalid number format for {}", field),
+            ValidationError::OutOfRange(field, min, max) => format!("{} must be between {} and {}", field, min, max),
+            ValidationError::ZeroQuaternion => "Quaternion cannot be zero (all components zero)".to_string(),
+            ValidationError::InvalidQuaternionNorm => "Quaternion norm is too small (near zero)".to_string(),
+            ValidationError::EmptyInput => "Input field cannot be empty".to_string(),
+        }
+    }
+}
+
 pub struct ToolQuaternion {
     quaternion: Quaternion,
     quaternion_res: Quaternion,
@@ -28,6 +49,8 @@ pub struct ToolQuaternion {
     convert_euler: EulerAngles,
     euler_res: EulerAngles,
     convert_quat: Quaternion,
+    quaternion_errors: std::collections::HashMap<String, Option<ValidationError>>,
+    euler_errors: std::collections::HashMap<String, Option<ValidationError>>,
 }
 
 pub enum Msg {
@@ -42,6 +65,17 @@ impl Component for ToolQuaternion {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
+        let mut quaternion_errors = std::collections::HashMap::new();
+        quaternion_errors.insert("w".to_string(), None);
+        quaternion_errors.insert("x".to_string(), None);
+        quaternion_errors.insert("y".to_string(), None);
+        quaternion_errors.insert("z".to_string(), None);
+
+        let mut euler_errors = std::collections::HashMap::new();
+        euler_errors.insert("roll".to_string(), None);
+        euler_errors.insert("pitch".to_string(), None);
+        euler_errors.insert("yaw".to_string(), None);
+
         Self {
             quaternion: Quaternion {
                 w: 1.0,
@@ -77,6 +111,8 @@ impl Component for ToolQuaternion {
                 z: 0.0,
             },
             convert: false,
+            quaternion_errors,
+            euler_errors,
         }
     }
 
@@ -84,15 +120,36 @@ impl Component for ToolQuaternion {
         match msg {
             Msg::UpdateQuaternion(field, value) => {
                 let trimmed_value = value.trim();
+                
+                // 입력 검증
+                let validation_result = self.validate_quaternion_input(&field, &trimmed_value);
+                let error_option = validation_result.as_ref().err().cloned();
+                self.quaternion_errors.insert(field.clone(), error_option);
 
-                // 파싱된 값 (숫자 형식이 아니면 기존 값 유지)
-                if let Ok(parsed_value) = trimmed_value.parse::<f64>() {
+                // 유효한 경우에만 값 업데이트
+                if let Ok(parsed_value) = validation_result {
                     match field.as_str() {
                         "w" => self.quaternion.w = parsed_value,
                         "x" => self.quaternion.x = parsed_value,
                         "y" => self.quaternion.y = parsed_value,
                         "z" => self.quaternion.z = parsed_value,
                         _ => {}
+                    }
+                }
+
+                // 쿼터니언 전체 검증
+                let quaternion_validation = self.validate_quaternion(&self.quaternion);
+                if let Err(error) = quaternion_validation {
+                    // 전체 쿼터니언 에러를 모든 필드에 표시
+                    for field_name in ["w", "x", "y", "z"].iter() {
+                        self.quaternion_errors.insert(field_name.to_string(), Some(error.clone()));
+                    }
+                } else {
+                    // 개별 필드 에러만 유지
+                    for field_name in ["w", "x", "y", "z"].iter() {
+                        if !self.quaternion_errors.contains_key(*field_name) {
+                            self.quaternion_errors.insert(field_name.to_string(), None);
+                        }
                     }
                 }
 
@@ -103,8 +160,14 @@ impl Component for ToolQuaternion {
             }
             Msg::UpdateEuler(field, value) => {
                 let trimmed_value = value.trim();
+                
+                // 입력 검증
+                let validation_result = self.validate_euler_input(&field, &trimmed_value);
+                let error_option = validation_result.as_ref().err().cloned();
+                self.euler_errors.insert(field.clone(), error_option);
 
-                if let Ok(parsed_value) = trimmed_value.parse::<f64>() {
+                // 유효한 경우에만 값 업데이트
+                if let Ok(parsed_value) = validation_result {
                     match field.as_str() {
                         "roll" => self.convert_euler.roll = parsed_value,
                         "pitch" => self.convert_euler.pitch = parsed_value,
@@ -269,6 +332,11 @@ Yaw: 0.0"#}
                                                     placeholder=1
                                                     autocomplete="off"
                                                     step="any"
+                                                    style={if self.quaternion_errors.get("w").unwrap_or(&None).is_some() { 
+                                                        "overflow: auto;border: 2px solid var(--color-error);" 
+                                                    } else { 
+                                                        "overflow: auto;" 
+                                                    }}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("w".to_string(), input.value())
@@ -280,6 +348,11 @@ Yaw: 0.0"#}
                                                 </span>
                                             </div>
                                         </div>
+                                        if let Some(error) = self.quaternion_errors.get("w").unwrap_or(&None) {
+                                            <div style="color: var(--color-error); font-size: 12px; margin-top: 4px; line-height: 1.3;">
+                                                { error.to_string() }
+                                            </div>
+                                        }
                                     </div>
                                     <div>
                                         <div class="tool-subtitle" style="margin-top: 15px;">{ "X" }</div>
@@ -292,6 +365,11 @@ Yaw: 0.0"#}
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
+                                                    style={if self.quaternion_errors.get("x").unwrap_or(&None).is_some() { 
+                                                        "overflow: auto; border: 2px solid var(--color-error);" 
+                                                    } else { 
+                                                        "overflow: auto;" 
+                                                    }}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("x".to_string(), input.value())
@@ -303,6 +381,11 @@ Yaw: 0.0"#}
                                                 </span>
                                             </div>
                                         </div>
+                                        if let Some(error) = self.quaternion_errors.get("x").unwrap_or(&None) {
+                                            <div style="color: var(--color-error); font-size: 12px; margin-top: 4px; line-height: 1.3;">
+                                                { error.to_string() }
+                                            </div>
+                                        }
                                     </div>
                                     <div>
                                         <div class="tool-subtitle" style="margin-top: 15px;">{ "Y" }</div>
@@ -315,6 +398,11 @@ Yaw: 0.0"#}
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
+                                                    style={if self.quaternion_errors.get("y").unwrap_or(&None).is_some() { 
+                                                        "overflow: auto; border: 2px solid var(--color-error);" 
+                                                    } else { 
+                                                        "overflow: auto;" 
+                                                    }}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("y".to_string(), input.value())
@@ -326,6 +414,11 @@ Yaw: 0.0"#}
                                                 </span>
                                             </div>
                                         </div>
+                                        if let Some(error) = self.quaternion_errors.get("y").unwrap_or(&None) {
+                                            <div style="color: var(--color-error); font-size: 12px; margin-top: 4px; line-height: 1.3;">
+                                                { error.to_string() }
+                                            </div>
+                                        }
                                     </div>
                                     <div>
                                         <div class="tool-subtitle" style="margin-top: 15px;">{ "Z" }</div>
@@ -338,6 +431,11 @@ Yaw: 0.0"#}
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
+                                                    style={if self.quaternion_errors.get("z").unwrap_or(&None).is_some() { 
+                                                        "overflow: auto; border: 2px solid var(--color-error);" 
+                                                    } else { 
+                                                        "overflow: auto;" 
+                                                    }}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateQuaternion("z".to_string(), input.value())
@@ -349,6 +447,11 @@ Yaw: 0.0"#}
                                                 </span>
                                             </div>
                                         </div>
+                                        if let Some(error) = self.quaternion_errors.get("z").unwrap_or(&None) {
+                                            <div style="color: var(--color-error); font-size: 12px; margin-top: 4px; line-height: 1.3;">
+                                                { error.to_string() }
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                                 <div class="tool-inner" style="margin-top: 10px;">
@@ -405,6 +508,11 @@ Yaw: 0.0"#}
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
+                                                    style={if self.euler_errors.get("roll").unwrap_or(&None).is_some() { 
+                                                        "overflow: auto; border: 2px solid var(--color-error);" 
+                                                    } else { 
+                                                        "overflow: auto;" 
+                                                    }}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateEuler("roll".to_string(), input.value())
@@ -416,6 +524,11 @@ Yaw: 0.0"#}
                                                 </span>
                                             </div>
                                         </div>
+                                        if let Some(error) = self.euler_errors.get("roll").unwrap_or(&None) {
+                                            <div style="color: var(--color-error); font-size: 12px; margin-top: 4px; line-height: 1.3;">
+                                                { error.to_string() }
+                                            </div>
+                                        }
                                     </div>
                                     <div>
                                         <div class="tool-subtitle" style="margin-top: 15px;">{ "Pitch (radian)" }</div>
@@ -428,6 +541,11 @@ Yaw: 0.0"#}
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
+                                                    style={if self.euler_errors.get("pitch").unwrap_or(&None).is_some() { 
+                                                        "overflow: auto; border: 2px solid var(--color-error);" 
+                                                    } else { 
+                                                        "overflow: auto;" 
+                                                    }}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateEuler("pitch".to_string(), input.value())
@@ -439,6 +557,11 @@ Yaw: 0.0"#}
                                                 </span>
                                             </div>
                                         </div>
+                                        if let Some(error) = self.euler_errors.get("pitch").unwrap_or(&None) {
+                                            <div style="color: var(--color-error); font-size: 12px; margin-top: 4px; line-height: 1.3;">
+                                                { error.to_string() }
+                                            </div>
+                                        }
                                     </div>
                                     <div>
                                         <div class="tool-subtitle" style="margin-top: 15px;">{ "Yaw (radian)" }</div>
@@ -451,6 +574,11 @@ Yaw: 0.0"#}
                                                     placeholder=0
                                                     autocomplete="off"
                                                     step="any"
+                                                    style={if self.euler_errors.get("yaw").unwrap_or(&None).is_some() { 
+                                                        "overflow: auto; border: 2px solid var(--color-error);" 
+                                                    } else { 
+                                                        "overflow: auto;" 
+                                                    }}
                                                     oninput={_ctx.link().callback(|e: InputEvent| {
                                                         let input: HtmlInputElement = e.target_unchecked_into();
                                                         Msg::UpdateEuler("yaw".to_string(), input.value())
@@ -462,6 +590,11 @@ Yaw: 0.0"#}
                                                 </span>
                                             </div>
                                         </div>
+                                        if let Some(error) = self.euler_errors.get("yaw").unwrap_or(&None) {
+                                            <div style="color: var(--color-error); font-size: 12px; margin-top: 4px; line-height: 1.3;">
+                                                { error.to_string() }
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                                 <div class="tool-inner" style="margin-top: 10px;">
@@ -618,5 +751,46 @@ impl ToolQuaternion {
             norm_angle += 2.0 * PI;
         }
         norm_angle
+    }
+
+    fn validate_quaternion_input(&self, field: &str, value: &str) -> Result<f64, ValidationError> {
+        if value.trim().is_empty() {
+            return Err(ValidationError::EmptyInput);
+        }
+        if let Ok(num) = value.trim().parse::<f64>() {
+            if num.is_infinite() || num.is_nan() {
+                return Err(ValidationError::InvalidNumber(field.to_string()));
+            }
+            // 쿼터니언 컴포넌트는 일반적으로 큰 값도 허용 (정규화되므로)
+            Ok(num)
+        } else {
+            Err(ValidationError::InvalidNumber(field.to_string()))
+        }
+    }
+
+    fn validate_euler_input(&self, field: &str, value: &str) -> Result<f64, ValidationError> {
+        if value.trim().is_empty() {
+            return Err(ValidationError::EmptyInput);
+        }
+        if let Ok(num) = value.trim().parse::<f64>() {
+            if num.is_infinite() || num.is_nan() {
+                return Err(ValidationError::InvalidNumber(field.to_string()));
+            }
+            // Euler 각도는 일반적으로 -π에서 π 범위
+            if num < -PI || num > PI {
+                return Err(ValidationError::OutOfRange(field.to_string(), -PI, PI));
+            }
+            Ok(num)
+        } else {
+            Err(ValidationError::InvalidNumber(field.to_string()))
+        }
+    }
+
+    fn validate_quaternion(&self, q: &Quaternion) -> Result<(), ValidationError> {
+        let norm = (q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w).sqrt();
+        if norm < 1e-6 { // 작은 값으로 정의
+            return Err(ValidationError::InvalidQuaternionNorm);
+        }
+        Ok(())
     }
 }
